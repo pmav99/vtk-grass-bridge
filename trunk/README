@@ -1,0 +1,28 @@
+vtkGRASSBridge
+
+A bridge between the GRASS GIS library and VTK.
+
+The support is currently limited to the basic raster map functions of libgrass_gis.
+
+The library was successfully tested with VTK 5.2 and 5.4 and grass 6.4 RC5.
+
+The GRASS shared librareis as well as the VTK and vtkGRASSBridge
+libraries must be present in your LD_LIBRARY_PATH to use the vtkGRASSBridge
+functions in your C++ program.
+
+Python and Java support:
+To enable Python and Java support, you need a VTK installation with Python
+and Java support.
+The VTK Python and Java shared libraries as well as the vtkGRASSBridge libraries
+must be present in your LD_LIBRARY_PATH varaible.
+The VTK and vtkGRASSBridge Python libraries must be present in your PYTHONPATH.
+
+To use the vtkGRASSBridge in Java programs, the vtkGRASSBridge java classes
+must be included in the vtk.jar file.
+
+GRASS library linking:
+cmake tries to find the grass shared libraries and include files based on the paths
+specified in CMAKe/FindGRASS.cmake.
+Modify the paths listed there to your grass installation directory.
+
+Have fun :)

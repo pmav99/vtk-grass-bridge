@@ -1,0 +1,16 @@
+/**
+\mainpage vtkGRASSBridge
+
+The purpose of this library is to provide an interface between the grass C libraries and
+C++, Python and Java.
+It uses the VTK wrapper to support Python and Java.
+The support is currently limited to the basic raster map functions of libgrass_gis.
+
+The library was successfully tested with VTK 5.2 and 5.4 and grass 6.4 RC5.
+
+\author Soeren Gebbert
+\author Berlin, Germany Aug. 2009
+\date Aug 2009
+
+\anchor vtkGRASSBridge_mainpage
+*/
