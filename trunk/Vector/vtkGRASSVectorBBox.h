@@ -74,7 +74,7 @@ public:
        \return 1
      */
     virtual int Extent(vtkGRASSVectorBBox *Box) {
-        Vect_box_extend(&this->box, Box->GetPointer());
+        return Vect_box_extend(&this->box, Box->GetPointer());
     }
 
     /*!
@@ -84,7 +84,7 @@ public:
 
        \return 1 on success, 0 on error
      */
-    virtual int CopyBoxFromRegion(vtkGRASSRegion *region) {Vect_region_box(region->GetPointer(), &this->box);}
+    virtual int CopyBoxFromRegion(vtkGRASSRegion *region) {return Vect_region_box(region->GetPointer(), &this->box);}
 
     /*!
      * \brief Set the box values
