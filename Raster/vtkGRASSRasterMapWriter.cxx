@@ -82,9 +82,8 @@ bool vtkGRASSRasterMapWriter::OpenMap(char *name) {
 
 int vtkGRASSRasterMapWriter::PutNextRow(vtkDataArray *data) {
 
-    void *ptr;
     int i;
-    int size, ret;
+    int ret;
     char buff[1024];
 
     if (data == NULL) {
@@ -129,8 +128,6 @@ int vtkGRASSRasterMapWriter::PutNextRow(vtkDataArray *data) {
 
 bool vtkGRASSRasterMapWriter::CloseMap() {
 
-    struct History hist;
-    char typebuff[8];
 
     if (this->Open == true && this->Map != -1) {
         if (G_close_cell(this->Map) != 1) {

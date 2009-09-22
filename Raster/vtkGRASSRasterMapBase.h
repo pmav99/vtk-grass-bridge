@@ -61,10 +61,10 @@ public:
   vtkGetObjectMacro(History, vtkGRASSHistory);
 
   //! \brief open the map for reading or writing. This function must be implemented by the subclasses.
-  virtual bool OpenMap(char *name){};
+  virtual bool OpenMap(char *name){return false;}
 
   //! \brief close the map. Must be implemented in the subclass
-  virtual bool CloseMap(){};
+  virtual bool CloseMap(){return false;}
 
   //! \brief Read a row of the map and return the content as vtkDataArray
   virtual vtkDataArray *GetRow(int idx);
