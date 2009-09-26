@@ -19,7 +19,7 @@ from libvtkGraphicsPython import *
 from libvtkRenderingPython import *
 from libvtkIOPython import *
 from libvtkImagingPython import *
-from libvtkGRASSBridgeIOPython import *
+from libvtkGRASSBridgeRasterPython import *
 from libvtkGRASSBridgeCommonPython import *
 
 class GRASSRasterMapReaderWriterTest(unittest.TestCase):

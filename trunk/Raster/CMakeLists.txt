@@ -10,12 +10,14 @@ SET (IO_SRCS
 vtkGRASSRasterMapBase.cxx
 vtkGRASSRasterMapReader.cxx
 vtkGRASSRasterMapWriter.cxx
+vtkGRASSHistory.cxx
 )
 
 SET (IO_H
 vtkGRASSRasterMapBase.h
 vtkGRASSRasterMapReader.h
 vtkGRASSRasterMapWriter.h
+vtkGRASSHistory.h
 vtkGRASSBridgeRasterWin32Header.h
 )
 

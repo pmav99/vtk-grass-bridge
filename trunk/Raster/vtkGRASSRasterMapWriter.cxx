@@ -65,7 +65,7 @@ bool vtkGRASSRasterMapWriter::OpenMap(char *name) {
     this->SetRegion();
 
     /* open raster map */
-    this->Map = G_open_raster_new(this->RasterName, this->MapType);
+    this->Map = Rast_open_new(this->RasterName, this->MapType);
     if (this->Map < 0) {
         G_snprintf(buff, 1024, "class: %s line: %i Unable to open new raster map %s.",
                 this->GetClassName(), __LINE__, this->RasterName);
@@ -113,7 +113,7 @@ int vtkGRASSRasterMapWriter::PutNextRow(vtkDataArray *data) {
             ((DCELL*)this->RasterBuff)[i] = (DCELL)data->GetTuple1(i);
     }
 
-    this->RowCount = G_put_raster_row(this->Map, this->RasterBuff, this->MapType);
+    this->RowCount = Rast_put_row(this->Map, this->RasterBuff, this->MapType);
     if (this->RowCount < 0) {
         G_snprintf(buff, 1024, "class: %s line: %i Unable to put row %i.",
                 this->GetClassName(), __LINE__, ret);
@@ -130,7 +130,7 @@ bool vtkGRASSRasterMapWriter::CloseMap() {
 
 
     if (this->Open == true && this->Map != -1) {
-        if (G_close_cell(this->Map) != 1) {
+        if (Rast_close(this->Map) != 1) {
             char buff[1024];
             G_snprintf(buff, 1024, "class: %s line: %i Unable to close raster map %s.",
                     this->GetClassName(), __LINE__, this->RasterName);
@@ -156,7 +156,7 @@ bool vtkGRASSRasterMapWriter::CloseMap() {
 
     if(!this->History->WriteHistory(this->RasterName))
     {
-        if (G_close_cell(this->Map) != 1) {
+        if (Rast_close(this->Map) != 1) {
             char buff[1024];
             G_snprintf(buff, 1024, "class: %s line: %i %s.",
                     this->GetClassName(), __LINE__, this->History->GetError());

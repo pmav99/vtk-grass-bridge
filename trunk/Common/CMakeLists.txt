@@ -12,7 +12,6 @@ vtkGRASSFileLister.cxx
 vtkGRASSRasterMapLister.cxx
 vtkGRASSVectorMapLister.cxx
 vtkGRASSRegion.cxx
-vtkGRASSHistory.cxx
 vtkObjectGRASSErrorHandler.cxx
 vtkGRASSInit.cxx
 )
@@ -23,7 +22,6 @@ vtkGRASSFileLister.h
 vtkGRASSRasterMapLister.h
 vtkGRASSVectorMapLister.h
 vtkGRASSRegion.h
-vtkGRASSHistory.h
 vtkGRASSInit.h
 vtkObjectGRASSErrorHandler.h
 vtkGRASSBridgeCommonWin32Header.h
@@ -34,7 +32,7 @@ vtkGRASSBridgeCommonWin32Header.h
 
 # Create the vtkGRASSBridgeCommon C++ library.
 ADD_LIBRARY (vtkGRASSBridgeCommon ${Common_SRCS}  ${Common_H})
-TARGET_LINK_LIBRARIES(vtkGRASSBridgeCommon vtkCommon ${GRASS_gis_LIBRARY}  ${GRASS_vect_LIBRARY})
+TARGET_LINK_LIBRARIES(vtkGRASSBridgeCommon vtkCommon ${GRASS_gis_LIBRARY} ${GRASS_raster_LIBRARY} ${GRASS_vector_LIBRARY})
 #TARGET_LINK_LIBRARIES(vtkGRASSBridgeCommon vtkCommon)
 
 # Create the vtkGRASSBridgeCommon Java library.

@@ -21,7 +21,7 @@
 
 extern "C" {
 #include <grass/gis.h>
-#include <grass/Vect.h>
+#include <grass/vector.h>
 }
 class vtkGRASSVectorBBox;
 
@@ -219,8 +219,8 @@ public:
     /*!\brief Set the Number of points to zero
      \return 0
      */
-    virtual int Reset() {
-        return Vect_reset_line(this->points);
+    virtual void Reset() {
+        Vect_reset_line(this->points);
     }
 
     /*! \brief Return the number of points

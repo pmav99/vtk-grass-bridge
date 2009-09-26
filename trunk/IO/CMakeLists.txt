@@ -26,7 +26,7 @@ vtkGRASSBridgeIOWin32Header.h
 
 # Create the vtkGRASSBridgeIO C++ library.
 ADD_LIBRARY (vtkGRASSBridgeIO ${IO_SRCS}  ${IO_H})
-TARGET_LINK_LIBRARIES(vtkGRASSBridgeIO vtkGRASSBridgeCommon vtkGRASSBridgeRaster vtkGRASSBridgeVector vtkIO vtkFiltering vtkCommon vtkImaging ${GRASS_gis_LIBRARY})
+TARGET_LINK_LIBRARIES(vtkGRASSBridgeIO vtkGRASSBridgeCommon vtkGRASSBridgeRaster vtkGRASSBridgeVector vtkIO vtkFiltering vtkCommon vtkImaging ${GRASS_gis_LIBRARY} ${GRASS_raster_LIBRARY} ${GRASS_vector_LIBRARY})
 #TARGET_LINK_LIBRARIES(vtkGRASSBridgeIO vtkIO)
 
 # Create the vtkGRASSBridgeIO Java library.

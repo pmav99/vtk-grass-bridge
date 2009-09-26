@@ -87,7 +87,7 @@ bool vtkGRASSRasterMapBase::SetRegion() {
         G_set_window(&head);
         this->Region->CopyRegionFrom(&head);
     } else if (this->RegionUsage == VTK_GRASS_REGION_RASTER) {
-        G_get_cellhd(this->GetRasterName(), this->GetMapset(), &head);
+        Rast_get_cellhd(this->GetRasterName(), this->GetMapset(), &head);
         G_set_window(&head);
         this->Region->CopyRegionFrom(&head);
     } else if (this->RegionUsage == VTK_GRASS_REGION_USER && this->Region != NULL) {
@@ -129,12 +129,12 @@ bool vtkGRASSRasterMapBase::SetUpRasterBuffer() {
             this->Row = vtkDoubleArray::New();
 
         this->Row->SetNumberOfTuples(this->NumberOfCols);
-        this->MapType = G_get_raster_map_type(this->Map);
+        this->MapType = Rast_get_map_type(this->Map);
     }
 
     if (this->RasterBuff == NULL)
     {
-        this->RasterBuff = G_allocate_raster_buf(this->MapType);
+        this->RasterBuff = Rast_allocate_buf(this->MapType);
     }
 
     return true;
@@ -159,7 +159,7 @@ vtkDataArray *vtkGRASSRasterMapBase::GetRow(int idx) {
 
     this->SetUpRasterBuffer();
 
-    if (G_get_raster_row(this->Map, this->RasterBuff, idx, this->MapType) < 0) {
+    if (Rast_get_row(this->Map, this->RasterBuff, idx, this->MapType) < 0) {
         G_snprintf(buff, 1024, "class: %s line: %i Unable to read row %i.",
                 this->GetClassName(), __LINE__, idx);
         this->InsertNextError(buff);
@@ -167,7 +167,7 @@ vtkDataArray *vtkGRASSRasterMapBase::GetRow(int idx) {
     }
 
     // copy data
-    size = G_raster_size(this->MapType);
+    size = Rast_cell_size(this->MapType);
     ptr = this->RasterBuff;
     
     if (this->MapType == CELL_TYPE)
