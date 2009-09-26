@@ -11,35 +11,33 @@
 #  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 #  GNU General Public License for more details.
 
-import unittest
-import os
+# The purpose of this example is to demonstrate 
+# the to read a grass vector map without topology information
+# into the VTK poly data format and processing that map with vtkDelaunay2D.
+# The processed data is written as VTK XML file to the file system
+
 from libvtkCommonPython import *
 from libvtkFilteringPython import *
 from libvtkGraphicsPython import *
-from libvtkRenderingPython import *
 from libvtkIOPython import *
 from libvtkImagingPython import *
 from libvtkGRASSBridgeIOPython import *
 from libvtkGRASSBridgeVectorPython import *
 from libvtkGRASSBridgeCommonPython import *
 
-class GRASSRasterSourceTest(unittest.TestCase):
+# Init grass variables
+init = vtkGRASSInit()
 
-    def testSmoke(self):
-        init = vtkGRASSInit()
-        rs = vtkGRASSVectorPolyDataReader()
-        rs.SetVectorName("elev_lid792_randpts")
-
-	delaunay = vtkDelaunay2D()
-	delaunay.SetInputConnection(rs.GetOutputPort())
-
-        writer = vtkPolyDataWriter()
-        writer.SetFileName("/tmp/test.vtk")
-        writer.SetInputConnection(delaunay.GetOutputPort())
-        writer.Write()
-
-
-if __name__ == '__main__':
-    suite = unittest.TestLoader().loadTestsFromTestCase(GRASSRasterSourceTest)
-    unittest.TextTestRunner(verbosity=2).run(suite)
+# Now build the pipeline
+# read the vector map without creating topology
+reader = vtkGRASSVectorPolyDataReader() # The reader does not need topology information
+reader.SetVectorName("elev_lid792_randpts")
+# start the delaunay triangulation
+delaunay = vtkDelaunay2D()
+delaunay.SetInputConnection(reader.GetOutputPort())
+# write the data as XML with base64 encoding
+writer = vtkXMLPolyDataWriter()
+writer.SetFileName("/tmp/test.vtk")
+writer.SetInputConnection(delaunay.GetOutputPort())
+writer.Write()
 
