@@ -22,6 +22,7 @@
 
 extern "C" {
 #include <grass/gis.h>
+#include <grass/raster.h>
 #include <math.h>
 }
 
@@ -73,10 +74,10 @@ int vtkGRASSRasterToImageReader::RequestInformation(
         vtkInformationVector *outputVector) {
 
     struct Cell_head head;
-    char *mapset;
+    const char *mapset;
 
     // Open the ratser map
-    mapset = G_find_cell2(this->GetRasterName(), "");
+    mapset = G_find_raster2(this->GetRasterName(), "");
     if (mapset == NULL) {
         fprintf(stderr, "Rasterfile %s not found", this->GetRasterName());
         return -1;
@@ -98,7 +99,7 @@ int vtkGRASSRasterToImageReader::RequestInformation(
     else if(this->RegionUsage == VTK_GRASS_REGION_RASTER)
     {
         cout << "VTK_GRASS_REGION_RASTER" << endl;
-        G_get_cellhd(this->GetRasterName(), this->GetMapset(), &head);
+        Rast_get_cellhd(this->GetRasterName(), this->GetMapset(), &head);
         G_set_window(&head);
     }
     else if(this->RegionUsage == VTK_GRASS_REGION_USER && this->Region != NULL)
@@ -153,12 +154,12 @@ void vtkGRASSRasterToImageReaderExecute(vtkGRASSRasterToImageReader *self,
     int rowcount = outExt[3];
 
     /* open raster map */
-    fd = G_open_cell_old(self->GetRasterName(), self->GetMapset());
+    fd = Rast_open_old(self->GetRasterName(), self->GetMapset());
     if (fd < 0)
 	    fprintf(stderr, "Unable to open raster map <%s>", self->GetRasterName());
 
-    out_type = G_get_raster_map_type(fd);
-    raster = G_allocate_raster_buf(out_type);
+    out_type = Rast_get_map_type(fd);
+    raster = Rast_allocate_buf(out_type);
 
     // Get increments to march through data
     data->GetContinuousIncrements(outExt, outIncX, outIncY, outIncZ);
@@ -168,13 +169,13 @@ void vtkGRASSRasterToImageReaderExecute(vtkGRASSRasterToImageReader *self,
     for (idxZ = outExt[4]; idxZ <= outExt[5]; idxZ++) {
         for (idxY = outExt[2]; !self->GetAbortExecute() && idxY <= outExt[3]; idxY++) {
 
-            if (G_get_raster_row(fd, raster, rowcount, out_type) < 0) {
+            if (Rast_get_row(fd, raster, rowcount, out_type) < 0) {
                 fprintf(stderr, "Unable to read row %i\n", rowcount);
 	    return;
             }
             rowcount--;
 
-            for (idxX = outExt[0], ptr = raster; idxX <= outExt[1]; idxX++, ptr = G_incr_void_ptr(ptr, G_raster_size(out_type))) {
+            for (idxX = outExt[0], ptr = raster; idxX <= outExt[1]; idxX++, ptr = G_incr_void_ptr(ptr, Rast_cell_size(out_type))) {
                 *outPtr++ = self->GetRasterValueAsDouble(out_type, ptr, 0);
             }
             outPtr += outIncY;
@@ -182,7 +183,7 @@ void vtkGRASSRasterToImageReaderExecute(vtkGRASSRasterToImageReader *self,
         outPtr += outIncZ;
     }
 
-    G_close_cell(fd);
+    Rast_close(fd);
 
 }
 
@@ -231,7 +232,7 @@ double vtkGRASSRasterToImageReader::GetRasterValueAsDouble(int MapType, void *pt
     double val = nullval;
 
     if (MapType == CELL_TYPE) {
-	if (G_is_null_value(ptr, MapType)) {
+	if (Rast_is_null_value(ptr, MapType)) {
 	    val = nullval;
 	}
 	else {
@@ -239,7 +240,7 @@ double vtkGRASSRasterToImageReader::GetRasterValueAsDouble(int MapType, void *pt
 	}
     }
     if (MapType == FCELL_TYPE) {
-	if (G_is_null_value(ptr, MapType)) {
+	if (Rast_is_null_value(ptr, MapType)) {
 	    val = nullval;
 	}
 	else {
@@ -247,7 +248,7 @@ double vtkGRASSRasterToImageReader::GetRasterValueAsDouble(int MapType, void *pt
 	}
     }
     if (MapType == DCELL_TYPE) {
-	if (G_is_null_value(ptr, MapType)) {
+	if (Rast_is_null_value(ptr, MapType)) {
 	    val = nullval;
 	}
 	else {

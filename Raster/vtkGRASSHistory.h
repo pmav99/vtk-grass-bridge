@@ -25,14 +25,15 @@
 #ifndef __vtkGRASSHistory_h
 #define __vtkGRASSHistory_h
 
-#include "vtkGRASSBridgeCommonWin32Header.h"
+#include "vtkGRASSBridgeRasterWin32Header.h"
 #include "vtkObjectGRASSErrorHandler.h"
 
 extern "C" {
 #include <grass/gis.h>
+#include <grass/raster.h>
 }
 
-class VTK_GRASS_BRIDGE_COMMON_EXPORT vtkGRASSHistory : public vtkObjectGRASSErrorHandler
+class VTK_GRASS_BRIDGE_RASTER_EXPORT vtkGRASSHistory : public vtkObjectGRASSErrorHandler
 {
 public:
   static vtkGRASSHistory *New();

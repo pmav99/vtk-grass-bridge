@@ -25,7 +25,7 @@ class vtkGRASSVectorBBox;
 
 extern "C" {
 #include <grass/gis.h>
-#include <grass/Vect.h>
+#include <grass/vector.h>
 }
 
 class VTK_GRASS_BRIDGE_VECTOR_EXPORT vtkGRASSVectorMapBase : public vtkObjectGRASSErrorHandler {

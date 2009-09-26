@@ -68,7 +68,7 @@ bool vtkGRASSRegion::ReadDefaultRegion() {
 
 bool vtkGRASSRegion::ReadRegion(char *regionName) {
 
-    char * mapset;
+    const char * mapset;
     char buff[1024];
 
     this->SetName(regionName);
@@ -113,7 +113,7 @@ bool vtkGRASSRegion::ReadRegion(char *regionName) {
 
 bool vtkGRASSRegion::SaveRegion(char *regionName) {
 
-    char *message;
+    const char *message;
     char buff[1024];
 
     this->SetName(regionName);
@@ -158,7 +158,7 @@ bool vtkGRASSRegion::SaveRegion(char *regionName) {
 //----------------------------------------------------------------------------
 
 bool vtkGRASSRegion::SaveRegionAsDefault() {
-    char *message;
+    const char *message;
     char buff[1024];
 
     this->CopyRegionTo(&this->head);
@@ -186,7 +186,7 @@ bool vtkGRASSRegion::SaveRegionAsDefault() {
 //----------------------------------------------------------------------------
 
 bool vtkGRASSRegion::AdjustRegion() {
-    char *message;
+    const char *message;
     char buff[1024];
 
     this->CopyRegionTo(&this->head);

@@ -29,7 +29,7 @@ vtkStandardNewMacro(vtkGRASSRasterMapReader);
 bool
 vtkGRASSRasterMapReader::OpenMap(char *name)
 {
-    char *mapset;
+    const char *mapset;
     char buff[1024];
 
     // Check if the same map is already opened
@@ -46,7 +46,7 @@ vtkGRASSRasterMapReader::OpenMap(char *name)
 
     this->SetRasterName(name);
 
-    mapset = G_find_cell2(this->GetRasterName(), "");
+    mapset = G_find_raster2(this->GetRasterName(), "");
     if (mapset == NULL)
     {
         G_snprintf(buff, 1024, "class: %s line: %i Raster map %s not found.",
@@ -61,7 +61,7 @@ vtkGRASSRasterMapReader::OpenMap(char *name)
     this->SetRegion();
 
     /* open raster map */
-    this->Map = G_open_cell_old(this->RasterName, this->Mapset);
+    this->Map = Rast_open_old(this->RasterName, this->Mapset);
     if (this->Map < 0)
     {
         G_snprintf(buff, 1024, "class: %s line: %i Unable to open raster map %s.",
@@ -103,7 +103,7 @@ vtkGRASSRasterMapReader::GetRange(double range[2])
     if (this->MapType == CELL_TYPE)
     {
         struct Range r;
-        if (G_read_range(this->RasterName, this->Mapset, &r) == -1)
+        if (Rast_read_range(this->RasterName, this->Mapset, &r) == -1)
         {
             G_snprintf(buff, 1024, "class: %s line: %i Unable to read raster map range.",
                        this->GetClassName(), __LINE__);
@@ -116,7 +116,7 @@ vtkGRASSRasterMapReader::GetRange(double range[2])
     else
     {
         struct FPRange r;
-        if (G_read_fp_range(this->RasterName, this->Mapset, &r) == -1)
+        if (Rast_read_fp_range(this->RasterName, this->Mapset, &r) == -1)
         {
             G_snprintf(buff, 1024, "class: %s line: %i Unable to read raster map range.",
                        this->GetClassName(), __LINE__);
@@ -136,7 +136,7 @@ vtkGRASSRasterMapReader::CloseMap()
 {
     if (this->Open == true && this->Map != -1)
     {
-        if (G_close_cell(this->Map) != 1)
+        if (Rast_close(this->Map) != 1)
         {
             char buff[1024];
             G_snprintf(buff, 1024, "class: %s line: %i Unable to close raster map %s.",
