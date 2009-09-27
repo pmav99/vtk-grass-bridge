@@ -19,6 +19,7 @@
 #include <vtkObjectFactory.h>
 #include <vtkGRASSVectorFeaturePoints.h>
 #include <vtkGRASSVectorFeatureCats.h>
+#include <vtkIntArray.h>
 
 
 vtkCxxRevisionMacro(vtkGRASSVectorMapTopoReader, "$Revision: 1.18 $");
@@ -71,6 +72,164 @@ void vtkGRASSVectorMapTopoReader::GetBoundingBox(vtkGRASSVectorBBox *box)
 }
 
 //----------------------------------------------------------------------------
+
+int vtkGRASSVectorMapTopoReader::GetAreaFromCentroid(int centroid)
+{
+    if(this->Open){
+        return Vect_get_centroid_area(&this->map, centroid);
+    }
+    return -1;
+}
+
+//----------------------------------------------------------------------------
+
+int vtkGRASSVectorMapTopoReader::GetAreaPoints(vtkGRASSVectorFeaturePoints *points, vtkGRASSVectorFeatureCats *cats, int area)
+{
+    if(this->Open){
+        Vect_get_area_cats(&this->map, area, cats->GetPointer());
+        return  Vect_get_area_points (&this->map, area, points->GetPointer());
+    }
+    return -1;
+}
+
+//----------------------------------------------------------------------------
+
+int vtkGRASSVectorMapTopoReader::GetAreaBoundaries(int area, vtkIntArray* boundaryids)
+{
+    ilist *ids = Vect_new_list();
+    int ret = -1;
+    int i;
+
+    boundaryids->Initialize();
+
+    if(this->Open){
+        ret = Vect_get_area_boundaries(&this->map, area, ids);
+
+        for(i = 0; i < ids->n_values; i++)
+        {
+            boundaryids->InsertNextValue(ids->value[i]);
+        }
+    }
+
+    Vect_destroy_list(ids);
+    return ret;
+}
+
+//----------------------------------------------------------------------------
+
+int vtkGRASSVectorMapTopoReader::GetIsleBoundaries(int isle, vtkIntArray* boundaryids)
+{
+    ilist *ids = Vect_new_list();
+    int ret = -1;
+    int i;
+
+    boundaryids->Initialize();
+
+    if(this->Open){
+        ret = Vect_get_isle_boundaries(&this->map, isle, ids);
+
+        for(i = 0; i < ids->n_values; i++)
+        {
+            boundaryids->InsertNextValue(ids->value[i]);
+        }
+    }
+
+    Vect_destroy_list(ids);
+    return ret;
+}
+
+//------------------------------------------------------------------------------
+
+int vtkGRASSVectorMapTopoReader::SelectLinesByBox(vtkGRASSVectorBBox *box, int type, vtkIntArray *ids)
+{
+    ilist *pids = Vect_new_list();
+    int ret = -1;
+    int i;
+
+    ids->Initialize();
+
+    if(this->Open){
+        ret = Vect_select_lines_by_box(&this->map, box->GetPointer(), type, pids);
+
+        for(i = 0; i < pids->n_values; i++)
+        {
+            ids->InsertNextValue(pids->value[i]);
+        }
+    }
+
+    Vect_destroy_list(pids);
+    return ret;
+}
+
+//------------------------------------------------------------------------------
+
+int vtkGRASSVectorMapTopoReader::SelectAreasByBox(vtkGRASSVectorBBox *box, vtkIntArray *ids)
+{
+    ilist *pids = Vect_new_list();
+    int ret = -1;
+    int i;
+
+    ids->Initialize();
+
+    if(this->Open){
+        ret = Vect_select_areas_by_box(&this->map, box->GetPointer(), pids);
+
+        for(i = 0; i < pids->n_values; i++)
+        {
+            ids->InsertNextValue(pids->value[i]);
+        }
+    }
+
+    Vect_destroy_list(pids);
+    return ret;
+}
+
+//------------------------------------------------------------------------------
+
+int vtkGRASSVectorMapTopoReader::SelectIslesByBox(vtkGRASSVectorBBox *box, vtkIntArray *ids)
+{
+    ilist *pids = Vect_new_list();
+    int ret = -1;
+    int i;
+
+    ids->Initialize();
+
+    if(this->Open){
+        ret = Vect_select_isles_by_box(&this->map, box->GetPointer(), pids);
+
+        for(i = 0; i < pids->n_values; i++)
+        {
+            ids->InsertNextValue(pids->value[i]);
+        }
+    }
+
+    Vect_destroy_list(pids);
+    return ret;
+}
+
+//------------------------------------------------------------------------------
+
+int vtkGRASSVectorMapTopoReader::SelectNodesByBox(vtkGRASSVectorBBox *box, vtkIntArray *ids){
+    ilist *pids = Vect_new_list();
+    int ret = -1;
+    int i;
+
+    ids->Initialize();
+
+    if(this->Open){
+        ret = Vect_select_nodes_by_box(&this->map, box->GetPointer(), pids);
+
+        for(i = 0; i < pids->n_values; i++)
+        {
+            ids->InsertNextValue(pids->value[i]);
+        }
+    }
+
+    Vect_destroy_list(pids);
+    return ret;
+}
+
+//------------------------------------------------------------------------------
 
 void
 vtkGRASSVectorMapTopoReader::PrintSelf(ostream& os, vtkIndent indent)
