@@ -13,11 +13,18 @@
  * GNU General Public License for more details.
  */
 
+/*!
+ *
+ * \TODO add documentation for class and member variables/functions
+ *
+ * */
 #ifndef _vtkGRASSVectorMapTopoReader_h
 #define	_vtkGRASSVectorMapTopoReader_h
 
 #include <vtkGRASSVectorMapBase.h>
 #include "vtkGRASSBridgeVectorWin32Header.h"
+#include "vtkGRASSVectorFeaturePoints.h"
+#include "vtkGRASSVectorBBox.h"
 
 extern "C" {
 #include <grass/gis.h>
@@ -27,6 +34,7 @@ extern "C" {
 class vtkGRASSVectorFeaturePoints;
 class vtkGRASSVectorFeatureCats;
 class vtkGRASSVectorBBox;
+class vtkIntArray;
 
 class VTK_GRASS_BRIDGE_VECTOR_EXPORT vtkGRASSVectorMapTopoReader : public vtkGRASSVectorMapBase {
 public:
@@ -49,15 +57,60 @@ public:
      * */
     virtual int ReadFeature(vtkGRASSVectorFeaturePoints *points, vtkGRASSVectorFeatureCats *cats, int index);
 
-//    int GetAreaFromCentroid(int centroid);
-//    int GetArea(vtkGRASSVectorFeaturePoints *points, vtkGRASSVectorFeatureCats *cats, int area);
-
+    /*************** AREA FUNCTIONS *********************************/
+    int GetAreaFromCentroid(int centroid);
+    int GetAreaPoints(vtkGRASSVectorFeaturePoints *points, vtkGRASSVectorFeatureCats *cats, int area);
+    int GetIslePoints(vtkGRASSVectorFeaturePoints *points, int isle) {
+        if (this->Open) return Vect_get_isle_points (&this->map, isle, points->GetPointer());
+        else return -1;
+    }
+    int GetCentroidFromArea(int isle ){
+        if (this->Open) return Vect_get_area_centroid (&this->map, isle);
+        else return -1;
+    }
+    int GetAreaBoundaries(int area, vtkIntArray *boundaryids);
+    int GetIsleBoundaries(int area, vtkIntArray *boundaryids);
+    int GetNumberOfAreaIsles(int area){
+        if (this->Open) return Vect_get_area_num_isles (&this->map, area);
+        else return -1;
+    }
+    int GetAreaIsle(int area, int isle){
+        if (this->Open) return Vect_get_area_isle (&this->map, area, isle);
+        else return -1;
+    }
+    int GetIsleArea(int isle){
+        if (this->Open) return Vect_get_isle_area (&this->map, isle);
+        else return -1;
+    }
+    int IsPointInArea(int area, double x, double y){
+        if (this->Open) return Vect_point_in_area (&this->map, area, x, y);
+        else return -1;
+    }
     //!\brief Returns area of area without areas of isles.
     double GetAreaOfArea(int area) {
         if (this->Open)return Vect_get_area_area(&this->map, area);
         else return -1;
     }
+    //!\brief Returns the perimeter of area
+    double GetPerimeterOfArea(vtkGRASSVectorFeaturePoints *areapoints) {
+        if (this->Open)return Vect_area_perimeter(areapoints->GetPointer());
+        else return -1;
+    }
+        //!\brief Returns area of area without areas of isles.
+    double GetAreaBoundingBox(int area, vtkGRASSVectorBBox *box) {
+        if (this->Open)return Vect_get_area_box(&this->map, area, box->GetPointer());
+        else return -1;
+    }
+    int FindArea(double x, double y){
+        if (this->Open)return Vect_find_area(&this->map, x, y);
+        else return -1;
+    }
+    int FindIsle(double x, double y){
+        if (this->Open)return Vect_find_island(&this->map, x, y);
+        else return -1;
+    }
 
+    /***************************** FIND FUNCTIONS *****************************/
 
     //!\brief Get the bounding box of the map
     void GetBoundingBox(vtkGRASSVectorBBox *box);
@@ -120,10 +173,33 @@ public:
         else return -1;
     }
 
-    //!\brief Return the number of database links
+    //!\brief Return the number of holes
+    virtual int GetNumberOfHoles() {
+        if (this->Open)return (int) Vect_get_num_holes(&this->map);
+        else return -1;
+    }
 
+    //!\brief Return the number of database links
     virtual int GetNumberOfDBLinks() {
         if (this->Open)return (int) Vect_get_num_dblinks(&this->map);
+        else return -1;
+    }
+    virtual int SelectLinesByBox(vtkGRASSVectorBBox *box, int type, vtkIntArray *ids);
+    virtual int SelectAreasByBox(vtkGRASSVectorBBox *box, vtkIntArray *ids);
+    virtual int SelectIslesByBox(vtkGRASSVectorBBox *box, vtkIntArray *ids);
+    virtual int SelectNodesByBox(vtkGRASSVectorBBox *box, vtkIntArray *ids);
+/*
+  int   Vect_select_lines_by_box (struct Map_info *Map, const struct bound_box *Box, int type, struct ilist *list)
+     Select lines by box.
+  int   Vect_select_areas_by_box (struct Map_info *Map, const struct bound_box *Box, struct ilist *list)
+     Select areas by box.
+  int   Vect_select_isles_by_box (struct Map_info *Map, const struct bound_box *Box, struct ilist *list)
+     Select isles by box.
+  int   Vect_select_nodes_by_box (struct Map_info *Map, const struct bound_box *Box, struct ilist *list)
+     Select nodes by box.
+*/
+    int DeepCopy(vtkGRASSVectorMapTopoReader *src){
+        if(this->Open && src->IsOpen()) return Vect_copy_map_lines(src->GetPointer(), this->GetPointer());
         else return -1;
     }
 
