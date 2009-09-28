@@ -35,7 +35,7 @@ class GRASSVectorLinePointsTest(unittest.TestCase):
         points = vtkGRASSVectorFeaturePoints()
         cats = vtkGRASSVectorFeatureCats()
         for i in range(map.GetNumberOfFeatures()):
-            if map.ReadFeature(points, cats, i + 1) < 0:
+            if map.ReadFeature(i + 1, points, cats) < 0:
                 break
             #print points
             #print cats
@@ -54,7 +54,7 @@ class GRASSVectorLinePointsTest(unittest.TestCase):
         points = vtkGRASSVectorFeaturePoints()
         cats = vtkGRASSVectorFeatureCats()
         for i in range(map.GetNumberOfFeatures()):
-            if map.ReadFeature(points, cats, i + 1) < 0:
+            if map.ReadFeature(i + 1, points, cats) < 0:
                 break
             #print points
             #print cats
@@ -73,7 +73,7 @@ class GRASSVectorLinePointsTest(unittest.TestCase):
         points = vtkGRASSVectorFeaturePoints()
         cats = vtkGRASSVectorFeatureCats()
         for i in range(map.GetNumberOfFeatures()):
-            if map.ReadFeature(points, cats, i + 1) < 0:
+            if map.ReadFeature(i + 1, points, cats) < 0:
                 break
             #print points
             #print cats
