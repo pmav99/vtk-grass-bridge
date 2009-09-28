@@ -11,6 +11,7 @@ vtkGRASSRasterImageReader.cxx
 vtkGRASSRasterImageWriter.cxx
 vtkGRASSRasterToImageReader.cxx
 vtkGRASSVectorPolyDataReader.cxx
+vtkGRASSVectorTopoPolyDataReader.cxx
 )
 
 SET (IO_H
@@ -18,6 +19,7 @@ vtkGRASSRasterImageReader.h
 vtkGRASSRasterImageWriter.h
 vtkGRASSRasterToImageReader.h
 vtkGRASSVectorPolyDataReader.h
+vtkGRASSVectorTopoPolyDataReader.h
 vtkGRASSBridgeIOWin32Header.h
 )
 
