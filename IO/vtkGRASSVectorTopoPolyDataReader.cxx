@@ -33,8 +33,7 @@ vtkStandardNewMacro(vtkGRASSVectorTopoPolyDataReader);
 
 //----------------------------------------------------------------------------
 
-vtkGRASSVectorTopoPolyDataReader::vtkGRASSVectorTopoPolyDataReader()
-{
+vtkGRASSVectorTopoPolyDataReader::vtkGRASSVectorTopoPolyDataReader() {
     this->Mapset = NULL;
     this->VectorName = NULL;
     this->FeatureType = GV_POINTS;
@@ -43,8 +42,7 @@ vtkGRASSVectorTopoPolyDataReader::vtkGRASSVectorTopoPolyDataReader()
 
 //----------------------------------------------------------------------------
 
-vtkGRASSVectorTopoPolyDataReader::~vtkGRASSVectorTopoPolyDataReader()
-{
+vtkGRASSVectorTopoPolyDataReader::~vtkGRASSVectorTopoPolyDataReader() {
     if (this->VectorName)
         delete [] this->VectorName;
     if (this->Mapset)
@@ -54,13 +52,12 @@ vtkGRASSVectorTopoPolyDataReader::~vtkGRASSVectorTopoPolyDataReader()
 //----------------------------------------------------------------------------
 
 void
-vtkGRASSVectorTopoPolyDataReader::PrintSelf(ostream& os, vtkIndent indent)
-{
+vtkGRASSVectorTopoPolyDataReader::PrintSelf(ostream& os, vtkIndent indent) {
     this->Superclass::PrintSelf(os, indent);
     os << indent << "Vector name: "
-        << (this->VectorName ? this->VectorName : "(none)") << "\n";
+            << (this->VectorName ? this->VectorName : "(none)") << "\n";
     os << indent << "Mapset: "
-        << (this->Mapset ? this->Mapset : "(none)") << "\n";
+            << (this->Mapset ? this->Mapset : "(none)") << "\n";
 
 }
 
@@ -68,29 +65,26 @@ vtkGRASSVectorTopoPolyDataReader::PrintSelf(ostream& os, vtkIndent indent)
 
 int
 vtkGRASSVectorTopoPolyDataReader::RequestData(vtkInformation*,
-                                          vtkInformationVector**,
-                                          vtkInformationVector* outputVector)
-{
+        vtkInformationVector**,
+        vtkInformationVector* outputVector) {
     // Allocate objects to hold points and vertex cells.
     vtkPoints *points = vtkPoints::New();
 
-    if (this->VectorName == NULL)
-    {
+    if (this->VectorName == NULL) {
         vtkErrorMacro( << "Vector name not set.");
         return -1;
     }
 
-    vtkGRASSVectorMapNoTopoReader *reader = vtkGRASSVectorMapNoTopoReader::New();
+    vtkGRASSVectorMapTopoReader *reader = vtkGRASSVectorMapTopoReader::New();
     vtkGRASSVectorFeatureCats *cats = vtkGRASSVectorFeatureCats::New();
-    vtkGRASSVectorFeaturePoints *features = vtkGRASSVectorFeaturePoints::New();
+    vtkGRASSVectorFeaturePoints *feature = vtkGRASSVectorFeaturePoints::New();
 
 
-    if (!reader->OpenMap(this->VectorName))
-    {
+    if (!reader->OpenMap(this->VectorName)) {
         vtkErrorMacro( << "Unable to open vector map " << this->VectorName);
         reader->Delete();
         cats->Delete();
-        features->Delete();
+        feature->Delete();
         return -1;
     }
 
@@ -104,23 +98,39 @@ vtkGRASSVectorTopoPolyDataReader::RequestData(vtkInformation*,
     categories->SetName("cat");
 
     vtkIdList *ids = vtkIdList::New();
-    int i;
+    int i, area;
     vtkIdType id;
 
-    // Read every feature in vector map
-    while (reader->ReadNextFeature(features, cats) > 0)
-    {
-        for(i = 0; i < features->GetNumberOfPoints(); i++)
-        {
-            double *point = features->GetPoint(i);
-            id = points->InsertNextPoint(point[0], point[1], point[2]);
-            ids->InsertNextId(id);
-        }
-        output->InsertNextCell(features->GetVTKCellId(), ids);
-        ids->Initialize();
+    // Read only the requested feature in vector map
+    if (this->FeatureType != GV_AREA) {
+        while (reader->ReadNextFeature(feature, cats) > 0) {
+            if (feature->GetFeatureType() == this->FeatureType) {
+                for (i = 0; i < feature->GetNumberOfPoints(); i++) {
+                    double *point = feature->GetPoint(i);
+                    id = points->InsertNextPoint(point[0], point[1], point[2]);
+                    ids->InsertNextId(id);
+                }
+                output->InsertNextCell(feature->GetVTKCellId(), ids);
+                ids->Initialize();
 
-        categories->InsertNextValue(cats->GetCat(1));
+                categories->InsertNextValue(cats->GetCat(1));
+            }
+        }
+    } else {
+        for (area = 1; area <= reader->GetNumberOfAreas(); area++) {
+            reader->GetArea(area, feature, cats);
+            for (i = 0; i < feature->GetNumberOfPoints(); i++) {
+                double *point = feature->GetPoint(i);
+                id = points->InsertNextPoint(point[0], point[1], point[2]);
+                ids->InsertNextId(id);
+            }
+            output->InsertNextCell(feature->GetVTKCellId(), ids);
+            ids->Initialize();
+
+            categories->InsertNextValue(cats->GetCat(1));
+        }
     }
+
     ids->Delete();
     vtkDebugMacro("Read " << points->GetNumberOfPoints() << " points.");
 
@@ -135,7 +145,7 @@ vtkGRASSVectorTopoPolyDataReader::RequestData(vtkInformation*,
     points->Delete();
     reader->Delete();
     cats->Delete();
-    features->Delete();
+    feature->Delete();
 
     return 1;
 }

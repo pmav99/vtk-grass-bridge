@@ -24,9 +24,9 @@ from libvtkGRASSBridgeRasterPython import *
 from libvtkGRASSBridgeVectorPython import *
 from libvtkGRASSBridgeCommonPython import *
 
-class GRASSRasterSourceTest(unittest.TestCase):
+class GRASSVectorPolyDataReaderTest(unittest.TestCase):
 
-    def testSmoke(self):
+    def testNoTopoReader(self):
         init = vtkGRASSInit()
         rs = vtkGRASSVectorPolyDataReader()
 #        rs.SetVectorName("streams")
@@ -37,12 +37,91 @@ class GRASSRasterSourceTest(unittest.TestCase):
         print rs.GetOutput()
 
         writer = vtkPolyDataWriter()
-        writer.SetFileName("/tmp/test.vtk")
+        writer.SetFileName("/tmp/test1.vtk")
         writer.SetInputConnection(rs.GetOutputPort())
         writer.Update()
 
+    def testTopoReaderAreas(self):
+        init = vtkGRASSInit()
+        rs = vtkGRASSVectorTopoPolyDataReader()
+        rs.SetFeatureTypeToArea()
+#        rs.SetVectorName("streams")
+#        rs.SetVectorName("lakes")
+        rs.SetVectorName("boundary_county@user1")
+#        rs.SetVectorName("elev_lid792_cont1m")
+	rs.Update()
+        print rs.GetOutput()
+
+        writer = vtkPolyDataWriter()
+        writer.SetFileName("/tmp/testAreas.vtk")
+        writer.SetInputConnection(rs.GetOutputPort())
+        writer.Update()
+
+    def testTopoReaderLines(self):
+        init = vtkGRASSInit()
+        rs = vtkGRASSVectorTopoPolyDataReader()
+        rs.SetFeatureTypeToLines()
+#        rs.SetVectorName("streams")
+#        rs.SetVectorName("lakes")
+        rs.SetVectorName("boundary_county@user1")
+#        rs.SetVectorName("elev_lid792_cont1m")
+	rs.Update()
+        print rs.GetOutput()
+
+        writer = vtkPolyDataWriter()
+        writer.SetFileName("/tmp/testLines.vtk")
+        writer.SetInputConnection(rs.GetOutputPort())
+        writer.Update()
+
+    def testTopoReaderBoundaries(self):
+        init = vtkGRASSInit()
+        rs = vtkGRASSVectorTopoPolyDataReader()
+        rs.SetFeatureTypeToBoundary()
+#        rs.SetVectorName("streams")
+#        rs.SetVectorName("lakes")
+        rs.SetVectorName("boundary_county@user1")
+#        rs.SetVectorName("elev_lid792_cont1m")
+	rs.Update()
+        print rs.GetOutput()
+
+        writer = vtkPolyDataWriter()
+        writer.SetFileName("/tmp/testBoundaries.vtk")
+        writer.SetInputConnection(rs.GetOutputPort())
+        writer.Update()
+
+    def testTopoReaderCentroids(self):
+        init = vtkGRASSInit()
+        rs = vtkGRASSVectorTopoPolyDataReader()
+        rs.SetFeatureTypeToCentroid()
+#        rs.SetVectorName("streams")
+#        rs.SetVectorName("lakes")
+        rs.SetVectorName("boundary_county@user1")
+#        rs.SetVectorName("elev_lid792_cont1m")
+	rs.Update()
+        print rs.GetOutput()
+
+        writer = vtkPolyDataWriter()
+        writer.SetFileName("/tmp/testCentroids.vtk")
+        writer.SetInputConnection(rs.GetOutputPort())
+        writer.Update()
+
+    def testTopoReaderPoints(self):
+        init = vtkGRASSInit()
+        rs = vtkGRASSVectorTopoPolyDataReader()
+        rs.SetFeatureTypeToPoints()
+#        rs.SetVectorName("streams")
+#        rs.SetVectorName("lakes")
+        rs.SetVectorName("boundary_county@user1")
+#        rs.SetVectorName("elev_lid792_cont1m")
+	rs.Update()
+        print rs.GetOutput()
+
+        writer = vtkPolyDataWriter()
+        writer.SetFileName("/tmp/testPoints.vtk")
+        writer.SetInputConnection(rs.GetOutputPort())
+        writer.Update()
 
 if __name__ == '__main__':
-    suite = unittest.TestLoader().loadTestsFromTestCase(GRASSRasterSourceTest)
+    suite = unittest.TestLoader().loadTestsFromTestCase(GRASSVectorPolyDataReaderTest)
     unittest.TextTestRunner(verbosity=2).run(suite)
 
