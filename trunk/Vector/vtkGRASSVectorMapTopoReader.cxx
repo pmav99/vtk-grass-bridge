@@ -35,7 +35,7 @@ vtkGRASSVectorMapTopoReader::vtkGRASSVectorMapTopoReader()
 //----------------------------------------------------------------------------
 
 int
-vtkGRASSVectorMapTopoReader::ReadFeature(vtkGRASSVectorFeaturePoints *points, vtkGRASSVectorFeatureCats *cats, int index)
+vtkGRASSVectorMapTopoReader::ReadFeature( int index, vtkGRASSVectorFeaturePoints *points, vtkGRASSVectorFeatureCats *cats)
 {
     char buff[1024];
     int ret = 1;
@@ -83,13 +83,16 @@ int vtkGRASSVectorMapTopoReader::GetAreaFromCentroid(int centroid)
 
 //----------------------------------------------------------------------------
 
-int vtkGRASSVectorMapTopoReader::GetAreaPoints(vtkGRASSVectorFeaturePoints *points, vtkGRASSVectorFeatureCats *cats, int area)
+int vtkGRASSVectorMapTopoReader::GetArea( int area, vtkGRASSVectorFeaturePoints *points, vtkGRASSVectorFeatureCats *cats)
 {
+    int ret = -1;
     if(this->Open){
         Vect_get_area_cats(&this->map, area, cats->GetPointer());
-        return  Vect_get_area_points (&this->map, area, points->GetPointer());
+        ret =  Vect_get_area_points (&this->map, area, points->GetPointer());
+        points->SetFeatureTypeToArea();
+        return ret;
     }
-    return -1;
+    return ret;
 }
 
 //----------------------------------------------------------------------------
