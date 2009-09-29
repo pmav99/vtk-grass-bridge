@@ -13,6 +13,17 @@
  * GNU General Public License for more details.
  */
 
+/*!
+ * \brief This class provides access to vector featrue categories
+ * information
+ *
+ * Most of the grass vector lib functions are supported. You can add, set or remove a category.
+ *
+ * \author Soeren Gebbert
+ * \author Berlin, Germany Sep. 2009
+ * \author soerengebbert@googlemail.com
+ * */
+
 #ifndef _vtkGRASSVectorLineCats_h
 #define	_vtkGRASSVectorLineCats_h
 

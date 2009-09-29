@@ -37,6 +37,8 @@ vtkGRASSVectorPolyDataReader::vtkGRASSVectorPolyDataReader()
 {
     this->Mapset = NULL;
     this->VectorName = NULL;
+    this->CategoryArrayName = NULL;
+    this->SetCategoryArrayName("cats");
     this->SetNumberOfInputPorts(0);
 }
 
@@ -70,8 +72,8 @@ vtkGRASSVectorPolyDataReader::RequestData(vtkInformation*,
                                           vtkInformationVector**,
                                           vtkInformationVector* outputVector)
 {
-    // Allocate objects to hold points and vertex cells.
-    vtkPoints *points = vtkPoints::New();
+    int i;
+    vtkIdType id;
 
     if (this->VectorName == NULL)
     {
@@ -80,31 +82,31 @@ vtkGRASSVectorPolyDataReader::RequestData(vtkInformation*,
     }
 
     vtkGRASSVectorMapNoTopoReader *reader = vtkGRASSVectorMapNoTopoReader::New();
-    vtkGRASSVectorFeatureCats *cats = vtkGRASSVectorFeatureCats::New();
-    vtkGRASSVectorFeaturePoints *features = vtkGRASSVectorFeaturePoints::New();
 
 
     if (!reader->OpenMap(this->VectorName))
     {
         vtkErrorMacro( << "Unable to open vector map " << this->VectorName);
         reader->Delete();
-        cats->Delete();
-        features->Delete();
         return -1;
     }
 
     this->SetMapset(reader->GetMapset());
 
+    vtkGRASSVectorFeatureCats *cats = vtkGRASSVectorFeatureCats::New();
+    vtkGRASSVectorFeaturePoints *features = vtkGRASSVectorFeaturePoints::New();
+
     vtkPolyData* output = vtkPolyData::GetData(outputVector);
     output->Allocate(1);
 
+    vtkPoints *points = vtkPoints::New();
+
     vtkIntArray *categories = vtkIntArray::New();
     categories->SetNumberOfComponents(1);
-    categories->SetName("cat");
+    categories->SetName(this->CategoryArrayName);
 
     vtkIdList *ids = vtkIdList::New();
-    int i;
-    vtkIdType id;
+
 
     // Read every feature in vector map
     while (reader->ReadNextFeature(features, cats) > 0)
@@ -121,14 +123,10 @@ vtkGRASSVectorPolyDataReader::RequestData(vtkInformation*,
         categories->InsertNextValue(cats->GetCat(1));
     }
     ids->Delete();
-    vtkDebugMacro("Read " << points->GetNumberOfPoints() << " points.");
 
-    // Store the points and cells in the output data object.
+    // Store the points in the output data object.
     output->SetPoints(points);
     output->GetCellData()->SetScalars(categories);
-
-    vtkIndent indent;
-    reader->PrintSelf(cout, indent);
 
     categories->Delete();
     points->Delete();

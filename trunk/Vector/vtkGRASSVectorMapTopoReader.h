@@ -18,11 +18,14 @@
  *  with topology information
  *
  * This class provides an interface to read grass vector maps with topology information.
- * Most of the topology functions of the grass vector lib are available as member function.
+ * Many of the topology functions of the grass vector library are available as member function.
  *
  *
  * \TODO Implement database support
  *
+ * \author Soeren Gebbert
+ * \author Berlin, Germany Sep. 2009
+ * \author soerengebbert@googlemail.com
  * */
 #ifndef _vtkGRASSVectorMapTopoReader_h
 #define	_vtkGRASSVectorMapTopoReader_h
@@ -100,8 +103,8 @@ public:
        \return centroid number of area
        \return 0 if no centroid found
      */
-    int GetCentroidFromArea(int isle ){
-        if (this->Open) return Vect_get_area_centroid (&this->map, isle);
+    int GetCentroidFromArea(int area ){
+        if (this->Open) return Vect_get_area_centroid (&this->map, area);
         else return -1;
     }
 

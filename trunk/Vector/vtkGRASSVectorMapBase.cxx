@@ -28,6 +28,7 @@ vtkStandardNewMacro(vtkGRASSVectorMapBase);
 vtkGRASSVectorMapBase::vtkGRASSVectorMapBase()
 {
     this->Open = false;
+    this->VectorLevel = 0;
     this->SetVectorLevelToNoTopo();
     this->VectorName = NULL;
     this->Initiated = false;

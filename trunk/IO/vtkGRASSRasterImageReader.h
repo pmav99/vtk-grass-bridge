@@ -12,7 +12,6 @@
  * GNU General Public License for more details.
 */
 
-
 /**
  * \brief This class reads a grass raster map from a valid location/mapset
  * and creates a vtkImageData as output.
@@ -50,12 +49,12 @@ public:
   vtkTypeRevisionMacro(vtkGRASSRasterImageReader,vtkImageAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-  // Description:
-  // Set/Get the data type of pixels in the imported data.
-  // As a convenience, the OutputScalarType is set to the same value.
+  //! \brief Get the data type of pixels in the imported data.
+  //! As a convenience, the OutputScalarType is set to the same value.
   vtkGetMacro(DataScalarType, int);
   const char *GetDataScalarTypeAsString() { 
-    return vtkImageScalarTypeNameMacro(this->DataScalarType); }
+    return vtkImageScalarTypeNameMacro(this->DataScalarType);
+  }
 
   vtkSetStringMacro(RasterName);
   vtkGetStringMacro(RasterName);
@@ -67,9 +66,15 @@ public:
   void UseUserDefinedRegion(){this->SetRegionUsage(VTK_GRASS_REGION_USER);}
   vtkGetMacro(RegionUsage, int);
 
+  /*! \brief Set the region which should be used to open the raster map
+   *
+   * */
   void SetRegion(vtkGRASSRegion *region) {this->RasterMap->SetRegion(region);}
   vtkGRASSRegion *GetRegion() {return this->RasterMap->GetRegion();}
 
+  /*! \breif Return the RasterMap object
+   *
+   * */
   vtkGetObjectMacro(RasterMap, vtkGRASSRasterMapReader);
 
 protected:
