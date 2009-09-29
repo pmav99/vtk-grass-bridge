@@ -13,10 +13,9 @@
  * GNU General Public License for more details.
  */
 /*!
- * \brief This class provides read-only access to a vector map
- *  without topology information
+ * \brief This class provides write access to a new vector map
  *
- * This class provides an interface to read grass vector maps without topology information.
+ * This class provides an interface to write grass vector maps.
  *
  * \TODO Implement database support
  *
@@ -27,15 +26,15 @@
 #ifndef _vtkGRASSVectorMapWriter_h
 #define	_vtkGRASSVectorMapWriter_h
 
-#include <vtkGRASSVectorMapBase.h>
+#include <vtkGRASSVectorMapTopoReader.h>
 #include "vtkGRASSBridgeVectorWin32Header.h"
 #include "vtkGRASSVectorFeaturePoints.h"
 #include "vtkGRASSVectorFeatureCats.h"
 
-class VTK_GRASS_BRIDGE_VECTOR_EXPORT vtkGRASSVectorMapWriter : public vtkGRASSVectorMapBase {
+class VTK_GRASS_BRIDGE_VECTOR_EXPORT vtkGRASSVectorMapWriter : public vtkGRASSVectorMapTopoReader {
 public:
     static vtkGRASSVectorMapWriter *New();
-    vtkTypeRevisionMacro(vtkGRASSVectorMapWriter, vtkGRASSVectorMapBase);
+    vtkTypeRevisionMacro(vtkGRASSVectorMapWriter, vtkGRASSVectorMapTopoReader);
 
 
     /*!\brief Open a new vector map to write
@@ -69,6 +68,20 @@ public:
      }
 
     /*!
+       \brief Delete feature
+
+       Vector map must be opened on topo level 2.
+
+       \param line feature id
+
+       \return 0 on success
+       \return -1 on error
+     */
+    int DeleteFeature(int line) {
+        if (this->Open)return Vect_delete_line(&this->map, line);
+        else return -1;
+    }
+    /*!
        \brief Rewrites feature info at the given offset.
 
        The number of points or cats or type may change. If necessary, the
@@ -86,6 +99,22 @@ public:
          if(this->Open) return Vect_rewrite_line(&this->map, line, type, points->GetPointer(), cats->GetPointer());
          else return -1;
     }
+
+    /*!
+       \brief Restore previously deleted feature
+
+       Vector map must be opened on topo level 2.
+
+       \param line feature id to be deleted
+
+       \return 0 on success
+       \return -1 on error
+     */
+    int RestoreFeature(int line, off_t offset){
+        if (this->Open)return Vect_restore_line(&this->map, line, offset);
+        else return -1;
+    }
+
     //!\brief Set the name of the organisation
     int SetOrganisation(const char *org) {
         if (this->Open)return Vect_set_organization(&this->map, org);
@@ -116,6 +145,22 @@ public:
         if (this->Open)return Vect_set_thresh(&this->map, thres);
         else return -1;
     }
+
+    //! \brief Build the topology of the vector map
+    virtual int Build(){
+        if (this->Open)return Vect_build(&this->map);
+        else return -1;
+    }
+
+    //!\brief Set open new vector map without topology support
+    void SetVectorLevelToNoTopo() {
+        this->SetVectorLevel(1);
+    }
+    //!\brief Set open new vector map with topology support
+    void SetVectorLevelToTopo() {
+        this->SetVectorLevel(2);
+    }
+
 
 protected:
     vtkGRASSVectorMapWriter();

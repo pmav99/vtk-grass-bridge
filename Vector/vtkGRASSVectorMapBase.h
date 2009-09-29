@@ -191,6 +191,11 @@ protected:
     void SetVectorLevelToNoTopo() {
         this->SetVectorLevel(1);
     }
+    //!\brief Set open vector map without topology support
+
+    void SetVectorLevelToTopo() {
+        this->SetVectorLevel(2);
+    }
 
     /*!\brief Open the vector map read only
      *
