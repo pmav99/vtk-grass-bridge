@@ -54,7 +54,7 @@ public:
     /*!
        \brief Tests for overlap of two boxes
 
-       \param Boundary box  to test with
+       \param Box to test with
 
        \return 1 boxes overlap
        \return 0 boxes do not overlap
@@ -66,7 +66,7 @@ public:
     /*!
        \brief Deep copy of bounding box
 
-       \param boundary
+       \param Box the boundary box
 
        \return 1
      */
@@ -77,7 +77,7 @@ public:
     /*!
        \brief Extend this box with Box
 
-       \param boundary box Box
+       \param Box boundary box
 
        \return 1
      */
@@ -88,7 +88,7 @@ public:
     /*!
        \brief Copy region  to box
 
-       \param vtkGRASSRegion
+       \param region vtkGRASSRegion
 
        \return 1 on success, 0 on error
      */

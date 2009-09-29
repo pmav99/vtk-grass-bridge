@@ -72,7 +72,7 @@ public:
   void SetRegion(vtkGRASSRegion *region) {this->RasterMap->SetRegion(region);}
   vtkGRASSRegion *GetRegion() {return this->RasterMap->GetRegion();}
 
-  /*! \breif Return the RasterMap object
+  /*! \brief Return the RasterMap object
    *
    * */
   vtkGetObjectMacro(RasterMap, vtkGRASSRasterMapReader);
