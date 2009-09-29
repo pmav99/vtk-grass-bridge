@@ -13,6 +13,19 @@
  * GNU General Public License for more details.
  */
 
+/*!
+ * \brief This is the base class for read/write access to a vector map.
+ *
+ * This class provides an interface to read grass vector map information
+ * without building topology.
+ *
+ * \TODO Implement database support
+ *
+ * \author Soeren Gebbert
+ * \author Berlin, Germany Sep. 2009
+ * \author soerengebbert@googlemail.com
+ * */
+
 #ifndef _vtkGRASSVectorMapBase_h
 #define	_vtkGRASSVectorMapBase_h
 

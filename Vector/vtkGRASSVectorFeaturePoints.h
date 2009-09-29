@@ -13,6 +13,20 @@
  * GNU General Public License for more details.
  */
 
+/*!
+ * \brief This class provides access to a vector feature
+ *
+ * This class wrapps the functionality of the grass vector struct line_pnts
+ * and sets additionally the type of the feature within this class.
+ *
+ * Methods for adding, setting and removing of points are available. Most
+ * of the grass vector library functions are supported.
+ *
+ * \author Soeren Gebbert
+ * \author Berlin, Germany Sep. 2009
+ * \author soerengebbert@googlemail.com
+ * */
+
 #ifndef __vtkGRASSVectorLinePoints_h
 #define	__vtkGRASSVectorLinePoints_h
 

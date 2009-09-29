@@ -12,7 +12,6 @@
  * GNU General Public License for more details.
  */
 #include <vtkDataSetAttributes.h>
-#include <vtk-5.2/vtkDoubleArray.h>
 #include "vtkGRASSVectorTopoPolyDataReader.h"
 
 #include <vtkCellArray.h>
@@ -28,6 +27,7 @@
 #include <vtkIdList.h>
 #include "vtkGRASSVectorFeatureCats.h"
 #include <vtkDoubleArray.h>
+#include <vtkShortArray.h>
 #include <vtkPointData.h>
 
 vtkCxxRevisionMacro(vtkGRASSVectorTopoPolyDataReader, "$Revision: 1.1 $");
@@ -39,6 +39,8 @@ vtkGRASSVectorTopoPolyDataReader::vtkGRASSVectorTopoPolyDataReader() {
     this->Mapset = NULL;
     this->VectorName = NULL;
     this->FeatureType = GV_POINTS;
+    this->CategoryArrayName = NULL;
+    this->SetCategoryArrayName("cats");
     this->SetNumberOfInputPorts(0);
 }
 
@@ -69,8 +71,9 @@ int
 vtkGRASSVectorTopoPolyDataReader::RequestData(vtkInformation*,
         vtkInformationVector**,
         vtkInformationVector* outputVector) {
-    // Allocate objects to hold points and vertex cells.
-    vtkPoints *points = vtkPoints::New();
+
+    int i, area, isle;
+    vtkIdType id;
 
     if (this->VectorName == NULL) {
         vtkErrorMacro( << "Vector name not set.");
@@ -78,30 +81,28 @@ vtkGRASSVectorTopoPolyDataReader::RequestData(vtkInformation*,
     }
 
     vtkGRASSVectorMapTopoReader *reader = vtkGRASSVectorMapTopoReader::New();
-    vtkGRASSVectorFeatureCats *cats = vtkGRASSVectorFeatureCats::New();
-    vtkGRASSVectorFeaturePoints *feature = vtkGRASSVectorFeaturePoints::New();
 
 
     if (!reader->OpenMap(this->VectorName)) {
         vtkErrorMacro( << "Unable to open vector map " << this->VectorName);
         reader->Delete();
-        cats->Delete();
-        feature->Delete();
         return -1;
     }
 
     this->SetMapset(reader->GetMapset());
 
+    vtkGRASSVectorFeatureCats *cats = vtkGRASSVectorFeatureCats::New();
+    vtkGRASSVectorFeaturePoints *feature = vtkGRASSVectorFeaturePoints::New();
+
     vtkPolyData* output = vtkPolyData::GetData(outputVector);
     output->Allocate(1);
-
+    vtkPoints *points = vtkPoints::New();
+    
     vtkIntArray *categories = vtkIntArray::New();
     categories->SetNumberOfComponents(1);
-    categories->SetName("cat");
+    categories->SetName(this->CategoryArrayName);
 
     vtkIdList *ids = vtkIdList::New();
-    int i, area;
-    vtkIdType id;
 
     // Read only the requested feature in vector map
     if (this->FeatureType != GV_AREA) {
@@ -124,6 +125,18 @@ vtkGRASSVectorTopoPolyDataReader::RequestData(vtkInformation*,
         a->SetNumberOfComponents(1);
         a->SetNumberOfValues(reader->GetNumberOfAreas());
         a->SetName("Area");
+        // Save the number of islanfs for each area
+        vtkIntArray *isles = vtkIntArray::New();
+        isles->SetNumberOfComponents(1);
+        isles->SetNumberOfValues(reader->GetNumberOfAreas());
+        isles->SetName("IslandsPerArea");
+        // Save the state of an area (island, no island)
+        vtkShortArray *isIsle = vtkShortArray::New();
+        isIsle->SetNumberOfComponents(1);
+        isIsle->SetNumberOfValues(reader->GetNumberOfAreas());
+        isIsle->SetName("isIsle");
+        isIsle->FillComponent(0, 0.0);
+
         // Save each area as polygone
         for (area = 1; area <= reader->GetNumberOfAreas(); area++) {
             reader->GetArea(area, feature, cats);
@@ -132,28 +145,40 @@ vtkGRASSVectorTopoPolyDataReader::RequestData(vtkInformation*,
                 id = points->InsertNextPoint(point[0], point[1], point[2]);
                 ids->InsertNextId(id);
             }
+            // Save the area of the area
             a->SetValue(area - 1, reader->GetAreaOfArea(area));
-
+            // Insert cell in polydataset
             output->InsertNextCell(feature->GetVTKCellId(), ids);
             ids->Initialize();
-
+            // Add categories and number of islands per area
             categories->InsertNextValue(cats->GetCat(1));
+            isles->SetValue(area - 1, reader->GetNumberOfAreaIsles(area));
         }
+
+         // Save if an area is an isle
+        for (isle = 1; isle <= reader->GetNumberOfIsles(); isle++) {
+            area = reader->GetIsleArea(isle);
+            if(area > 0)
+                isIsle->SetValue(area - 1, 1);
+        }
+
         // Add the area as scalars
         output->GetCellData()->AddArray(a);
+        output->GetCellData()->AddArray(isles);
+        output->GetCellData()->AddArray(isIsle);
         a->Delete();
+        isles->Delete();
+        isIsle->Delete();
     }
 
-    ids->Delete();
-    vtkDebugMacro("Read " << points->GetNumberOfPoints() << " points.");
+    output->GetCellData()->AddArray(categories);
+    output->GetCellData()->SetActiveScalars(categories->GetName());
 
-    // Store the points and cells in the output data object.
+    // Store the points in the output data object.
     output->SetPoints(points);
-    output->GetCellData()->SetScalars(categories);
 
-    vtkIndent indent;
-    reader->PrintSelf(cout, indent);
-
+    //Cleanup
+    ids->Delete();
     categories->Delete();
     points->Delete();
     reader->Delete();

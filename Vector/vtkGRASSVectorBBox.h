@@ -12,7 +12,15 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  */
-
+/*!
+ * \brief This class provides access to the grass bounding box
+ *
+ * Most of the grass vector bounding box functions are supported.
+ *
+ * \author Soeren Gebbert
+ * \author Berlin, Germany Sep. 2009
+ * \author soerengebbert@googlemail.com
+ * */
 #ifndef _vtkGRASSVectorBBox_h
 #define	_vtkGRASSVectorBBox_h
 
