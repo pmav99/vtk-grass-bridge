@@ -69,60 +69,51 @@ public:
 
     //! \brief Returns thr opening state
     //! \return true for open, false for not open
-
     virtual bool IsOpen() {
         return this->Open;
     }
 
     //!\brief Return the name of the organisation
-
     const char *GetOrganisation() {
         if (this->Open)return Vect_get_organization(&this->map);
         else return NULL;
     }
-    //!\brief Return the name of the date of creation as string of the map
-
+    //!\brief Return the the date of creation as string of the map
     const char *GetCreationDate() {
         if (this->Open)return Vect_get_date(&this->map);
         else return NULL;
     }
     //!\brief Return the name of the creator
-
     const char *GetPerson() {
         if (this->Open)return Vect_get_person(&this->map);
         else return NULL;
     }
-    //!\brief Return the name of the map
-
+    //!\brief Return the title of the map
     const char *GetTitle() {
         if (this->Open)return Vect_get_map_name(&this->map);
         else return NULL;
     }
-    //!\brief Return the full name of the map (map@mapset)
-
+    //!\brief Return the full name of the map 
     const char *GetFullName() {
         if (this->Open)return Vect_get_full_name(&this->map);
         else return NULL;
     }
     //!\brief Return the mapset of the map
-
     const char *GetMapset() {
         if (this->Open)return Vect_get_mapset(&this->map);
         else return NULL;
     }
-    //!\brief Return the name of the date of the map
-
+    //!\brief Return the date of the map
     const char *GetMapDate() {
         if (this->Open)return Vect_get_map_date(&this->map);
         else return NULL;
     }
-    //!\brief Return the name of the scale
-
+    //!\brief Return the scale
     int GetScale() {
         if (this->Open)return Vect_get_scale(&this->map);
         else return 0;
     }
-    //!\brief Return the name of the map comment
+    //!\brief Return the map comment
 
     const char *GetComment() {
         if (this->Open)return Vect_get_comment(&this->map);
@@ -134,7 +125,7 @@ public:
         if (this->Open)return Vect_get_zone(&this->map);
         else return -1;
     }
-    //!\brief Return the name of the map threshold
+    //!\brief Return the map threshold
 
     double GetThreshold() {
         if (this->Open)return Vect_get_thresh(&this->map);

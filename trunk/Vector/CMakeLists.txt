@@ -10,6 +10,7 @@ SET (VECTOR_SRCS
 vtkGRASSVectorFeaturePoints.cxx
 vtkGRASSVectorFeatureCats.cxx
 vtkGRASSVectorMapBase.cxx
+vtkGRASSVectorMapWriter.cxx
 vtkGRASSVectorMapTopoReader.cxx
 vtkGRASSVectorMapNoTopoReader.cxx
 vtkGRASSVectorBBox.cxx
@@ -19,6 +20,7 @@ SET (VECTOR_H
 vtkGRASSVectorFeaturePoints.h
 vtkGRASSVectorFeatureCats.h
 vtkGRASSVectorMapBase.h
+vtkGRASSVectorMapWriter.h
 vtkGRASSVectorMapTopoReader.h
 vtkGRASSVectorMapNoTopoReader.h
 vtkGRASSVectorBBox.h
