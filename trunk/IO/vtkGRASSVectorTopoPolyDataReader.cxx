@@ -12,6 +12,7 @@
  * GNU General Public License for more details.
  */
 #include <vtkDataSetAttributes.h>
+#include <vtk-5.2/vtkDoubleArray.h>
 #include "vtkGRASSVectorTopoPolyDataReader.h"
 
 #include <vtkCellArray.h>
@@ -26,7 +27,8 @@
 #include "vtkGRASSVectorFeaturePoints.h"
 #include <vtkIdList.h>
 #include "vtkGRASSVectorFeatureCats.h"
-
+#include <vtkDoubleArray.h>
+#include <vtkPointData.h>
 
 vtkCxxRevisionMacro(vtkGRASSVectorTopoPolyDataReader, "$Revision: 1.1 $");
 vtkStandardNewMacro(vtkGRASSVectorTopoPolyDataReader);
@@ -117,6 +119,12 @@ vtkGRASSVectorTopoPolyDataReader::RequestData(vtkInformation*,
             }
         }
     } else {
+        // Save the area of the area
+        vtkDoubleArray *a = vtkDoubleArray::New();
+        a->SetNumberOfComponents(1);
+        a->SetNumberOfValues(reader->GetNumberOfAreas());
+        a->SetName("Area");
+        // Save each area as polygone
         for (area = 1; area <= reader->GetNumberOfAreas(); area++) {
             reader->GetArea(area, feature, cats);
             for (i = 0; i < feature->GetNumberOfPoints(); i++) {
@@ -124,11 +132,16 @@ vtkGRASSVectorTopoPolyDataReader::RequestData(vtkInformation*,
                 id = points->InsertNextPoint(point[0], point[1], point[2]);
                 ids->InsertNextId(id);
             }
+            a->SetValue(area - 1, reader->GetAreaOfArea(area));
+
             output->InsertNextCell(feature->GetVTKCellId(), ids);
             ids->Initialize();
 
             categories->InsertNextValue(cats->GetCat(1));
         }
+        // Add the area as scalars
+        output->GetCellData()->AddArray(a);
+        a->Delete();
     }
 
     ids->Delete();
