@@ -11,6 +11,7 @@ vtkGRASSVectorFeaturePoints.cxx
 vtkGRASSVectorFeatureCats.cxx
 vtkGRASSVectorMapBase.cxx
 vtkGRASSVectorMapWriter.cxx
+vtkGRASSVectorMapUpdater.cxx
 vtkGRASSVectorMapTopoReader.cxx
 vtkGRASSVectorMapNoTopoReader.cxx
 vtkGRASSVectorBBox.cxx
@@ -21,6 +22,7 @@ vtkGRASSVectorFeaturePoints.h
 vtkGRASSVectorFeatureCats.h
 vtkGRASSVectorMapBase.h
 vtkGRASSVectorMapWriter.h
+vtkGRASSVectorMapUpdater.h
 vtkGRASSVectorMapTopoReader.h
 vtkGRASSVectorMapNoTopoReader.h
 vtkGRASSVectorBBox.h

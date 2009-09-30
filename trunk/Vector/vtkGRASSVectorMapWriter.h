@@ -52,20 +52,21 @@ public:
      *
      * */
     virtual bool CloseMap(int build_topo = 0);
-     /*!
-       \brief Writes new feature to the end of file (table)
 
-       \param type feature type
-       \param points feature geometry
-       \param cats feature categories
+    /*!
+      \brief Writes new feature to the end of file (table)
 
-       \return new feature id (level 2) or offset into file where the feature starts (level 1)
+      \param type feature type
+      \param points feature geometry
+      \param cats feature categories
+
+      \return new feature id (level 2) or offset into file where the feature starts (level 1)
      */
 
-    virtual int WriteFeature(int type, vtkGRASSVectorFeaturePoints *points, vtkGRASSVectorFeatureCats *cats){
-         if(this->Open) return Vect_write_line(&this->map, type, points->GetPointer(), cats->GetPointer());
-         else return -1;
-     }
+    virtual int WriteFeature(int type, vtkGRASSVectorFeaturePoints *points, vtkGRASSVectorFeatureCats *cats) {
+        if (this->Open) return Vect_write_line(&this->map, type, points->GetPointer(), cats->GetPointer());
+        else return -1;
+    }
 
     /*!
        \brief Delete feature
@@ -77,94 +78,145 @@ public:
        \return 0 on success
        \return -1 on error
      */
-    int DeleteFeature(int line) {
+    virtual int DeleteFeature(int line) {
         if (this->Open)return Vect_delete_line(&this->map, line);
         else return -1;
     }
-    /*!
-       \brief Rewrites feature info at the given offset.
 
-       The number of points or cats or type may change. If necessary, the
-       old feature is deleted and new is written.
-
-       \param line feature id
-       \param type feature type
-       \param points feature geometry
-       \param cats feature categories
-
-       \return new feature id
-       \return -1 on error
-     */
-    int RewriteFeature(int line, int type, vtkGRASSVectorFeaturePoints *points, vtkGRASSVectorFeatureCats *cats){
-         if(this->Open) return Vect_rewrite_line(&this->map, line, type, points->GetPointer(), cats->GetPointer());
-         else return -1;
-    }
-
-    /*!
-       \brief Restore previously deleted feature
-
-       Vector map must be opened on topo level 2.
-
-       \param line feature id to be deleted
-
-       \return 0 on success
-       \return -1 on error
-     */
-    int RestoreFeature(int line, off_t offset){
-        if (this->Open)return Vect_restore_line(&this->map, line, offset);
-        else return -1;
-    }
 
     //!\brief Set the name of the organisation
-    int SetOrganisation(const char *org) {
+
+    virtual int SetOrganisation(const char *org) {
         if (this->Open)return Vect_set_organization(&this->map, org);
         else return -1;
     }
     //!\brief Set date of creation as string
-    int SetCreationDate(const char *date) {
+
+    virtual int SetCreationDate(const char *date) {
         if (this->Open)return Vect_set_date(&this->map, date);
         else return -1;
     }
     //!\brief Set the name of the creator
-    int SetPerson(const char* person) {
+
+    virtual int SetPerson(const char* person) {
         if (this->Open)return Vect_set_person(&this->map, person);
         else return -1;
     }
     //!\brief Set the title of the map
-    int SetTitle(const char *title) {
+
+    virtual int SetTitle(const char *title) {
         if (this->Open)return Vect_set_map_name(&this->map, title);
         else return -1;
     }
     //!\brief Set the scale
-    int SetScale(int scale) {
+
+    virtual int SetScale(int scale) {
         if (this->Open)return Vect_set_scale(&this->map, scale);
         else return -1;
     }
     //!\brief Set the map threshold
-    int SetThreshold(double thres) {
+
+    virtual int SetThreshold(double thres) {
         if (this->Open)return Vect_set_thresh(&this->map, thres);
         else return -1;
     }
 
-    //! \brief Build the topology of the vector map
-    virtual int Build(){
-        if (this->Open)return Vect_build(&this->map);
+
+    //! \brief Build the full topology of the vector map
+
+    virtual int BuildAll() {
+        if (this->Open) {
+            Vect_set_category_index_update(&this->map);
+            return Vect_build(&this->map);
+        } else return -1;
+    }
+    //! \brief Build the base topology of the vector map
+
+    virtual int BuildBase() {
+        if (this->Open) return Vect_build_partial(&this->map, GV_BUILD_BASE);
+        else return -1;
+    }
+    //! \brief Build the area topology of the vector map
+
+    virtual int BuildAreas() {
+        if (this->Open) return Vect_build_partial(&this->map, GV_BUILD_AREAS);
+        else return -1;
+    }
+    //! \brief Attach islands to areas
+
+    virtual int BuildIsles() {
+        if (this->Open)return Vect_build_partial(&this->map, GV_BUILD_ATTACH_ISLES);
         else return -1;
     }
 
+    /*!
+     * \brief Snap lines in vector map to existing vertex in threshold.
+     *
+     *
+     * \param[in] type type of lines to snap
+     * \param[in] thresh threshold in which snap vertices
+     *
+     * \return void
+     */
+    virtual void SnapLines(int featureType, double threshold) {
+        if (this->Open) Vect_snap_lines(&this->map, featureType, threshold, NULL);
+    }
+
+     /*!
+       \brief Break lines in vector map at each intersection.
+
+       \param type feature type
+       \return void
+     */
+   virtual void BreakLines(int featureType) {
+        if (this->Open) Vect_break_lines(&this->map, featureType, NULL);
+    }
+     /*!
+       \brief Remove small areas from the map map.
+
+       Centroid of the area and the longest boundary with adjacent area is
+       removed.  Map topology must be built BuildAll().
+
+       \param thresh maximum area size for removed areas
+
+       \return number of removed areas or -1 for failure
+     */
+    virtual int RemoveSmallAreas(double thres) {
+        if (this->Open) return Vect_remove_small_areas(&this->map, thres, NULL, NULL);
+        else return -1;
+    }
+
+    /*!
+       \brief Remove duplicate features from vector map.
+
+       Remove duplicate lines of given types from vector map. Duplicate
+       lines may be optionally written to error map. Input map must be
+       opened on level 2 for update. Categories are merged.
+
+       \param type type of line to be delete
+       \return void
+     */
+    virtual void RemoveDuplicates(int type) {
+        if (this->Open) Vect_remove_duplicates(&this->map, type, NULL);
+    }
+
     //!\brief Set open new vector map without topology support
-    void SetVectorLevelToNoTopo() {
+
+    virtual void SetVectorLevelToNoTopo() {
         this->SetVectorLevel(1);
     }
     //!\brief Set open new vector map with topology support
-    void SetVectorLevelToTopo() {
+
+    virtual void SetVectorLevelToTopo() {
         this->SetVectorLevel(2);
     }
 
 
 protected:
     vtkGRASSVectorMapWriter();
-    ~vtkGRASSVectorMapWriter(){};
+
+    ~vtkGRASSVectorMapWriter() {
+    };
 
     vtkSetMacro(Open3D, int);
 

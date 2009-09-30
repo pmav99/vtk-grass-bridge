@@ -128,6 +128,9 @@ vtkGRASSVectorMapBase::ReadNextFeature(vtkGRASSVectorFeaturePoints *points, vtkG
     if(ret != 1)
         return ret;
 
+    points->Reset();
+    cats->Reset();
+
     ret = Vect_read_next_line(&this->map, points->GetPointer(), cats->GetPointer());
 
     if (ret == -1)
