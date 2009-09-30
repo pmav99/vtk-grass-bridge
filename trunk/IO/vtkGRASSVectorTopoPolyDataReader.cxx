@@ -125,7 +125,7 @@ vtkGRASSVectorTopoPolyDataReader::RequestData(vtkInformation*,
         a->SetNumberOfComponents(1);
         a->SetNumberOfValues(reader->GetNumberOfAreas());
         a->SetName("Area");
-        // Save the number of islanfs for each area
+        // Save the number of islands for each area
         vtkIntArray *isles = vtkIntArray::New();
         isles->SetNumberOfComponents(1);
         isles->SetNumberOfValues(reader->GetNumberOfAreas());
