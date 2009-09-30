@@ -156,6 +156,17 @@ public:
         if (this->Open)return Vect_is_3d(&this->map);
         else return -1;
     }
+    /*!
+       \brief Check if feature of vector map is alive
+
+       \return 1 is alive
+       \return 0 is not alive
+     * \return -1 map not open
+     */
+    virtual int IsFeatureAlive(int feature) {
+        if (this->Open)return Vect_line_alive(&this->map, feature);
+        else return -1;
+    }
 
     //!\brief compute the total number of points used by this map. This may be very time consuming.
     virtual int GetTotalNumberOfPoints();

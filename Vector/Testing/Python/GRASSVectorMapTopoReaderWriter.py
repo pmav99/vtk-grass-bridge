@@ -72,9 +72,10 @@ class GRASSVectorMapReaderWriterTest(unittest.TestCase):
 
         i = 0
         for i  in range(updater.GetNumberOfFeatures()):
-            updater.ReadFeature(i + 1, points, cats)
-	    id = updater.RewriteFeature(i + 1, points.GetFeatureType(), points, cats)
-            print "rewrite feature", id, i + 1
+            if updater.IsFeatureAlive(i + 1) == 1:
+                updater.ReadFeature(i + 1, points, cats)
+                id = updater.RewriteFeature(i + 1, points.GetFeatureType(), points, cats)
+                print "rewrite feature", id, i + 1
 
         updater.BuildAll()
         updater.RemoveDuplicates(updater.GetFeatureTypeBoundary());
