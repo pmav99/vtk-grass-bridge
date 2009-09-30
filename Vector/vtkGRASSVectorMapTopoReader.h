@@ -279,6 +279,7 @@ public:
         nprimitives += Vect_get_num_primitives(&this->map, GV_CENTROID);
         nprimitives += Vect_get_num_primitives(&this->map, GV_KERNEL);
         if (this->Open)return (int) nprimitives;
+//        if (this->Open)return (int) Vect_get_num_lines(&this->map);
         else return -1;
     }
 

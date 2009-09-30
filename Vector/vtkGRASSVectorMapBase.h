@@ -160,6 +160,27 @@ public:
     //!\brief compute the total number of points used by this map. This may be very time consuming.
     virtual int GetTotalNumberOfPoints();
 
+    //!\brief Return the number of the feature type line
+    int GetFeatureTypeLine(){return GV_LINE;}
+    //!\brief Return the number of the feature type lines
+    int GetFeatureTypeLines(){return GV_LINES;}
+    //!\brief Return the number of the feature type point
+    int GetFeatureTypePoint(){return GV_POINT;}
+    //!\brief Return the number of the feature type points
+    int GetFeatureTypePoints(){return GV_POINTS;}
+    //!\brief Return the number of the feature type boundary
+    int GetFeatureTypeBoundary(){return GV_BOUNDARY;}
+    //!\brief Return the number of the feature type area
+    int GetFeatureTypeArea(){return GV_AREA;}
+    //!\brief Return the number of the feature type face
+    int GetFeatureTypeCentroid(){return GV_CENTROID;}
+    //!\brief Return the number of the feature type kernel
+    int GetFeatureTypeKernel(){return GV_KERNEL;}
+    //!\brief Return the number of the feature type face
+    int GetFeatureTypeFace(){return GV_FACE;}
+    //!\brief Return the number of the feature type face
+    int GetFeatureTypeVolume(){return GV_VOLUME;}
+
     //BTX
     virtual struct Map_info *GetPointer() {
         return &this->map;

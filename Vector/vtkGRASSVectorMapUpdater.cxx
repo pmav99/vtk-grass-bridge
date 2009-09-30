@@ -13,16 +13,16 @@
  * GNU General Public License for more details.
  */
 
-#include "vtkGRASSVectorMapWriter.h"
+#include "vtkGRASSVectorMapUpdater.h"
 #include <vtkObjectFactory.h>
 
 
-vtkCxxRevisionMacro(vtkGRASSVectorMapWriter, "$Revision: 1.18 $");
-vtkStandardNewMacro(vtkGRASSVectorMapWriter);
+vtkCxxRevisionMacro(vtkGRASSVectorMapUpdater, "$Revision: 1.18 $");
+vtkStandardNewMacro(vtkGRASSVectorMapUpdater);
 
 //----------------------------------------------------------------------------
 
-vtkGRASSVectorMapWriter::vtkGRASSVectorMapWriter()
+vtkGRASSVectorMapUpdater::vtkGRASSVectorMapUpdater()
 {
     this->SetVectorLevelToTopo();
 }
@@ -31,7 +31,7 @@ vtkGRASSVectorMapWriter::vtkGRASSVectorMapWriter()
 //----------------------------------------------------------------------------
 
 bool
-vtkGRASSVectorMapWriter::OpenMap(const char *name, int with_z)
+vtkGRASSVectorMapUpdater::OpenMap(const char *name, int with_z)
 {
     char buff[1024];
 
@@ -51,7 +51,7 @@ vtkGRASSVectorMapWriter::OpenMap(const char *name, int with_z)
 
     Vect_set_open_level(this->VectorLevel);
 
-    if (1 > Vect_open_new(&this->map, name, with_z))
+    if (1 > Vect_open_update(&this->map, name, ""))
     {
         G_snprintf(buff, 1024, "class: %s line: %i Unable to open vector map <%s>.",
                    this->GetClassName(), __LINE__, name);
@@ -60,43 +60,5 @@ vtkGRASSVectorMapWriter::OpenMap(const char *name, int with_z)
     }
 
     this->Open = true;
-    return true;
-}
-
-//----------------------------------------------------------------------------
-
-bool
-vtkGRASSVectorMapWriter::CloseMap(int build_topo)
-{
-    char buff[1024];
-
-    if(this->Open == false)
-        return true;
-
-    if (build_topo == 1 && Vect_build(&this->map) != 1)
-    {
-        G_snprintf(buff, 1024, "class: %s line: %i Error while closing vector map <%s>.",
-                   this->GetClassName(), __LINE__, this->GetFullName());
-        this->InsertNextError(buff);
-        this->Open = false;
-        return false;
-    }
-
-    Vect_set_category_index_update(&this->map);
-
-    Vect_set_release_support(&this->map);
-
-    if (Vect_close(&this->map) != 0)
-    {
-        G_snprintf(buff, 1024, "class: %s line: %i Error while closing vector map <%s>.",
-                   this->GetClassName(), __LINE__, this->GetFullName());
-        this->InsertNextError(buff);
-        this->Open = false;
-        return false;
-    }
-    
-    this->Open = false;
-    this->Initiated = false;
-    this->TotalNumberOfPoints = 0;
     return true;
 }
