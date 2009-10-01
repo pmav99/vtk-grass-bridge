@@ -158,6 +158,8 @@ public:
     }
     /*!
        \brief Check if feature of vector map is alive
+     *
+     * \param feature id
 
        \return 1 is alive
        \return 0 is not alive
@@ -165,6 +167,62 @@ public:
      */
     virtual int IsFeatureAlive(int feature) {
         if (this->Open)return Vect_line_alive(&this->map, feature);
+        else return -1;
+    }
+    /*!
+       \brief Check if node of vector map is alive
+
+     *
+     * \param node id
+     *
+       \return 1 is alive
+       \return 0 is not alive
+     * \return -1 map not open
+     */
+    virtual int IsNodeAlive(int node) {
+        if (this->Open)return Vect_node_alive(&this->map, node);
+        else return -1;
+    }
+    /*!
+       \brief Check if areaof vector map is alive
+     *
+     * \param area id
+     *
+
+       \return 1 is alive
+       \return 0 is not alive
+     * \return -1 map not open
+     */
+    virtual int IsAreaAlive(int area) {
+        if (this->Open)return Vect_line_alive(&this->map, area);
+        else return -1;
+    }
+    /*!
+       \brief Check if isle of vector map is alive
+     *
+     * \param isle id
+     *
+
+       \return 1 is alive
+       \return 0 is not alive
+     * \return -1 map not open
+     */
+    virtual int IsIsleAlive(int isle) {
+        if (this->Open)return Vect_line_alive(&this->map, isle);
+        else return -1;
+    }
+    /*!
+      \brief Get feature offset
+
+      Can be used for RestoreLine().
+
+      \param line feature id
+
+      \return feature offset
+      \return -1 on error
+    */
+    virtual int GetLineOffset(int line){
+        if (this->Open)return Vect_get_line_offset(&this->map, line);
         else return -1;
     }
 
