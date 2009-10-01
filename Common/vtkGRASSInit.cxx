@@ -10,30 +10,53 @@
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
-*/
+ */
 
-#include "vtkGRASSInit.h"
 #include "vtkGRASSInit.h"
 #include <vtkStringArray.h>
 #include <vtkObjectFactory.h>
+#include "vtkGRASSDefines.h"
 
-
-extern "C" {
+extern "C"
+{
 #include <grass/gis.h>
+#include <setjmp.h>
 }
 
 vtkCxxRevisionMacro(vtkGRASSInit, "$Revision: 1.18 $");
 vtkStandardNewMacro(vtkGRASSInit);
 
-//int G_long_run;
-//Thread jmp_buf env;
+threadLocal jmp_buf vgb_stack_buffer;
+
 
 //----------------------------------------------------------------------------
 
- vtkGRASSInit::vtkGRASSInit() {
+static int
+vgb_error_handler(const char *msg, int fatal)
+{
+    if (fatal == 0)
+    {
+        fprintf(stderr, "%s\n", msg);
+        return 1;
+    }
+    else if (fatal == 1)
+    {
+        fprintf(stderr, "WARNING: %s\n", msg);
+        longjmp(vgb_stack_buffer, 1);
+    }
+    else if (fatal == 2)
+    {
+        fprintf(stderr, "ERROR: %s\n", msg);
+        longjmp(vgb_stack_buffer, 2);
+    }
+    return 1;
+}
 
-     G_gisinit("vtkGRASSInit");
+//----------------------------------------------------------------------------
 
-	 // Set the long run variable to provide long run support in grass libraries
-	 //G_long_run = 1;
+vtkGRASSInit::vtkGRASSInit()
+{
+    G_gisinit("vtkGRASSInit");
+    // Set the error routine
+    G_set_error_routine(vgb_error_handler);
 }

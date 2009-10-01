@@ -10,7 +10,7 @@
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
-*/
+ */
 
 #include "vtkGRASSRasterMapWriter.h"
 #include "vtkGRASSHistory.h"
@@ -26,7 +26,8 @@ vtkStandardNewMacro(vtkGRASSRasterMapWriter);
 
 //----------------------------------------------------------------------------
 
-vtkGRASSRasterMapWriter::vtkGRASSRasterMapWriter() {
+vtkGRASSRasterMapWriter::vtkGRASSRasterMapWriter()
+{
     this->RowCount = 0;
     this->MapTitle = NULL;
     this->SetMapTitle("Raster map title");
@@ -34,8 +35,11 @@ vtkGRASSRasterMapWriter::vtkGRASSRasterMapWriter() {
 
 //----------------------------------------------------------------------------
 
-bool vtkGRASSRasterMapWriter::OpenMap(char *name) {
+bool
+vtkGRASSRasterMapWriter::OpenMap(char *name)
+{
     char buff[1024];
+    int error = 0;
 
     // Check if the same map is already opened
     if (this->Open == true && strcmp(name, this->RasterName) == 0)
@@ -44,7 +48,9 @@ bool vtkGRASSRasterMapWriter::OpenMap(char *name) {
                    this->GetClassName(), __LINE__, this->RasterName);
         this->InsertNextError(buff);
         return false;
-    } else if (this->Open == true) {
+    }
+    else if (this->Open == true)
+    {
         // If a new name is given, the open map will be closed
         this->CloseMap();
     }
@@ -52,9 +58,10 @@ bool vtkGRASSRasterMapWriter::OpenMap(char *name) {
     this->SetRasterName(name);
 
 
-    if (G_legal_filename(this->RasterName) != 1) {
+    if (G_legal_filename(this->RasterName) != 1)
+    {
         G_snprintf(buff, 1024, "class: %s line: %i Raster map name %s is not valid.",
-                this->GetClassName(), __LINE__, this->RasterName);
+                   this->GetClassName(), __LINE__, this->RasterName);
         this->InsertNextError(buff);
         return false;
     }
@@ -64,11 +71,26 @@ bool vtkGRASSRasterMapWriter::OpenMap(char *name) {
     // Set the region for the map
     this->SetRegion();
 
-    /* open raster map */
-    this->Map = Rast_open_new(this->RasterName, this->MapType);
-    if (this->Map < 0) {
+    if (!setjmp(vgb_stack_buffer))
+    {
+        /* open raster map */
+        this->Map = Rast_open_new(this->RasterName, this->MapType);
+        if (this->Map < 0)
+        {
+            error = 1;
+        }
+    }
+    else
+    {
+        error = 1;
+    }
+
+    if (error == 1)
+    {
         G_snprintf(buff, 1024, "class: %s line: %i Unable to open new raster map %s.",
-                this->GetClassName(), __LINE__, this->RasterName);
+                   this->GetClassName(), __LINE__, this->RasterName);
+        this->Open = false;
+        this->RowCount = 0;
         this->InsertNextError(buff);
         return false;
     }
@@ -80,43 +102,62 @@ bool vtkGRASSRasterMapWriter::OpenMap(char *name) {
 
 //----------------------------------------------------------------------------
 
-int vtkGRASSRasterMapWriter::PutNextRow(vtkDataArray *data) {
+int
+vtkGRASSRasterMapWriter::PutNextRow(vtkDataArray *data)
+{
 
     int i;
     int ret;
     char buff[1024];
+    int error = 0;
 
-    if (data == NULL) {
+    if (data == NULL)
+    {
         G_snprintf(buff, 1024, "class: %s line: %i The data array is NULL.",
-                this->GetClassName(), __LINE__);
+                   this->GetClassName(), __LINE__);
         this->InsertNextError(buff);
         return -1;
     }
 
-    if (data->GetNumberOfTuples()  < this->NumberOfCols) {
+    if (data->GetNumberOfTuples() < this->NumberOfCols)
+    {
         G_snprintf(buff, 1024, "class: %s line: %i The index of data is out of range.",
-                this->GetClassName(), __LINE__);
+                   this->GetClassName(), __LINE__);
         this->InsertNextError(buff);
         return -1;
     }
 
-    if(!this->SetUpRasterBuffer())
+    if (!this->SetUpRasterBuffer())
         return -1;
 
     // copy data
-    for (i = 0; i < this->NumberOfCols; i++) {
+    for (i = 0; i < this->NumberOfCols; i++)
+    {
         if (this->MapType == CELL_TYPE)
-            ((CELL*)this->RasterBuff)[i] = (CELL)data->GetTuple1(i);
+            ((CELL*)this->RasterBuff)[i] = (CELL) data->GetTuple1(i);
         if (this->MapType == FCELL_TYPE)
-            ((FCELL*)this->RasterBuff)[i] = (FCELL)data->GetTuple1(i);
+            ((FCELL*)this->RasterBuff)[i] = (FCELL) data->GetTuple1(i);
         if (this->MapType == DCELL_TYPE)
-            ((DCELL*)this->RasterBuff)[i] = (DCELL)data->GetTuple1(i);
+            ((DCELL*)this->RasterBuff)[i] = (DCELL) data->GetTuple1(i);
     }
 
-    this->RowCount = Rast_put_row(this->Map, this->RasterBuff, this->MapType);
-    if (this->RowCount < 0) {
+    if (!setjmp(vgb_stack_buffer))
+    {
+        this->RowCount = Rast_put_row(this->Map, this->RasterBuff, this->MapType);
+        if (this->RowCount < 0)
+        {
+            error = 1;
+        }
+    }
+    else
+    {
+        error = 1;
+    }
+
+    if (error == 1)
+    {
         G_snprintf(buff, 1024, "class: %s line: %i Unable to put row %i.",
-                this->GetClassName(), __LINE__, ret);
+                   this->GetClassName(), __LINE__, ret);
         this->InsertNextError(buff);
         return -1;
     }
@@ -126,44 +167,60 @@ int vtkGRASSRasterMapWriter::PutNextRow(vtkDataArray *data) {
 
 //----------------------------------------------------------------------------
 
-bool vtkGRASSRasterMapWriter::CloseMap() {
+bool
+vtkGRASSRasterMapWriter::CloseMap()
+{
+    int error = 0;
 
+    if (this->Open == true && this->Map != -1)
+    {
+        if (!setjmp(vgb_stack_buffer))
+        {
+            if (Rast_close(this->Map) != 1)
+            {
+                error = 1;
+            }
+        }
+        else
+        {
+            error = 1;
+        }
 
-    if (this->Open == true && this->Map != -1) {
-        if (Rast_close(this->Map) != 1) {
+        if (error == 1)
+        {
             char buff[1024];
             G_snprintf(buff, 1024, "class: %s line: %i Unable to close raster map %s.",
-                    this->GetClassName(), __LINE__, this->RasterName);
+                       this->GetClassName(), __LINE__, this->RasterName);
             this->InsertNextError(buff);
             return false;
         }
     }
-
 
     // This flag is important and must be set by open and close methods
     this->Open = false;
 
     // Cleaning up the raster buffer for reuse
-    if (this->RasterBuff) {
+    if (this->RasterBuff)
+    {
         G_free(this->RasterBuff);
         this->RasterBuff = (void*) NULL;
     }
     // Cleaning up the vtkDataArray for reuse
-    if (this->Row) {
+    if (this->Row)
+    {
         this->Row->Delete();
         this->Row = NULL;
     }
 
-    if(!this->History->WriteHistory(this->RasterName))
+    if (!this->History->WriteHistory(this->RasterName))
     {
-        if (Rast_close(this->Map) != 1) {
-            char buff[1024];
-            G_snprintf(buff, 1024, "class: %s line: %i %s.",
-                    this->GetClassName(), __LINE__, this->History->GetError());
-            this->InsertNextError(buff);
-            return false;
-        }
+        char buff[1024];
+        G_snprintf(buff, 1024, "class: %s line: %i %s.",
+                   this->GetClassName(), __LINE__, this->History->GetError());
+        this->InsertNextError(buff);
+        return false;
     }
+
 
     return true;
 }

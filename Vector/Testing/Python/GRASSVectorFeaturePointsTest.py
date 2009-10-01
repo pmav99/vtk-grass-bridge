@@ -69,18 +69,6 @@ class GRASSVectorLinePointsTest(unittest.TestCase):
 
         print segment
 
-    def test3MapBase(self):
-        map = vtkGRASSVectorMapBase()
-        map.OpenMapReadOnly("lakes")
-        points = vtkGRASSVectorFeaturePoints()
-        cats = vtkGRASSVectorFeatureCats()
-        for i in range(map.GetNumberOfFeatures()):
-            map.ReadNextFeature(points, cats)
-            print points
-            print cats
-
-        map.CloseMap()
-
 if __name__ == '__main__':
     suite = unittest.TestLoader().loadTestsFromTestCase(GRASSVectorLinePointsTest)
     unittest.TextTestRunner(verbosity=2).run(suite)

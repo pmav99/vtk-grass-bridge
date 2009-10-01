@@ -14,6 +14,7 @@
  */
 
 #include "vtkGRASSVectorMapWriter.h"
+#include "vtkGRASSDefines.h"
 #include <vtkObjectFactory.h>
 
 
@@ -27,6 +28,49 @@ vtkGRASSVectorMapWriter::vtkGRASSVectorMapWriter()
     this->SetVectorLevelToTopo();
 }
 
+int
+vtkGRASSVectorMapWriter::WriteFeature(int type, vtkGRASSVectorFeaturePoints *points, vtkGRASSVectorFeatureCats *cats)
+{
+    if (this->Open)
+    {
+        if (!setjmp(vgb_stack_buffer))
+        {
+            return Vect_write_line(&this->map, type, points->GetPointer(), cats->GetPointer());
+        }
+        else
+        {
+            char buff[1024];
+            G_snprintf(buff, 1024, "class: %s line: %i unamble to write feature to vector map <%s>.",
+                       this->GetClassName(), __LINE__, this->VectorName);
+            this->InsertNextError(buff);
+            return -1;
+        }
+    }
+    else return -1;
+}
+
+//----------------------------------------------------------------------------
+
+int
+vtkGRASSVectorMapWriter::DeleteFeature(int feature)
+{
+    if (this->Open)
+    {
+        if (!setjmp(vgb_stack_buffer))
+        {
+            return Vect_delete_line(&this->map, feature);
+        }
+        else
+        {
+            char buff[1024];
+            G_snprintf(buff, 1024, "class: %s line: %i unamble to delete feature to vector map <%s>.",
+                       this->GetClassName(), __LINE__, this->VectorName);
+            this->InsertNextError(buff);
+            return -1;
+        }
+    }
+    else return -1;
+}
 
 //----------------------------------------------------------------------------
 
@@ -42,7 +86,9 @@ vtkGRASSVectorMapWriter::OpenMap(const char *name, int with_z)
                    this->GetClassName(), __LINE__, this->VectorName);
         this->InsertNextError(buff);
         return false;
-    } else if (this->Open == true) {
+    }
+    else if (this->Open == true)
+    {
         // If a new name is given, the open map will be closed
         this->CloseMap();
     }
@@ -51,23 +97,25 @@ vtkGRASSVectorMapWriter::OpenMap(const char *name, int with_z)
 
     Vect_set_open_level(this->VectorLevel);
 
-//	if(!setjmp(env))
-//	{
-		if (1 > Vect_open_new(&this->map, name, with_z))
-		{
-			G_snprintf(buff, 1024, "class: %s line: %i Unable to open vector map <%s>.",
-					   this->GetClassName(), __LINE__, name);
-			this->InsertNextError(buff);
-			this->Open = false;
-			return false;
-		}
-//	} else {
-//		G_snprintf(buff, 1024, "class: %s line: %i Unable to open vector map <%s>.",
-//				   this->GetClassName(), __LINE__, name);
-//		this->InsertNextError(buff);
-//		this->Open = false;
-//		return false;
-//	}
+    if (!setjmp(vgb_stack_buffer))
+    {
+        if (1 > Vect_open_new(&this->map, name, with_z))
+        {
+            G_snprintf(buff, 1024, "class: %s line: %i Unable to open vector map <%s>.",
+                       this->GetClassName(), __LINE__, name);
+            this->InsertNextError(buff);
+            this->Open = false;
+            return false;
+        }
+    }
+    else
+    {
+        G_snprintf(buff, 1024, "class: %s line: %i Unable to open vector map <%s>.",
+                   this->GetClassName(), __LINE__, name);
+        this->InsertNextError(buff);
+        this->Open = false;
+        return false;
+    }
 
     this->Open = true;
     return true;
@@ -80,7 +128,7 @@ vtkGRASSVectorMapWriter::CloseMap(int build_topo)
 {
     char buff[1024];
 
-    if(this->Open == false)
+    if (this->Open == false)
         return true;
 
     if (build_topo == 1 && Vect_build(&this->map) != 1)
@@ -93,10 +141,20 @@ vtkGRASSVectorMapWriter::CloseMap(int build_topo)
     }
 
     Vect_set_category_index_update(&this->map);
-
     Vect_set_release_support(&this->map);
 
-    if (Vect_close(&this->map) != 0)
+    if (!setjmp(vgb_stack_buffer))
+    {
+        if (Vect_close(&this->map) != 0)
+        {
+            G_snprintf(buff, 1024, "class: %s line: %i Error while closing vector map <%s>.",
+                       this->GetClassName(), __LINE__, this->GetFullName());
+            this->InsertNextError(buff);
+            this->Open = false;
+            return false;
+        }
+    }
+    else
     {
         G_snprintf(buff, 1024, "class: %s line: %i Error while closing vector map <%s>.",
                    this->GetClassName(), __LINE__, this->GetFullName());
@@ -104,7 +162,7 @@ vtkGRASSVectorMapWriter::CloseMap(int build_topo)
         this->Open = false;
         return false;
     }
-    
+
     this->Open = false;
     this->Initiated = false;
     this->TotalNumberOfPoints = 0;

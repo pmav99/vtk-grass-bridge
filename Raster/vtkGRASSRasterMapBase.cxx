@@ -10,7 +10,7 @@
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
-*/
+ */
 
 #include "vtkGRASSRasterMapBase.h"
 #include "vtkGRASSRasterToImageReader.h"
@@ -22,13 +22,15 @@
 #include <vtkDoubleArray.h>
 #include "vtkGRASSRegion.h"
 #include "vtkGRASSHistory.h"
+#include <vtkGRASSDefines.h>
 
 vtkCxxRevisionMacro(vtkGRASSRasterMapBase, "$Revision: 1.18 $");
 vtkStandardNewMacro(vtkGRASSRasterMapBase);
 
 //----------------------------------------------------------------------------
 
-vtkGRASSRasterMapBase::vtkGRASSRasterMapBase() {
+vtkGRASSRasterMapBase::vtkGRASSRasterMapBase()
+{
     this->RasterName = NULL;
     this->Mapset = NULL;
     this->Region = vtkGRASSRegion::New();
@@ -45,7 +47,8 @@ vtkGRASSRasterMapBase::vtkGRASSRasterMapBase() {
 
 //----------------------------------------------------------------------------
 
-vtkGRASSRasterMapBase::~vtkGRASSRasterMapBase() {
+vtkGRASSRasterMapBase::~vtkGRASSRasterMapBase()
+{
 
 
     this->CloseMap();
@@ -68,36 +71,56 @@ vtkGRASSRasterMapBase::~vtkGRASSRasterMapBase() {
 
 //----------------------------------------------------------------------------
 
-bool vtkGRASSRasterMapBase::SetRegion() {
+bool
+vtkGRASSRasterMapBase::SetRegion()
+{
     struct Cell_head head;
 
-    if(this->RasterName == NULL || this->Mapset == NULL)
+    if (this->RasterName == NULL || this->Mapset == NULL)
     {
         char buff[1024];
         G_snprintf(buff, 1024, "class: %s line: %i Unable to set the region. RasterName is not set.",
-                    this->GetClassName(), __LINE__);
+                   this->GetClassName(), __LINE__);
         return false;
     }
-
-    if (this->RegionUsage == VTK_GRASS_REGION_CURRENT) {
-        G_get_set_window(&head);
-        this->Region->CopyRegionFrom(&head);
-    } else if (this->RegionUsage == VTK_GRASS_REGION_DEFAULT) {
-        G_get_default_window(&head);
-        G_set_window(&head);
-        this->Region->CopyRegionFrom(&head);
-    } else if (this->RegionUsage == VTK_GRASS_REGION_RASTER) {
-        Rast_get_cellhd(this->GetRasterName(), this->GetMapset(), &head);
-        G_set_window(&head);
-        this->Region->CopyRegionFrom(&head);
-    } else if (this->RegionUsage == VTK_GRASS_REGION_USER && this->Region != NULL) {
-        this->Region->AdjustRegion();
-        this->Region->CopyRegionTo(&head);
-        G_set_window(&head);
-    } else {
-        // Use current region as default
-        G_get_set_window(&head);
-        this->Region->CopyRegionFrom(&head);
+    if (!setjmp(vgb_stack_buffer))
+    {
+        if (this->RegionUsage == VTK_GRASS_REGION_CURRENT)
+        {
+            G_get_set_window(&head);
+            this->Region->CopyRegionFrom(&head);
+        }
+        else if (this->RegionUsage == VTK_GRASS_REGION_DEFAULT)
+        {
+            G_get_default_window(&head);
+            G_set_window(&head);
+            this->Region->CopyRegionFrom(&head);
+        }
+        else if (this->RegionUsage == VTK_GRASS_REGION_RASTER)
+        {
+            Rast_get_cellhd(this->GetRasterName(), this->GetMapset(), &head);
+            G_set_window(&head);
+            this->Region->CopyRegionFrom(&head);
+        }
+        else if (this->RegionUsage == VTK_GRASS_REGION_USER && this->Region != NULL)
+        {
+            this->Region->AdjustRegion();
+            this->Region->CopyRegionTo(&head);
+            G_set_window(&head);
+        }
+        else
+        {
+            // Use current region as default
+            G_get_set_window(&head);
+            this->Region->CopyRegionFrom(&head);
+        }
+    }
+    else
+    {
+        char buff[1024];
+        G_snprintf(buff, 1024, "class: %s line: %i Unable to set the region.",
+                   this->GetClassName(), __LINE__);
+        return false;
     }
 
     this->NumberOfRows = head.rows;
@@ -108,19 +131,22 @@ bool vtkGRASSRasterMapBase::SetRegion() {
 
 //----------------------------------------------------------------------------
 
-bool vtkGRASSRasterMapBase::SetUpRasterBuffer() {
+bool
+vtkGRASSRasterMapBase::SetUpRasterBuffer()
+{
 
     // The region must be set and map must be open to allocate the buffer
-    if(this->Open == false || this->Map < 0)
+    if (this->Open == false || this->Map < 0)
     {
         char buff[1024];
         G_snprintf(buff, 1024, "class: %s line: %i Unable to allocate raster buffer. Raster map is not open",
-                    this->GetClassName(), __LINE__);
+                   this->GetClassName(), __LINE__);
         this->InsertNextError(buff);
         return false;
     }
-    
-    if (this->Row == NULL) {
+
+    if (this->Row == NULL)
+    {
         if (this->MapType == CELL_TYPE)
             this->Row = vtkIntArray::New();
         if (this->MapType == FCELL_TYPE)
@@ -143,25 +169,42 @@ bool vtkGRASSRasterMapBase::SetUpRasterBuffer() {
 
 //----------------------------------------------------------------------------
 
-vtkDataArray *vtkGRASSRasterMapBase::GetRow(int idx) {
+vtkDataArray *
+vtkGRASSRasterMapBase::GetRow(int idx)
+{
 
     void *ptr;
     int i;
     int size;
+    int error = 0;
     char buff[1024];
 
-    if (idx < 0 || idx > this->NumberOfCols - 1) {
+    if (idx < 0 || idx > this->NumberOfCols - 1)
+    {
         G_snprintf(buff, 1024, "class: %s line: %i The index %i is out of range.",
-                this->GetClassName(), __LINE__, idx);
+                   this->GetClassName(), __LINE__, idx);
         this->InsertNextError(buff);
         return NULL;
     }
 
     this->SetUpRasterBuffer();
+    if (!setjmp(vgb_stack_buffer))
+    {
+        if (Rast_get_row(this->Map, this->RasterBuff, idx, this->MapType) < 0)
+        {
+            error = 1;
 
-    if (Rast_get_row(this->Map, this->RasterBuff, idx, this->MapType) < 0) {
+        }
+    }
+    else
+    {
+        error = 1;
+    }
+
+    if (error == 1)
+    {
         G_snprintf(buff, 1024, "class: %s line: %i Unable to read row %i.",
-                this->GetClassName(), __LINE__, idx);
+                   this->GetClassName(), __LINE__, idx);
         this->InsertNextError(buff);
         return NULL;
     }
@@ -169,20 +212,23 @@ vtkDataArray *vtkGRASSRasterMapBase::GetRow(int idx) {
     // copy data
     size = Rast_cell_size(this->MapType);
     ptr = this->RasterBuff;
-    
+
     if (this->MapType == CELL_TYPE)
-        for (i = 0; i < this->NumberOfCols; i++, ptr = G_incr_void_ptr(ptr, size)){
+        for (i = 0; i < this->NumberOfCols; i++, ptr = G_incr_void_ptr(ptr, size))
+        {
             this->Row->SetTuple1(i, (double) *(CELL*) ptr);
         }
     if (this->MapType == FCELL_TYPE)
-        for (i = 0; i < this->NumberOfCols; i++, ptr = G_incr_void_ptr(ptr, size)){
+        for (i = 0; i < this->NumberOfCols; i++, ptr = G_incr_void_ptr(ptr, size))
+        {
             this->Row->SetTuple1(i, (double) *(FCELL*) ptr);
         }
     if (this->MapType == DCELL_TYPE)
-        for (i = 0; i < this->NumberOfCols; i++, ptr = G_incr_void_ptr(ptr, size)){
+        for (i = 0; i < this->NumberOfCols; i++, ptr = G_incr_void_ptr(ptr, size))
+        {
             this->Row->SetTuple1(i, (double) *(DCELL*) ptr);
         }
-   
+
 
     return this->Row;
 }

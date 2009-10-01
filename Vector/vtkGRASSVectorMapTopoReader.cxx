@@ -20,7 +20,7 @@
 #include <vtkGRASSVectorFeaturePoints.h>
 #include <vtkGRASSVectorFeatureCats.h>
 #include <vtkIntArray.h>
-
+#include <vtkGRASSDefines.h>
 
 vtkCxxRevisionMacro(vtkGRASSVectorMapTopoReader, "$Revision: 1.18 $");
 vtkStandardNewMacro(vtkGRASSVectorMapTopoReader);
@@ -35,26 +35,34 @@ vtkGRASSVectorMapTopoReader::vtkGRASSVectorMapTopoReader()
 //----------------------------------------------------------------------------
 
 int
-vtkGRASSVectorMapTopoReader::ReadFeature( int index, vtkGRASSVectorFeaturePoints *points, vtkGRASSVectorFeatureCats *cats)
+vtkGRASSVectorMapTopoReader::ReadFeature(int index, vtkGRASSVectorFeaturePoints *points, vtkGRASSVectorFeatureCats *cats)
 {
     char buff[1024];
     int ret = 1;
 
     ret = this->CheckBeforOpen(points, cats);
-    if(ret != 1)
+    if (ret != 1)
         return ret;
 
-    ret = Vect_read_line(&this->map, points->GetPointer(), cats->GetPointer(), index);
+    if (!setjmp(vgb_stack_buffer))
+    {
+        ret = Vect_read_line(&this->map, points->GetPointer(), cats->GetPointer(), index);
+    }
+    else
+    {
+
+        ret = -1;
+    }
 
     if (ret == -1)
     {
-        G_snprintf(buff, 1024, "class: %s line: %i Error wihle reading vector map <%s>.",
+        G_snprintf(buff, 1024, "class: %s line: %i Error while reading vector map <%s>.",
                    this->GetClassName(), __LINE__, this->GetFullName());
         this->InsertNextError(buff);
         return ret;
     }
 
-    if(ret >= 0)
+    if (ret >= 0)
         points->SetFeatureType(ret);
 
     return ret;
@@ -62,10 +70,11 @@ vtkGRASSVectorMapTopoReader::ReadFeature( int index, vtkGRASSVectorFeaturePoints
 
 //----------------------------------------------------------------------------
 
-void vtkGRASSVectorMapTopoReader::GetBoundingBox(vtkGRASSVectorBBox *box)
+void
+vtkGRASSVectorMapTopoReader::GetBoundingBox(vtkGRASSVectorBBox *box)
 {
 
-    if(box == NULL)
+    if (box == NULL)
         return;
     Vect_get_map_box(&this->map, box->GetPointer());
     return;
@@ -73,9 +82,11 @@ void vtkGRASSVectorMapTopoReader::GetBoundingBox(vtkGRASSVectorBBox *box)
 
 //----------------------------------------------------------------------------
 
-int vtkGRASSVectorMapTopoReader::GetAreaFromCentroid(int centroid)
+int
+vtkGRASSVectorMapTopoReader::GetAreaFromCentroid(int centroid)
 {
-    if(this->Open){
+    if (this->Open)
+    {
         return Vect_get_centroid_area(&this->map, centroid);
     }
     return -1;
@@ -83,21 +94,26 @@ int vtkGRASSVectorMapTopoReader::GetAreaFromCentroid(int centroid)
 
 //----------------------------------------------------------------------------
 
-int vtkGRASSVectorMapTopoReader::GetArea( int area, vtkGRASSVectorFeaturePoints *points, vtkGRASSVectorFeatureCats *cats)
+int
+vtkGRASSVectorMapTopoReader::GetArea(int area, vtkGRASSVectorFeaturePoints *points, vtkGRASSVectorFeatureCats *cats)
 {
     int ret = -1;
-    if(this->Open){
+
+    if (this->Open)
+    {
         Vect_get_area_cats(&this->map, area, cats->GetPointer());
-        ret =  Vect_get_area_points (&this->map, area, points->GetPointer());
+        ret = Vect_get_area_points(&this->map, area, points->GetPointer());
         points->SetFeatureTypeToArea();
         return ret;
     }
+
     return ret;
 }
 
 //----------------------------------------------------------------------------
 
-int vtkGRASSVectorMapTopoReader::GetAreaBoundaries(int area, vtkIntArray* boundaryids)
+int
+vtkGRASSVectorMapTopoReader::GetAreaBoundaries(int area, vtkIntArray* boundaryids)
 {
     ilist *ids = Vect_new_list();
     int ret = -1;
@@ -105,10 +121,11 @@ int vtkGRASSVectorMapTopoReader::GetAreaBoundaries(int area, vtkIntArray* bounda
 
     boundaryids->Initialize();
 
-    if(this->Open){
+    if (this->Open)
+    {
         ret = Vect_get_area_boundaries(&this->map, area, ids);
 
-        for(i = 0; i < ids->n_values; i++)
+        for (i = 0; i < ids->n_values; i++)
         {
             boundaryids->InsertNextValue(ids->value[i]);
         }
@@ -120,7 +137,8 @@ int vtkGRASSVectorMapTopoReader::GetAreaBoundaries(int area, vtkIntArray* bounda
 
 //----------------------------------------------------------------------------
 
-int vtkGRASSVectorMapTopoReader::GetIsleBoundaries(int isle, vtkIntArray* boundaryids)
+int
+vtkGRASSVectorMapTopoReader::GetIsleBoundaries(int isle, vtkIntArray* boundaryids)
 {
     ilist *ids = Vect_new_list();
     int ret = -1;
@@ -128,10 +146,11 @@ int vtkGRASSVectorMapTopoReader::GetIsleBoundaries(int isle, vtkIntArray* bounda
 
     boundaryids->Initialize();
 
-    if(this->Open){
+    if (this->Open)
+    {
         ret = Vect_get_isle_boundaries(&this->map, isle, ids);
 
-        for(i = 0; i < ids->n_values; i++)
+        for (i = 0; i < ids->n_values; i++)
         {
             boundaryids->InsertNextValue(ids->value[i]);
         }
@@ -143,7 +162,8 @@ int vtkGRASSVectorMapTopoReader::GetIsleBoundaries(int isle, vtkIntArray* bounda
 
 //------------------------------------------------------------------------------
 
-int vtkGRASSVectorMapTopoReader::SelectLinesByBox(vtkGRASSVectorBBox *box, int type, vtkIntArray *ids)
+int
+vtkGRASSVectorMapTopoReader::SelectLinesByBox(vtkGRASSVectorBBox *box, int type, vtkIntArray *ids)
 {
     ilist *pids = Vect_new_list();
     int ret = -1;
@@ -151,10 +171,11 @@ int vtkGRASSVectorMapTopoReader::SelectLinesByBox(vtkGRASSVectorBBox *box, int t
 
     ids->Initialize();
 
-    if(this->Open){
+    if (this->Open)
+    {
         ret = Vect_select_lines_by_box(&this->map, box->GetPointer(), type, pids);
 
-        for(i = 0; i < pids->n_values; i++)
+        for (i = 0; i < pids->n_values; i++)
         {
             ids->InsertNextValue(pids->value[i]);
         }
@@ -166,7 +187,8 @@ int vtkGRASSVectorMapTopoReader::SelectLinesByBox(vtkGRASSVectorBBox *box, int t
 
 //------------------------------------------------------------------------------
 
-int vtkGRASSVectorMapTopoReader::SelectAreasByBox(vtkGRASSVectorBBox *box, vtkIntArray *ids)
+int
+vtkGRASSVectorMapTopoReader::SelectAreasByBox(vtkGRASSVectorBBox *box, vtkIntArray *ids)
 {
     ilist *pids = Vect_new_list();
     int ret = -1;
@@ -174,10 +196,11 @@ int vtkGRASSVectorMapTopoReader::SelectAreasByBox(vtkGRASSVectorBBox *box, vtkIn
 
     ids->Initialize();
 
-    if(this->Open){
+    if (this->Open)
+    {
         ret = Vect_select_areas_by_box(&this->map, box->GetPointer(), pids);
 
-        for(i = 0; i < pids->n_values; i++)
+        for (i = 0; i < pids->n_values; i++)
         {
             ids->InsertNextValue(pids->value[i]);
         }
@@ -189,7 +212,8 @@ int vtkGRASSVectorMapTopoReader::SelectAreasByBox(vtkGRASSVectorBBox *box, vtkIn
 
 //------------------------------------------------------------------------------
 
-int vtkGRASSVectorMapTopoReader::SelectIslesByBox(vtkGRASSVectorBBox *box, vtkIntArray *ids)
+int
+vtkGRASSVectorMapTopoReader::SelectIslesByBox(vtkGRASSVectorBBox *box, vtkIntArray *ids)
 {
     ilist *pids = Vect_new_list();
     int ret = -1;
@@ -197,10 +221,11 @@ int vtkGRASSVectorMapTopoReader::SelectIslesByBox(vtkGRASSVectorBBox *box, vtkIn
 
     ids->Initialize();
 
-    if(this->Open){
+    if (this->Open)
+    {
         ret = Vect_select_isles_by_box(&this->map, box->GetPointer(), pids);
 
-        for(i = 0; i < pids->n_values; i++)
+        for (i = 0; i < pids->n_values; i++)
         {
             ids->InsertNextValue(pids->value[i]);
         }
@@ -212,17 +237,20 @@ int vtkGRASSVectorMapTopoReader::SelectIslesByBox(vtkGRASSVectorBBox *box, vtkIn
 
 //------------------------------------------------------------------------------
 
-int vtkGRASSVectorMapTopoReader::SelectNodesByBox(vtkGRASSVectorBBox *box, vtkIntArray *ids){
+int
+vtkGRASSVectorMapTopoReader::SelectNodesByBox(vtkGRASSVectorBBox *box, vtkIntArray *ids)
+{
     ilist *pids = Vect_new_list();
     int ret = -1;
     int i;
 
     ids->Initialize();
 
-    if(this->Open){
+    if (this->Open)
+    {
         ret = Vect_select_nodes_by_box(&this->map, box->GetPointer(), pids);
 
-        for(i = 0; i < pids->n_values; i++)
+        for (i = 0; i < pids->n_values; i++)
         {
             ids->InsertNextValue(pids->value[i]);
         }
@@ -240,7 +268,8 @@ vtkGRASSVectorMapTopoReader::PrintSelf(ostream& os, vtkIndent indent)
 
     this->Superclass::PrintSelf(os, indent);
 
-    if(this->Open){
+    if (this->Open)
+    {
         indent = indent.GetNextIndent();
         os << indent << "Number of features: " << this->GetNumberOfFeatures() << endl;
         os << indent << "Number of nodes: " << this->GetNumberOfNodes() << endl;

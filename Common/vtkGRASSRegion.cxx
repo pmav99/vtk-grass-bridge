@@ -58,9 +58,14 @@ bool vtkGRASSRegion::ReadCurrentRegion() {
 //----------------------------------------------------------------------------
 
 bool vtkGRASSRegion::ReadDefaultRegion() {
+    try {
     G_get_default_window(&this->head);
     this->CopyRegionFrom(&this->head);
     this->Modified();
+    } catch(char *msg) {
+        this->InsertNextError(msg);
+        return false;
+    }
     return true;
 }
 
