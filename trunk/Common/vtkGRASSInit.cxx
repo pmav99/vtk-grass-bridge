@@ -20,28 +20,20 @@
 
 extern "C" {
 #include <grass/gis.h>
-#include <grass/vector.h>
-#include <math.h>
 }
 
 vtkCxxRevisionMacro(vtkGRASSInit, "$Revision: 1.18 $");
 vtkStandardNewMacro(vtkGRASSInit);
 
-
-//----------------------------------------------------------------------------
-
-static int error_handler(const char *msg, int fatal)
-{
-    fprintf(stderr, "%s", msg);
-
-    return 0;
-}
+//int G_long_run;
+//Thread jmp_buf env;
 
 //----------------------------------------------------------------------------
 
  vtkGRASSInit::vtkGRASSInit() {
 
      G_gisinit("vtkGRASSInit");
-     Vect_set_fatal_error(GV_FATAL_PRINT);
-     G_set_error_routine(error_handler);
+
+	 // Set the long run variable to provide long run support in grass libraries
+	 //G_long_run = 1;
 }

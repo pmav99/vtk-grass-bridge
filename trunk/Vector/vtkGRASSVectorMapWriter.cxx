@@ -51,13 +51,23 @@ vtkGRASSVectorMapWriter::OpenMap(const char *name, int with_z)
 
     Vect_set_open_level(this->VectorLevel);
 
-    if (1 > Vect_open_new(&this->map, name, with_z))
-    {
-        G_snprintf(buff, 1024, "class: %s line: %i Unable to open vector map <%s>.",
-                   this->GetClassName(), __LINE__, name);
-        this->InsertNextError(buff);
-        return false;
-    }
+//	if(!setjmp(env))
+//	{
+		if (1 > Vect_open_new(&this->map, name, with_z))
+		{
+			G_snprintf(buff, 1024, "class: %s line: %i Unable to open vector map <%s>.",
+					   this->GetClassName(), __LINE__, name);
+			this->InsertNextError(buff);
+			this->Open = false;
+			return false;
+		}
+//	} else {
+//		G_snprintf(buff, 1024, "class: %s line: %i Unable to open vector map <%s>.",
+//				   this->GetClassName(), __LINE__, name);
+//		this->InsertNextError(buff);
+//		this->Open = false;
+//		return false;
+//	}
 
     this->Open = true;
     return true;

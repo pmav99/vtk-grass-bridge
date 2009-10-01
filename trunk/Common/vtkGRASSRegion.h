@@ -30,7 +30,6 @@
 
 extern "C" {
 #include <grass/gis.h>
-#include <math.h>
 }
 
 class VTK_GRASS_BRIDGE_COMMON_EXPORT vtkGRASSRegion : public vtkObjectGRASSErrorHandler
