@@ -10,7 +10,7 @@
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
-*/
+ */
 
 #include "vtkObjectGRASSErrorHandler.h"
 #include "vtkObjectGRASSErrorHandler.h"
@@ -18,7 +18,8 @@
 #include <vtkObjectFactory.h>
 
 
-extern "C" {
+extern "C"
+{
 #include <grass/gis.h>
 #include <math.h>
 }
@@ -28,7 +29,8 @@ vtkStandardNewMacro(vtkObjectGRASSErrorHandler);
 
 //----------------------------------------------------------------------------
 
-vtkObjectGRASSErrorHandler::vtkObjectGRASSErrorHandler() {
+vtkObjectGRASSErrorHandler::vtkObjectGRASSErrorHandler()
+{
 
     this->NumberOfErrors = 0;
     this->NumberOfWarnings = 0;
@@ -44,7 +46,8 @@ vtkObjectGRASSErrorHandler::vtkObjectGRASSErrorHandler() {
 
 //----------------------------------------------------------------------------
 
-vtkObjectGRASSErrorHandler::~vtkObjectGRASSErrorHandler() {
+vtkObjectGRASSErrorHandler::~vtkObjectGRASSErrorHandler()
+{
 
 
     this->ErrorList->Delete();
@@ -53,7 +56,9 @@ vtkObjectGRASSErrorHandler::~vtkObjectGRASSErrorHandler() {
 
 //----------------------------------------------------------------------------
 
-void vtkObjectGRASSErrorHandler::Reset() {
+void
+vtkObjectGRASSErrorHandler::Reset()
+{
 
     this->NumberOfErrors = 0;
     this->NumberOfWarnings = 0;
@@ -65,11 +70,16 @@ void vtkObjectGRASSErrorHandler::Reset() {
 
 //----------------------------------------------------------------------------
 
-void vtkObjectGRASSErrorHandler::InsertNextError(char *message) {
-    if (this->LastErrorNumber == 0 || (this->LastErrorNumber == this->MaxNumberOfErrors - 1)) {
+void
+vtkObjectGRASSErrorHandler::InsertNextError(char *message)
+{
+    if (this->LastErrorNumber == 0 || (this->LastErrorNumber == this->MaxNumberOfErrors - 1))
+    {
         this->LastErrorNumber = 0;
         this->ErrorList->InsertValue(this->LastErrorNumber, message);
-    } else {
+    }
+    else
+    {
         this->LastErrorNumber++;
         this->ErrorList->InsertValue(this->LastErrorNumber, message);
     }
@@ -77,18 +87,23 @@ void vtkObjectGRASSErrorHandler::InsertNextError(char *message) {
     if (this->NumberOfErrors < this->MaxNumberOfErrors)
         this->NumberOfErrors++;
 
-    vtkErrorMacro(<<message);
+    vtkErrorMacro( << message);
 
     return;
 }
 
 //----------------------------------------------------------------------------
 
-void vtkObjectGRASSErrorHandler::InsertNextWarning(char *message) {
-    if (this->LastWarningNumber == 0 || (this->LastWarningNumber == this->MaxNumberOfWarnings - 1)) {
+void
+vtkObjectGRASSErrorHandler::InsertNextWarning(char *message)
+{
+    if (this->LastWarningNumber == 0 || (this->LastWarningNumber == this->MaxNumberOfWarnings - 1))
+    {
         this->LastWarningNumber = 0;
         this->WarningList->InsertValue(this->LastWarningNumber, message);
-    } else {
+    }
+    else
+    {
         this->LastWarningNumber++;
         this->WarningList->InsertValue(this->LastWarningNumber, message);
     }
@@ -96,14 +111,16 @@ void vtkObjectGRASSErrorHandler::InsertNextWarning(char *message) {
     if (this->NumberOfWarnings < this->MaxNumberOfWarnings)
         this->NumberOfWarnings++;
 
-    vtkWarningMacro(<<message);
+    vtkWarningMacro( << message);
 
     return;
 }
 
 //----------------------------------------------------------------------------
 
-const char *vtkObjectGRASSErrorHandler::GetError() {
+const char *
+vtkObjectGRASSErrorHandler::GetError()
+{
     if (this->NumberOfErrors)
         return this->ErrorList->GetValue(this->LastErrorNumber);
 
@@ -112,7 +129,9 @@ const char *vtkObjectGRASSErrorHandler::GetError() {
 
 //----------------------------------------------------------------------------
 
-const char *vtkObjectGRASSErrorHandler::GetWarning() {
+const char *
+vtkObjectGRASSErrorHandler::GetWarning()
+{
     if (this->NumberOfWarnings)
         return this->WarningList->GetValue(this->LastWarningNumber);
 
@@ -121,7 +140,9 @@ const char *vtkObjectGRASSErrorHandler::GetWarning() {
 
 //----------------------------------------------------------------------------
 
-bool vtkObjectGRASSErrorHandler::HasErrors() {
+bool
+vtkObjectGRASSErrorHandler::HasErrors()
+{
     if (this->NumberOfErrors)
         return true;
 
@@ -130,7 +151,9 @@ bool vtkObjectGRASSErrorHandler::HasErrors() {
 
 //----------------------------------------------------------------------------
 
-bool vtkObjectGRASSErrorHandler::HasWarnings() {
+bool
+vtkObjectGRASSErrorHandler::HasWarnings()
+{
     if (this->NumberOfWarnings)
         return true;
 

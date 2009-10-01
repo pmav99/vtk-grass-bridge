@@ -63,10 +63,7 @@ public:
       \return new feature id (level 2) or offset into file where the feature starts (level 1)
      */
 
-    virtual int WriteFeature(int type, vtkGRASSVectorFeaturePoints *points, vtkGRASSVectorFeatureCats *cats) {
-        if (this->Open) return Vect_write_line(&this->map, type, points->GetPointer(), cats->GetPointer());
-        else return -1;
-    }
+    virtual int WriteFeature(int type, vtkGRASSVectorFeaturePoints *points, vtkGRASSVectorFeatureCats *cats) ;
 
     /*!
        \brief Delete feature
@@ -78,10 +75,7 @@ public:
        \return 0 on success
        \return -1 on error
      */
-    virtual int DeleteFeature(int line) {
-        if (this->Open)return Vect_delete_line(&this->map, line);
-        else return -1;
-    }
+    virtual int DeleteFeature(int feature);
 
 
     //!\brief Set the name of the organisation

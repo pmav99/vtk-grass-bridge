@@ -15,9 +15,10 @@
 
 #include "vtkGRASSVectorMapUpdater.h"
 #include <vtkObjectFactory.h>
+#include <vtkGRASSDefines.h>
 
 
-vtkCxxRevisionMacro(vtkGRASSVectorMapUpdater, "$Revision: 1.18 $");
+vtkCxxRevisionMacro(vtkGRASSVectorMapUpdater, "$Revision: 1.1 $");
 vtkStandardNewMacro(vtkGRASSVectorMapUpdater);
 
 //----------------------------------------------------------------------------
@@ -27,6 +28,49 @@ vtkGRASSVectorMapUpdater::vtkGRASSVectorMapUpdater()
     this->SetVectorLevelToTopo();
 }
 
+//----------------------------------------------------------------------------
+
+int
+vtkGRASSVectorMapUpdater::RewriteFeature(int feature, int type, vtkGRASSVectorFeaturePoints *points, vtkGRASSVectorFeatureCats *cats)
+{
+    if (this->Open)
+    {
+        if (!setjmp(vgb_stack_buffer))
+        {
+            return Vect_rewrite_line(&this->map, feature, type, points->GetPointer(), cats->GetPointer());
+        }
+        else
+        {
+            char buff[1024];
+            G_snprintf(buff, 1024, "class: %s line: %i unable to rewrite feature to vector map <%s>.",
+                       this->GetClassName(), __LINE__, this->VectorName);
+            this->InsertNextError(buff);
+            return -1;
+        }
+    }
+}
+
+//----------------------------------------------------------------------------
+
+int
+vtkGRASSVectorMapUpdater::RestoreFeature(int line, int offset)
+{
+    if (this->Open)
+    {
+        if (!setjmp(vgb_stack_buffer))
+        {
+            return Vect_restore_line(&this->map, line, (off_t) offset);
+        }
+        else
+        {
+            char buff[1024];
+            G_snprintf(buff, 1024, "class: %s line: %i unable to restore feature to vector map <%s>.",
+                       this->GetClassName(), __LINE__, this->VectorName);
+            this->InsertNextError(buff);
+            return -1;
+        }
+    }
+}
 
 //----------------------------------------------------------------------------
 
@@ -42,7 +86,9 @@ vtkGRASSVectorMapUpdater::OpenMap(const char *name, int with_z)
                    this->GetClassName(), __LINE__, this->VectorName);
         this->InsertNextError(buff);
         return false;
-    } else if (this->Open == true) {
+    }
+    else if (this->Open == true)
+    {
         // If a new name is given, the open map will be closed
         this->CloseMap();
     }
@@ -50,15 +96,25 @@ vtkGRASSVectorMapUpdater::OpenMap(const char *name, int with_z)
     this->SetVectorName(name);
 
     Vect_set_open_level(this->VectorLevel);
-
-    if (1 > Vect_open_update(&this->map, name, ""))
+    if (!setjmp(vgb_stack_buffer))
+    {
+        if (1 > Vect_open_update(&this->map, name, ""))
+        {
+            G_snprintf(buff, 1024, "class: %s line: %i Unable to open vector map <%s>.",
+                       this->GetClassName(), __LINE__, name);
+            this->InsertNextError(buff);
+            this->Open = false;
+            return false;
+        }
+    }
+    else
     {
         G_snprintf(buff, 1024, "class: %s line: %i Unable to open vector map <%s>.",
                    this->GetClassName(), __LINE__, name);
         this->InsertNextError(buff);
+        this->Open = false;
         return false;
     }
-
     this->Open = true;
     return true;
 }

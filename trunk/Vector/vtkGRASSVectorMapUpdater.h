@@ -49,7 +49,7 @@ public:
        The number of points or cats or type may change. If necessary, the
        old feature is deleted and new is written.
 
-       \param line feature id
+       \param feature feature id
        \param type feature type
        \param points feature geometry
        \param cats feature categories
@@ -58,25 +58,19 @@ public:
        \return -1 on error
      */
 
-    virtual int RewriteFeature(int line, int type, vtkGRASSVectorFeaturePoints *points, vtkGRASSVectorFeatureCats *cats) {
-        if (this->Open) return Vect_rewrite_line(&this->map, line, type, points->GetPointer(), cats->GetPointer());
-        else return -1;
-    }
-
+    virtual int RewriteFeature(int feature, int type, vtkGRASSVectorFeaturePoints *points, vtkGRASSVectorFeatureCats *cats) ;
+    
     /*!
        \brief Restore previously deleted feature
 
        Vector map must be opened on topo level 2.
 
-       \param line feature id to be deleted
+       \param feature feature id to be deleted
 
        \return 0 on success
        \return -1 on error
      */
-    virtual int RestoreFeature(int line, int offset) {
-        if (this->Open)return Vect_restore_line(&this->map, line, (off_t)offset);
-        else return -1;
-    }
+    virtual int RestoreFeature(int feature, int offset);
 
 
 protected:

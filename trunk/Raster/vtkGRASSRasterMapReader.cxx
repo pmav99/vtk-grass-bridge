@@ -10,7 +10,7 @@
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
-*/
+ */
 
 #include "vtkGRASSRasterMapReader.h"
 #include "vtkGRASSHistory.h"
@@ -31,6 +31,7 @@ vtkGRASSRasterMapReader::OpenMap(char *name)
 {
     const char *mapset;
     char buff[1024];
+    int error = 0;
 
     // Check if the same map is already opened
     if (this->Open == true && strcmp(name, this->RasterName) == 0)
@@ -39,7 +40,9 @@ vtkGRASSRasterMapReader::OpenMap(char *name)
                    this->GetClassName(), __LINE__, this->RasterName);
         this->InsertNextError(buff);
         return false;
-    } else if (this->Open == true) {
+    }
+    else if (this->Open == true)
+    {
         // If a new name is given, the open map will be closed
         this->CloseMap();
     }
@@ -60,9 +63,21 @@ vtkGRASSRasterMapReader::OpenMap(char *name)
     // Set the region for the map
     this->SetRegion();
 
-    /* open raster map */
-    this->Map = Rast_open_old(this->RasterName, this->Mapset);
-    if (this->Map < 0)
+    if (!setjmp(vgb_stack_buffer))
+    {
+        /* open raster map */
+        this->Map = Rast_open_old(this->RasterName, this->Mapset);
+        if (this->Map < 0)
+        {
+            error = 1;
+        }
+    }
+    else
+    {
+        error = 1;
+    }
+
+    if (error == 1)
     {
         G_snprintf(buff, 1024, "class: %s line: %i Unable to open raster map %s.",
                    this->GetClassName(), __LINE__, this->RasterName);
@@ -70,7 +85,7 @@ vtkGRASSRasterMapReader::OpenMap(char *name)
         return false;
     }
 
-    if(!this->History->ReadHistory(this->GetRasterName()))
+    if (!this->History->ReadHistory(this->GetRasterName()))
     {
         G_snprintf(buff, 1024, "class: %s line: %i %s.",
                    this->GetClassName(), __LINE__, this->History->GetError());
@@ -134,9 +149,22 @@ vtkGRASSRasterMapReader::GetRange(double range[2])
 bool
 vtkGRASSRasterMapReader::CloseMap()
 {
+    int error = 0;
     if (this->Open == true && this->Map != -1)
     {
-        if (Rast_close(this->Map) != 1)
+        if (!setjmp(vgb_stack_buffer))
+        {
+            if (Rast_close(this->Map) != 1)
+            {
+                error = 1;
+            }
+        }
+        else
+        {
+            error = 1;
+        }
+
+        if (error == 1)
         {
             char buff[1024];
             G_snprintf(buff, 1024, "class: %s line: %i Unable to close raster map %s.",

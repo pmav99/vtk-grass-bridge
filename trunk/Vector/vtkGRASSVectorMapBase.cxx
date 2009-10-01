@@ -18,6 +18,7 @@
 #include <vtkObjectFactory.h>
 #include <vtkGRASSVectorFeaturePoints.h>
 #include <vtkGRASSVectorFeatureCats.h>
+#include <vtkGRASSDefines.h>
 
 
 vtkCxxRevisionMacro(vtkGRASSVectorMapBase, "$Revision: 1.18 $");
@@ -40,7 +41,7 @@ vtkGRASSVectorMapBase::vtkGRASSVectorMapBase()
 vtkGRASSVectorMapBase::~vtkGRASSVectorMapBase()
 {
     this->CloseMap();
-    if(this->VectorName)
+    if (this->VectorName)
         delete [] this->VectorName;
 }
 
@@ -59,7 +60,9 @@ vtkGRASSVectorMapBase::OpenMapReadOnly(const char *name)
                    this->GetClassName(), __LINE__, this->VectorName);
         this->InsertNextError(buff);
         return false;
-    } else if (this->Open == true) {
+    }
+    else if (this->Open == true)
+    {
         // If a new name is given, the open map will be closed
         this->CloseMap();
     }
@@ -68,14 +71,24 @@ vtkGRASSVectorMapBase::OpenMapReadOnly(const char *name)
 
     Vect_set_open_level(this->VectorLevel);
 
-    if (1 > Vect_open_old(&this->map, name, mapset))
+    if (!setjmp(vgb_stack_buffer))
+    {
+        if (1 > Vect_open_old(&this->map, name, mapset))
+        {
+            G_snprintf(buff, 1024, "class: %s line: %i Unable to open vector map <%s>.",
+                       this->GetClassName(), __LINE__, name);
+            this->InsertNextError(buff);
+            return false;
+        }
+    }
+    else
     {
         G_snprintf(buff, 1024, "class: %s line: %i Unable to open vector map <%s>.",
                    this->GetClassName(), __LINE__, name);
         this->InsertNextError(buff);
+        this->Open = false;
         return false;
     }
-
     this->RewindMap();
 
     if (mapset)
@@ -86,6 +99,7 @@ vtkGRASSVectorMapBase::OpenMapReadOnly(const char *name)
 }
 
 //----------------------------------------------------------------------------
+
 int
 vtkGRASSVectorMapBase::CheckBeforOpen(vtkGRASSVectorFeaturePoints *points, vtkGRASSVectorFeatureCats *cats)
 {
@@ -125,13 +139,20 @@ vtkGRASSVectorMapBase::ReadNextFeature(vtkGRASSVectorFeaturePoints *points, vtkG
     int ret = 1;
 
     ret = this->CheckBeforOpen(points, cats);
-    if(ret != 1)
+    if (ret != 1)
         return ret;
 
     points->Reset();
     cats->Reset();
 
-    ret = Vect_read_next_line(&this->map, points->GetPointer(), cats->GetPointer());
+    if (!setjmp(vgb_stack_buffer))
+    {
+        ret = Vect_read_next_line(&this->map, points->GetPointer(), cats->GetPointer());
+    }
+    else
+    {
+        ret = -1;
+    }
 
     if (ret == -1)
     {
@@ -141,7 +162,7 @@ vtkGRASSVectorMapBase::ReadNextFeature(vtkGRASSVectorFeaturePoints *points, vtkG
         return ret;
     }
 
-    if(ret >= 0)
+    if (ret >= 0)
         points->SetFeatureType(ret);
 
     return ret;
@@ -153,13 +174,25 @@ bool
 vtkGRASSVectorMapBase::CloseMap()
 {
     char buff[1024];
-    
-    if(this->Open == false)
+
+    if (this->Open == false)
         return true;
 
 
     Vect_set_release_support(&this->map);
-    if (Vect_close(&this->map) != 0)
+
+    if (!setjmp(vgb_stack_buffer))
+    {
+        if (Vect_close(&this->map) != 0)
+        {
+            G_snprintf(buff, 1024, "class: %s line: %i Error while closing vector map <%s>.",
+                       this->GetClassName(), __LINE__, this->GetFullName());
+            this->InsertNextError(buff);
+            this->Open = false;
+            return false;
+        }
+    }
+    else
     {
         G_snprintf(buff, 1024, "class: %s line: %i Error while closing vector map <%s>.",
                    this->GetClassName(), __LINE__, this->GetFullName());
@@ -179,9 +212,9 @@ vtkGRASSVectorMapBase::CloseMap()
 int
 vtkGRASSVectorMapBase::GetTotalNumberOfPoints()
 {
-    if(this->Open == false)
+    if (this->Open == false)
         return 0;
-    if(this->Initiated == true)
+    if (this->Initiated == true)
         return this->TotalNumberOfPoints;
 
     this->RewindMap();
@@ -189,16 +222,23 @@ vtkGRASSVectorMapBase::GetTotalNumberOfPoints()
     vtkGRASSVectorFeaturePoints *points = vtkGRASSVectorFeaturePoints::New();
     vtkGRASSVectorFeatureCats *cats = vtkGRASSVectorFeatureCats::New();
 
-    while(0 < this->ReadNextFeature(points, cats))
+    if (!setjmp(vgb_stack_buffer))
     {
-        this->TotalNumberOfPoints += points->GetNumberOfPoints();
+        while (0 < this->ReadNextFeature(points, cats))
+        {
+            this->TotalNumberOfPoints += points->GetNumberOfPoints();
+        }
+    }
+    else
+    {
+        return -1;
     }
 
     this->RewindMap();
 
     points->Delete();
     cats->Delete();
-    
+
     this->Initiated = true;
 
     return this->TotalNumberOfPoints;
@@ -214,7 +254,8 @@ vtkGRASSVectorMapBase::PrintSelf(ostream& os, vtkIndent indent)
 
     os << indent << "Is Open: " << (this->Open ? "True:" : "False") << endl;
 
-    if(this->Open){
+    if (this->Open)
+    {
         indent = indent.GetNextIndent();
         os << indent << "Organisation: " << this->GetOrganisation() << endl;
         os << indent << "CreationDate: " << this->GetCreationDate() << endl;
@@ -229,7 +270,7 @@ vtkGRASSVectorMapBase::PrintSelf(ostream& os, vtkIndent indent)
         os << indent << "Threshold: " << this->GetThreshold() << endl;
         os << indent << "Projection: " << this->GetProjection() << endl;
         os << indent << "ProjectionName: " << this->GetProjectionName() << endl;
-        os << indent << "Is 3d: " << (this->Is3d()?"Yes":"No") << endl;
+        os << indent << "Is 3d: " << (this->Is3d() ? "Yes" : "No") << endl;
         os << indent << "Total number of coor points: " << this->GetTotalNumberOfPoints() << endl;
     }
 }
