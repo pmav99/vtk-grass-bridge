@@ -33,15 +33,8 @@ vtkGRASSVectorMapWriter::WriteFeature(int type, vtkGRASSVectorFeaturePoints *poi
 {
     if (this->Open)
     {
-        if (!setjmp(vgb_stack_buffer))
-        {
-            return Vect_write_line(&this->map, type, points->GetPointer(), cats->GetPointer());
-        }
-        else
-        {
-            this->InsertNextError(vgb_error_message);
-            return -1;
-        }
+        TRY return Vect_write_line(&this->map, type, points->GetPointer(), cats->GetPointer());
+        CATCH_INT
     }
     else return -1;
 }
@@ -53,15 +46,9 @@ vtkGRASSVectorMapWriter::DeleteFeature(int feature)
 {
     if (this->Open)
     {
-        if (!setjmp(vgb_stack_buffer))
-        {
-            return Vect_delete_line(&this->map, feature);
-        }
-        else
-        {
-            this->InsertNextError(vgb_error_message);
-            return -1;
-        }
+        TRY return Vect_delete_line(&this->map, feature);
+        CATCH_INT
+
     }
     else return -1;
 }

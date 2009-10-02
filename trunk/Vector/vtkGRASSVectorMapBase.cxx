@@ -143,15 +143,8 @@ vtkGRASSVectorMapBase::ReadNextFeature(vtkGRASSVectorFeaturePoints *points, vtkG
     points->Reset();
     cats->Reset();
 
-    if (!setjmp(vgb_stack_buffer))
-    {
-        ret = Vect_read_next_line(&this->map, points->GetPointer(), cats->GetPointer());
-    }
-    else
-    {
-        this->InsertNextError(vgb_error_message);
-        return ret;
-    }
+    TRY ret = Vect_read_next_line(&this->map, points->GetPointer(), cats->GetPointer()); CATCH_INT
+
 
     if (ret == -1)
     {
@@ -228,6 +221,8 @@ vtkGRASSVectorMapBase::GetTotalNumberOfPoints()
     }
     else
     {
+        points->Delete();
+        cats->Delete();
         return -1;
     }
 

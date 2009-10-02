@@ -83,8 +83,7 @@ vtkGRASSRasterMapBase::SetRegion()
                    this->GetClassName(), __LINE__);
         return false;
     }
-    if (!setjmp(vgb_stack_buffer))
-    {
+    TRY
         if (this->RegionUsage == VTK_GRASS_REGION_CURRENT)
         {
             G_get_set_window(&head);
@@ -114,12 +113,7 @@ vtkGRASSRasterMapBase::SetRegion()
             G_get_set_window(&head);
             this->Region->CopyRegionFrom(&head);
         }
-    }
-    else
-    {
-		this->InsertNextError(vgb_error_message);
-        return false;
-    }
+    CATCH_BOOL
 
     this->NumberOfRows = head.rows;
     this->NumberOfCols = head.cols;
@@ -227,7 +221,6 @@ vtkGRASSRasterMapBase::GetRow(int idx)
         {
             this->Row->SetTuple1(i, (double) *(DCELL*) ptr);
         }
-
 
     return this->Row;
 }

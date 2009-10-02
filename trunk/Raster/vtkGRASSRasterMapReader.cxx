@@ -44,7 +44,8 @@ vtkGRASSRasterMapReader::OpenMap(char *name)
     else if (this->Open == true)
     {
         // If a new name is given, the open map will be closed
-        this->CloseMap();
+        if(!this->CloseMap())
+            return false;
     }
 
     this->SetRasterName(name);
@@ -153,18 +154,9 @@ vtkGRASSRasterMapReader::CloseMap()
     int error = 0;
     if (this->Open == true && this->Map != -1)
     {
-        if (!setjmp(vgb_stack_buffer))
-        {
-            if (Rast_close(this->Map) != 1)
-            {
+         TRY if (Rast_close(this->Map) != 1)
                 error = 1;
-            }
-        }
-        else
-        {
-            this->InsertNextError(vgb_error_message);
-            return false;
-        }
+         CATCH_BOOL
 
         if (error == 1)
         {

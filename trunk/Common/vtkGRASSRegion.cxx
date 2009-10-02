@@ -14,6 +14,7 @@
 
 #include "vtkGRASSRegion.h"
 #include <vtkObjectFactory.h>
+#include "vtkGRASSDefines.h"
 
 vtkCxxRevisionMacro(vtkGRASSRegion, "$Revision: 1.18 $");
 vtkStandardNewMacro(vtkGRASSRegion);
@@ -49,7 +50,8 @@ vtkGRASSRegion::~vtkGRASSRegion() {
 //----------------------------------------------------------------------------
 
 bool vtkGRASSRegion::ReadCurrentRegion() {
-    G_get_set_window(&this->head);
+    TRY G_get_set_window(&this->head);
+    CATCH_BOOL
     this->CopyRegionFrom(&this->head);
     this->Modified();
     return true;
@@ -58,14 +60,12 @@ bool vtkGRASSRegion::ReadCurrentRegion() {
 //----------------------------------------------------------------------------
 
 bool vtkGRASSRegion::ReadDefaultRegion() {
-    try {
+    TRY
     G_get_default_window(&this->head);
+    CATCH_BOOL
     this->CopyRegionFrom(&this->head);
     this->Modified();
-    } catch(char *msg) {
-        this->InsertNextError(msg);
-        return false;
-    }
+
     return true;
 }
 
@@ -168,7 +168,8 @@ bool vtkGRASSRegion::SaveRegionAsDefault() {
 
     this->CopyRegionTo(&this->head);
 
-    message = G_adjust_Cell_head(&this->head, 1, 1);
+    TRY message = G_adjust_Cell_head(&this->head, 1, 1);
+    CATCH_BOOL
     if(message != NULL)
     {
         G_snprintf(buff, 1024, "class: %s line: %i %s",
@@ -196,7 +197,8 @@ bool vtkGRASSRegion::AdjustRegion() {
 
     this->CopyRegionTo(&this->head);
 
-    message = G_adjust_Cell_head(&this->head, 1, 1);
+    TRY message = G_adjust_Cell_head(&this->head, 1, 1);
+    CATCH_BOOL
     if(message != NULL)
     {
         G_snprintf(buff, 1024, "class: %s line: %i %s",

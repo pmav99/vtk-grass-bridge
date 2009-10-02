@@ -31,6 +31,7 @@
 
 #include <vtkObjectGRASSErrorHandler.h>
 #include "vtkGRASSBridgeVectorWin32Header.h"
+#include "vtkGRASSDefines.h"
 
 class vtkGRASSVectorFeaturePoints;
 class vtkGRASSVectorFeatureCats;
@@ -166,8 +167,8 @@ public:
      * \return -1 map not open
      */
     virtual int IsFeatureAlive(int feature) {
-        if (this->Open)return Vect_line_alive(&this->map, feature);
-        else return -1;
+        TRY if (this->Open)return Vect_line_alive(&this->map, feature);
+        else return -1; CATCH_INT
     }
     /*!
        \brief Check if node of vector map is alive
@@ -180,8 +181,8 @@ public:
      * \return -1 map not open
      */
     virtual int IsNodeAlive(int node) {
-        if (this->Open)return Vect_node_alive(&this->map, node);
-        else return -1;
+        TRY if (this->Open)return Vect_node_alive(&this->map, node);
+        else return -1; CATCH_INT
     }
     /*!
        \brief Check if areaof vector map is alive
@@ -194,8 +195,8 @@ public:
      * \return -1 map not open
      */
     virtual int IsAreaAlive(int area) {
-        if (this->Open)return Vect_line_alive(&this->map, area);
-        else return -1;
+        TRY if (this->Open)return Vect_line_alive(&this->map, area);
+        else return -1; CATCH_INT
     }
     /*!
        \brief Check if isle of vector map is alive
@@ -208,8 +209,8 @@ public:
      * \return -1 map not open
      */
     virtual int IsIsleAlive(int isle) {
-        if (this->Open)return Vect_line_alive(&this->map, isle);
-        else return -1;
+        TRY if (this->Open)return Vect_line_alive(&this->map, isle);
+        else return -1; CATCH_INT
     }
     /*!
       \brief Get feature offset
@@ -222,8 +223,8 @@ public:
       \return -1 on error
     */
     virtual int GetLineOffset(int line){
-        if (this->Open)return Vect_get_line_offset(&this->map, line);
-        else return -1;
+        TRY if (this->Open)return Vect_get_line_offset(&this->map, line);
+        else return -1; CATCH_INT
     }
 
     //!\brief compute the total number of points used by this map. This may be very time consuming.

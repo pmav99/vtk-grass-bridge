@@ -55,6 +55,8 @@ vtkGRASSDatabaseInfo::~vtkGRASSDatabaseInfo() {
     if(this->GisBasePath)
         delete [] this->GisBasePath;
 
+    this->AvailableMapSets->Delete();
+
 }
 //----------------------------------------------------------------------------
 

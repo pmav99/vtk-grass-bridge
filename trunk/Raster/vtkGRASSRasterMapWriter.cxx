@@ -52,7 +52,8 @@ vtkGRASSRasterMapWriter::OpenMap(char *name)
     else if (this->Open == true)
     {
         // If a new name is given, the open map will be closed
-        this->CloseMap();
+        if(!this->CloseMap())
+            return false;
     }
 
     this->SetRasterName(name);
@@ -144,19 +145,11 @@ vtkGRASSRasterMapWriter::PutNextRow(vtkDataArray *data)
             ((DCELL*)this->RasterBuff)[i] = (DCELL) data->GetTuple1(i);
     }
 
-    if (!setjmp(vgb_stack_buffer))
-    {
-        this->RowCount = Rast_put_row(this->Map, this->RasterBuff, this->MapType);
+    TRY this->RowCount = Rast_put_row(this->Map, this->RasterBuff, this->MapType);
         if (this->RowCount < 0)
-        {
             error = 1;
-        }
-    }
-    else
-    {
-        this->InsertNextError(vgb_error_message);
-        return -1;
-    }
+    CATCH_INT
+    
 
     if (error == 1)
     {
@@ -178,18 +171,9 @@ vtkGRASSRasterMapWriter::CloseMap()
 
     if (this->Open == true && this->Map != -1)
     {
-        if (!setjmp(vgb_stack_buffer))
-        {
-            if (Rast_close(this->Map) != 1)
-            {
-                error = 1;
-            }
-        }
-        else
-        {
-            this->InsertNextError(vgb_error_message);
-            return false;
-        }
+        TRY if (Rast_close(this->Map) != 1)
+                error = 1; 
+        CATCH_BOOL
 
         if (error == 1)
         {
