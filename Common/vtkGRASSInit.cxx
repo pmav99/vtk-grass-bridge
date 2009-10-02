@@ -42,6 +42,7 @@ vgb_error_handler(const char *msg, int fatal)
     }
     else 
     {
+		fprintf(stderr, "\n############## Exceptiont called ###########\n");
 		vgb_error_message = msg;
         longjmp(vgb_stack_buffer, 1);
     }
@@ -52,7 +53,8 @@ vgb_error_handler(const char *msg, int fatal)
 
 vtkGRASSInit::vtkGRASSInit()
 {
-    G_gisinit("vtkGRASSInit");
     // Set the error routine
     G_set_error_routine(vgb_error_handler);
+	G_sleep_on_error(0);
+    G_gisinit("vtkGRASSInit");
 }
