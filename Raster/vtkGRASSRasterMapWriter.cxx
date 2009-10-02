@@ -82,7 +82,10 @@ vtkGRASSRasterMapWriter::OpenMap(char *name)
     }
     else
     {
-        error = 1;
+        this->InsertNextError(vgb_error_message);
+        this->Open = false;
+        this->RowCount = 0;
+        return false;	
     }
 
     if (error == 1)
@@ -151,7 +154,8 @@ vtkGRASSRasterMapWriter::PutNextRow(vtkDataArray *data)
     }
     else
     {
-        error = 1;
+        this->InsertNextError(vgb_error_message);
+        return -1;
     }
 
     if (error == 1)
@@ -183,7 +187,8 @@ vtkGRASSRasterMapWriter::CloseMap()
         }
         else
         {
-            error = 1;
+            this->InsertNextError(vgb_error_message);
+            return false;
         }
 
         if (error == 1)

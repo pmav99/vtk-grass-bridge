@@ -34,3 +34,4 @@ extern "C" {
 #endif
 
 extern threadLocal jmp_buf vgb_stack_buffer;    /*to save the most important CPU register for each thread*/
+extern threadLocal const char* vgb_error_message;

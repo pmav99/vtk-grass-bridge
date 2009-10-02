@@ -83,9 +83,7 @@ vtkGRASSVectorMapBase::OpenMapReadOnly(const char *name)
     }
     else
     {
-        G_snprintf(buff, 1024, "class: %s line: %i Unable to open vector map <%s>.",
-                   this->GetClassName(), __LINE__, name);
-        this->InsertNextError(buff);
+        this->InsertNextError(vgb_error_message);
         this->Open = false;
         return false;
     }
@@ -151,7 +149,8 @@ vtkGRASSVectorMapBase::ReadNextFeature(vtkGRASSVectorFeaturePoints *points, vtkG
     }
     else
     {
-        ret = -1;
+        this->InsertNextError(vgb_error_message);
+        return ret;
     }
 
     if (ret == -1)
@@ -194,9 +193,7 @@ vtkGRASSVectorMapBase::CloseMap()
     }
     else
     {
-        G_snprintf(buff, 1024, "class: %s line: %i Error while closing vector map <%s>.",
-                   this->GetClassName(), __LINE__, this->GetFullName());
-        this->InsertNextError(buff);
+        this->InsertNextError(vgb_error_message);
         this->Open = false;
         return false;
     }

@@ -50,8 +50,8 @@ vtkGRASSVectorMapTopoReader::ReadFeature(int index, vtkGRASSVectorFeaturePoints 
     }
     else
     {
-
-        ret = -1;
+        this->InsertNextError(vgb_error_message);
+        return -1;
     }
 
     if (ret == -1)

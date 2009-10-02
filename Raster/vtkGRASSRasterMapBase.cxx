@@ -117,9 +117,7 @@ vtkGRASSRasterMapBase::SetRegion()
     }
     else
     {
-        char buff[1024];
-        G_snprintf(buff, 1024, "class: %s line: %i Unable to set the region.",
-                   this->GetClassName(), __LINE__);
+		this->InsertNextError(vgb_error_message);
         return false;
     }
 
@@ -198,7 +196,8 @@ vtkGRASSRasterMapBase::GetRow(int idx)
     }
     else
     {
-        error = 1;
+        this->InsertNextError(vgb_error_message);
+        return NULL;
     }
 
     if (error == 1)

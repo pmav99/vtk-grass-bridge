@@ -39,10 +39,7 @@ vtkGRASSVectorMapWriter::WriteFeature(int type, vtkGRASSVectorFeaturePoints *poi
         }
         else
         {
-            char buff[1024];
-            G_snprintf(buff, 1024, "class: %s line: %i unamble to write feature to vector map <%s>.",
-                       this->GetClassName(), __LINE__, this->VectorName);
-            this->InsertNextError(buff);
+            this->InsertNextError(vgb_error_message);
             return -1;
         }
     }
@@ -62,10 +59,7 @@ vtkGRASSVectorMapWriter::DeleteFeature(int feature)
         }
         else
         {
-            char buff[1024];
-            G_snprintf(buff, 1024, "class: %s line: %i unamble to delete feature to vector map <%s>.",
-                       this->GetClassName(), __LINE__, this->VectorName);
-            this->InsertNextError(buff);
+            this->InsertNextError(vgb_error_message);
             return -1;
         }
     }
@@ -101,18 +95,14 @@ vtkGRASSVectorMapWriter::OpenMap(const char *name, int with_z)
     {
         if (1 > Vect_open_new(&this->map, name, with_z))
         {
-            G_snprintf(buff, 1024, "class: %s line: %i Unable to open vector map <%s>.",
-                       this->GetClassName(), __LINE__, name);
-            this->InsertNextError(buff);
+            this->InsertNextError(vgb_error_message);
             this->Open = false;
             return false;
         }
     }
     else
     {
-        G_snprintf(buff, 1024, "class: %s line: %i Unable to open vector map <%s>.",
-                   this->GetClassName(), __LINE__, name);
-        this->InsertNextError(buff);
+        this->InsertNextError(vgb_error_message);
         this->Open = false;
         return false;
     }
@@ -156,9 +146,7 @@ vtkGRASSVectorMapWriter::CloseMap(int build_topo)
     }
     else
     {
-        G_snprintf(buff, 1024, "class: %s line: %i Error while closing vector map <%s>.",
-                   this->GetClassName(), __LINE__, this->GetFullName());
-        this->InsertNextError(buff);
+        this->InsertNextError(vgb_error_message);
         this->Open = false;
         return false;
     }
