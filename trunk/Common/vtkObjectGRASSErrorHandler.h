@@ -68,6 +68,8 @@ protected:
 
   void InsertNextError(char *message);
   void InsertNextWarning(char *message);
+  void InsertNextError(const char *message){this->InsertNextError((char*)message);}
+  void InsertNextWarning(const char *message){this->InsertNextWarning((char*)message);}
 
   int NumberOfErrors;
   int NumberOfWarnings;

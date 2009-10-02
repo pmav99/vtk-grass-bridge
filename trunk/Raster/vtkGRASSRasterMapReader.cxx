@@ -74,7 +74,8 @@ vtkGRASSRasterMapReader::OpenMap(char *name)
     }
     else
     {
-        error = 1;
+        this->InsertNextError(vgb_error_message);
+        return false;
     }
 
     if (error == 1)
@@ -161,7 +162,8 @@ vtkGRASSRasterMapReader::CloseMap()
         }
         else
         {
-            error = 1;
+            this->InsertNextError(vgb_error_message);
+            return false;
         }
 
         if (error == 1)

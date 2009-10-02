@@ -41,10 +41,7 @@ vtkGRASSVectorMapUpdater::RewriteFeature(int feature, int type, vtkGRASSVectorFe
         }
         else
         {
-            char buff[1024];
-            G_snprintf(buff, 1024, "class: %s line: %i unable to rewrite feature to vector map <%s>.",
-                       this->GetClassName(), __LINE__, this->VectorName);
-            this->InsertNextError(buff);
+            this->InsertNextError(vgb_error_message);
             return -1;
         }
     }
@@ -63,10 +60,7 @@ vtkGRASSVectorMapUpdater::RestoreFeature(int line, int offset)
         }
         else
         {
-            char buff[1024];
-            G_snprintf(buff, 1024, "class: %s line: %i unable to restore feature to vector map <%s>.",
-                       this->GetClassName(), __LINE__, this->VectorName);
-            this->InsertNextError(buff);
+            this->InsertNextError(vgb_error_message);
             return -1;
         }
     }
@@ -109,9 +103,7 @@ vtkGRASSVectorMapUpdater::OpenMap(const char *name, int with_z)
     }
     else
     {
-        G_snprintf(buff, 1024, "class: %s line: %i Unable to open vector map <%s>.",
-                   this->GetClassName(), __LINE__, name);
-        this->InsertNextError(buff);
+        this->InsertNextError(vgb_error_message);
         this->Open = false;
         return false;
     }

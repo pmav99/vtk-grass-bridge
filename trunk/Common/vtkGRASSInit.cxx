@@ -26,6 +26,7 @@ extern "C"
 vtkCxxRevisionMacro(vtkGRASSInit, "$Revision: 1.18 $");
 vtkStandardNewMacro(vtkGRASSInit);
 
+threadLocal const char* vgb_error_message = NULL;
 threadLocal jmp_buf vgb_stack_buffer;
 
 
@@ -39,15 +40,10 @@ vgb_error_handler(const char *msg, int fatal)
         fprintf(stderr, "%s\n", msg);
         return 1;
     }
-    else if (fatal == 1)
+    else 
     {
-        fprintf(stderr, "WARNING: %s\n", msg);
+		vgb_error_message = msg;
         longjmp(vgb_stack_buffer, 1);
-    }
-    else if (fatal == 2)
-    {
-        fprintf(stderr, "ERROR: %s\n", msg);
-        longjmp(vgb_stack_buffer, 2);
     }
     return 1;
 }
