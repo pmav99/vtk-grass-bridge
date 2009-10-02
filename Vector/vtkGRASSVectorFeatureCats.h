@@ -63,7 +63,7 @@ public:
        'cat' is set to first category found or -1 if field was not found
 
        \param[in] field layer number
-     *
+
        \return cat
      */
     virtual int GetCat(int field);
@@ -76,7 +76,7 @@ public:
 
        \return number of found categories
        \return -1 on invalid field
-     * \return -2 unable to allocate internal memory
+       \return -2 unable to allocate internal memory
      */
     virtual int GetCats(int field, vtkIntArray *categories);
 

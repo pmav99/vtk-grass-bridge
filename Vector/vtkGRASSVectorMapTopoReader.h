@@ -92,8 +92,8 @@ public:
        \return -1 on error
      */
     int GetIslePoints( int isle, vtkGRASSVectorFeaturePoints *points) {
-        if (this->Open) return Vect_get_isle_points (&this->map, isle, points->GetPointer());
-        else return -1;
+        TRY if (this->Open) return Vect_get_isle_points (&this->map, isle, points->GetPointer());
+        else return -1; CATCH_INT
     }
     /*!
        \brief Returns centroid id for given area
@@ -104,8 +104,8 @@ public:
        \return 0 if no centroid found
      */
     int GetCentroidFromArea(int area ){
-        if (this->Open) return Vect_get_area_centroid (&this->map, area);
-        else return -1;
+        TRY if (this->Open) return Vect_get_area_centroid (&this->map, area);
+        else return -1; CATCH_INT
     }
 
     /*!
@@ -135,8 +135,8 @@ public:
        \return 0 if area not found
      */
     int GetNumberOfAreaIsles(int area){
-        if (this->Open) return Vect_get_area_num_isles (&this->map, area);
-        else return -1;
+        TRY if (this->Open) return Vect_get_area_num_isles (&this->map, area);
+        else return -1; CATCH_INT
     }
     /*!
        \brief Returns isle id for area
@@ -148,8 +148,8 @@ public:
        \return 0 if no isle found
      */
     int GetAreaIsle(int area, int isle){
-        if (this->Open) return Vect_get_area_isle (&this->map, area, isle);
-        else return -1;
+        TRY if (this->Open) return Vect_get_area_isle (&this->map, area, isle);
+        else return -1; CATCH_INT
     }
     /*!
        \brief Returns area id for isle
@@ -160,8 +160,8 @@ public:
        \return 0 area not found
      */
     int GetIsleArea(int isle){
-        if (this->Open) return Vect_get_isle_area (&this->map, isle);
-        else return -1;
+        TRY if (this->Open) return Vect_get_isle_area (&this->map, isle);
+        else return -1; CATCH_INT
     }
     /*!
        \brief Check if point is in area
@@ -173,8 +173,8 @@ public:
        \return 0 if not
      */
     int IsPointInArea(int area, double x, double y){
-        if (this->Open) return Vect_point_in_area (&this->map, area, x, y);
-        else return -1;
+        TRY if (this->Open) return Vect_point_in_area (&this->map, area, x, y);
+        else return -1; CATCH_INT
     }
     /*!
        \brief Returns area of area without areas of isles
@@ -185,8 +185,8 @@ public:
        \return area of area without areas of isles
      */
     double GetAreaOfArea(int area) {
-        if (this->Open)return Vect_get_area_area(&this->map, area);
-        else return -1;
+        TRY if (this->Open)return Vect_get_area_area(&this->map, area);
+        else return -1; CATCH_INT
     }
     /*!
        \brief Calculate area perimeter
@@ -196,13 +196,13 @@ public:
        \return area perimeter
      */
     double GetPerimeterOfArea(vtkGRASSVectorFeaturePoints *areapoints) {
-        if (this->Open)return Vect_area_perimeter(areapoints->GetPointer());
-        else return -1;
+        TRY if (this->Open)return Vect_area_perimeter(areapoints->GetPointer());
+        else return -1; CATCH_INT
     }
         //!\brief Returns area of area without areas of isles.
     double GetAreaBoundingBox(int area, vtkGRASSVectorBBox *box) {
-        if (this->Open)return Vect_get_area_box(&this->map, area, box->GetPointer());
-        else return -1;
+        TRY if (this->Open)return Vect_get_area_box(&this->map, area, box->GetPointer());
+        else return -1; CATCH_INT
     }
     /*!
      * \brief Find the nearest node.
@@ -215,8 +215,8 @@ public:
      * \return 0 if not found
      */
     int FindNearestNode(double ux, double uy, double uz, double maxdist, int with_z){
-        if (this->Open)return Vect_find_node(&this->map, ux, uy, uz, maxdist, with_z);
-        else return -1;
+        TRY if (this->Open)return Vect_find_node(&this->map, ux, uy, uz, maxdist, with_z);
+        else return -1; CATCH_INT
     }
     /*!
      * \brief Find the nearest line.
@@ -234,8 +234,8 @@ public:
      *
      */
     int FindNearestLine(double ux, double uy, double uz, int type, double maxdist, int with_z, int exclude){
-        if (this->Open)return Vect_find_line(&this->map, ux, uy, uz, type, maxdist, with_z, exclude);
-        else return -1;
+        TRY if (this->Open)return Vect_find_line(&this->map, ux, uy, uz, type, maxdist, with_z, exclude);
+        else return -1; CATCH_INT
     }
     
     /*!
@@ -247,8 +247,8 @@ public:
      * \return 0 if not found
      */
     int FindNearestArea(double x, double y){
-        if (this->Open)return Vect_find_area(&this->map, x, y);
-        else return -1;
+        TRY if (this->Open)return Vect_find_area(&this->map, x, y);
+        else return -1; CATCH_INT
     }
 
     /*!
@@ -260,8 +260,8 @@ public:
      * \return 0 if not found
      */
     int FindNearestIsle(double x, double y){
-        if (this->Open)return Vect_find_island(&this->map, x, y);
-        else return -1;
+        TRY if (this->Open)return Vect_find_island(&this->map, x, y);
+        else return -1; CATCH_INT
     }
 
     /***************************** FIND FUNCTIONS *****************************/
@@ -395,8 +395,8 @@ public:
      *
      * */
     int DeepCopy(vtkGRASSVectorMapTopoReader *src){
-        if(this->Open && src->IsOpen()) return Vect_copy_map_lines(src->GetPointer(), this->GetPointer());
-        else return -1;
+        TRY if(this->Open && src->IsOpen()) return Vect_copy_map_lines(src->GetPointer(), this->GetPointer());
+        else return -1; CATCH_INT
     }
 
 protected:

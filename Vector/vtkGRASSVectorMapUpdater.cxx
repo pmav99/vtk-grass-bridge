@@ -35,15 +35,8 @@ vtkGRASSVectorMapUpdater::RewriteFeature(int feature, int type, vtkGRASSVectorFe
 {
     if (this->Open)
     {
-        if (!setjmp(vgb_stack_buffer))
-        {
-            return Vect_rewrite_line(&this->map, feature, type, points->GetPointer(), cats->GetPointer());
-        }
-        else
-        {
-            this->InsertNextError(vgb_error_message);
-            return -1;
-        }
+        TRY return Vect_rewrite_line(&this->map, feature, type, points->GetPointer(), cats->GetPointer());
+        CATCH_INT
     }
 }
 
@@ -54,15 +47,8 @@ vtkGRASSVectorMapUpdater::RestoreFeature(int line, int offset)
 {
     if (this->Open)
     {
-        if (!setjmp(vgb_stack_buffer))
-        {
-            return Vect_restore_line(&this->map, line, (off_t) offset);
-        }
-        else
-        {
-            this->InsertNextError(vgb_error_message);
-            return -1;
-        }
+        TRY return Vect_restore_line(&this->map, line, (off_t) offset);
+        CATCH_INT
     }
 }
 

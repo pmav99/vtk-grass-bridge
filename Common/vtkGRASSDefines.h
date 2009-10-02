@@ -33,5 +33,19 @@ extern "C" {
 #define threadLocal   __thread
 #endif
 
+#define TRY         if (!setjmp(vgb_stack_buffer)) {
+
+#define CATCH_INT   } else { \
+                    this->InsertNextError(vgb_error_message); \
+                    return -1;}
+
+#define CATCH_VOID  } else { \
+                    this->InsertNextError(vgb_error_message); \
+                    return;}
+
+#define CATCH_BOOL  } else { \
+                    this->InsertNextError(vgb_error_message); \
+                    return false;}
+
 extern threadLocal jmp_buf vgb_stack_buffer;    /*to save the most important CPU register for each thread*/
 extern threadLocal const char* vgb_error_message;

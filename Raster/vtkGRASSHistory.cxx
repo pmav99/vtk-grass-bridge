@@ -14,6 +14,7 @@
 
 #include "vtkGRASSHistory.h"
 #include <vtkObjectFactory.h>
+#include "vtkGRASSDefines.h"
 
 extern "C"
 {
@@ -197,7 +198,7 @@ bool
 vtkGRASSHistory::WriteHistory(char *rastername)
 {
     char buff[1024];
-    
+    TRY
     if(Rast_write_history(rastername, &this->hist) == -1)
     {
         G_snprintf(buff, 1024, "class: %s line: %i Unable to write history file of map %s.",
@@ -205,6 +206,7 @@ vtkGRASSHistory::WriteHistory(char *rastername)
         this->InsertNextError(buff);
         return false;
     }
+    CATCH_BOOL
 
     this->SetRasterName(rastername);
     

@@ -119,28 +119,28 @@ public:
     //! \brief Build the full topology of the vector map
 
     virtual int BuildAll() {
-        if (this->Open) {
+        TRY if (this->Open) {
             Vect_set_category_index_update(&this->map);
             return Vect_build(&this->map);
-        } else return -1;
+        } else return -1; CATCH_INT
     }
     //! \brief Build the base topology of the vector map
 
     virtual int BuildBase() {
-        if (this->Open) return Vect_build_partial(&this->map, GV_BUILD_BASE);
-        else return -1;
+        TRY if (this->Open) return Vect_build_partial(&this->map, GV_BUILD_BASE);
+        else return -1; CATCH_INT
     }
     //! \brief Build the area topology of the vector map
 
     virtual int BuildAreas() {
-        if (this->Open) return Vect_build_partial(&this->map, GV_BUILD_AREAS);
-        else return -1;
+        TRY if (this->Open) return Vect_build_partial(&this->map, GV_BUILD_AREAS);
+        else return -1; CATCH_INT
     }
     //! \brief Attach islands to areas
 
     virtual int BuildIsles() {
-        if (this->Open)return Vect_build_partial(&this->map, GV_BUILD_ATTACH_ISLES);
-        else return -1;
+        TRY if (this->Open)return Vect_build_partial(&this->map, GV_BUILD_ATTACH_ISLES);
+        else return -1; CATCH_INT
     }
 
     /*!
@@ -153,7 +153,7 @@ public:
      * \return void
      */
     virtual void SnapLines(int featureType, double threshold) {
-        if (this->Open) Vect_snap_lines(&this->map, featureType, threshold, NULL);
+        TRY if (this->Open) Vect_snap_lines(&this->map, featureType, threshold, NULL); CATCH_VOID
     }
 
      /*!
@@ -163,7 +163,7 @@ public:
        \return void
      */
    virtual void BreakLines(int featureType) {
-        if (this->Open) Vect_break_lines(&this->map, featureType, NULL);
+        TRY if (this->Open) Vect_break_lines(&this->map, featureType, NULL); CATCH_VOID
     }
      /*!
        \brief Remove small areas from the map map.
@@ -176,8 +176,8 @@ public:
        \return number of removed areas or -1 for failure
      */
     virtual int RemoveSmallAreas(double thres) {
-        if (this->Open) return Vect_remove_small_areas(&this->map, thres, NULL, NULL);
-        else return -1;
+       TRY if (this->Open) return Vect_remove_small_areas(&this->map, thres, NULL, NULL);
+        else return -1; CATCH_INT
     }
 
     /*!
@@ -191,7 +191,7 @@ public:
        \return void
      */
     virtual void RemoveDuplicates(int type) {
-        if (this->Open) Vect_remove_duplicates(&this->map, type, NULL);
+        TRY if (this->Open) Vect_remove_duplicates(&this->map, type, NULL); CATCH_VOID
     }
 
     //!\brief Set open new vector map without topology support
