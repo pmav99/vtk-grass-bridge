@@ -17,15 +17,17 @@ from libvtkCommonPython import *
 from libvtkGRASSBridgeCommonPython import *
 from libvtkGRASSBridgeVectorPython import *
 
-class GRASSVectorLinePointsTest(unittest.TestCase):
+class GRASSVectorMapBaseTest(unittest.TestCase):
     def setUp(self):
 
         #Initiate grass
         init = vtkGRASSInit()
+        init.Init("GRASSVectorMapBaseTest")
+        init.ExitOnErrorOn()
 
     def test1TopoReader(self):
         map = vtkGRASSVectorMapTopoReader()
-        map.OpenMap("nc_state")
+        map.OpenMap("nc_state@user1")
 
         box = vtkGRASSVectorBBox()
         map.GetBoundingBox(box)
@@ -44,7 +46,7 @@ class GRASSVectorLinePointsTest(unittest.TestCase):
 
     def test2TopoReader(self):
         map = vtkGRASSVectorMapTopoReader()
-        map.OpenMap("elev_lidrural_mrpts")
+        map.OpenMap("elev_lidrural_mrpts@user1")
 
         box = vtkGRASSVectorBBox()
         map.GetBoundingBox(box)
@@ -63,7 +65,7 @@ class GRASSVectorLinePointsTest(unittest.TestCase):
 
     def test3TopoReader(self):
         map = vtkGRASSVectorMapTopoReader()
-        map.OpenMap("streams")
+        map.OpenMap("streams@user1")
 
         box = vtkGRASSVectorBBox()
         map.GetBoundingBox(box)
@@ -135,5 +137,5 @@ class GRASSVectorLinePointsTest(unittest.TestCase):
         map.CloseMap()
 
 if __name__ == '__main__':
-    suite = unittest.TestLoader().loadTestsFromTestCase(GRASSVectorLinePointsTest)
+    suite = unittest.TestLoader().loadTestsFromTestCase(GRASSVectorMapBaseTest)
     unittest.TextTestRunner(verbosity=2).run(suite)

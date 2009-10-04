@@ -19,7 +19,11 @@ from libvtkGRASSBridgeCommonPython import *
 """Tests for the raster file lister"""
 class vtkGRASSRasterMapListerTest(unittest.TestCase):
     def testSmoke(self):
+
         init = vtkGRASSInit()
+        init.Init("vtkGRASSRasterMapListerTest")
+        init.ExitOnErrorOn()
+
         rml = vtkGRASSRasterMapLister()
         num = rml.GetFileNames().GetNumberOfValues()
         for i in range(num):
@@ -35,7 +39,10 @@ class vtkGRASSRasterMapListerTest(unittest.TestCase):
 """Tests for the vector file lister"""
 class vtkGRASSVectorMapListerTest(unittest.TestCase):
     def testSmoke(self):
+
         init = vtkGRASSInit()
+        init.Init("vtkGRASSRasterMapListerTest")
+        init.ExitOnErrorOn()
         rml = vtkGRASSVectorMapLister()
         num = rml.GetFileNames().GetNumberOfValues()
         for i in range(num):
@@ -51,7 +58,10 @@ class vtkGRASSVectorMapListerTest(unittest.TestCase):
 """Tests for the general file lister"""
 class vtkGRASSFileListerTest(unittest.TestCase):
     def testSmoke(self):
+
         init = vtkGRASSInit()
+        init.Init("vtkGRASSRasterMapListerTest")
+        init.ExitOnErrorOn()
         rml = vtkGRASSFileLister()
 	rml.SetMapsetName("PERMANENT")
         rml.SetElementToRegion()

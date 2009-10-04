@@ -24,10 +24,12 @@ from libvtkGRASSBridgeRasterPython import *
 from libvtkGRASSBridgeVectorPython import *
 from libvtkGRASSBridgeCommonPython import *
 
-class GRASSVectorPolyDataWriterTest(unittest.TestCase):
+class GRASSVectorPolyDataReaderWriterTest(unittest.TestCase):
 
     def testNoTopoReaderWriter(self):
         init = vtkGRASSInit()
+        init.Init("GRASSVectorPolyDataReaderWriterTest")
+        init.ExitOnErrorOn()
         rs = vtkGRASSVectorPolyDataReader()
         rs.SetVectorName("boundary_county@user1")
         rs.Update()
@@ -40,6 +42,8 @@ class GRASSVectorPolyDataWriterTest(unittest.TestCase):
 
     def testTopoReaderWriterAreas(self):
         init = vtkGRASSInit()
+        init.Init("GRASSVectorPolyDataReaderWriterTest")
+        init.ExitOnErrorOn()
         rs = vtkGRASSVectorTopoPolyDataReader()
         rs.SetFeatureTypeToArea()
         rs.SetVectorName("boundary_county@user1")
@@ -53,6 +57,8 @@ class GRASSVectorPolyDataWriterTest(unittest.TestCase):
 
     def testTopoReaderWriterLines(self):
         init = vtkGRASSInit()
+        init.Init("GRASSVectorPolyDataReaderWriterTest")
+        init.ExitOnErrorOn()
         rs = vtkGRASSVectorTopoPolyDataReader()
         rs.SetFeatureTypeToLines()
         rs.SetVectorName("boundary_county@user1")
@@ -66,6 +72,8 @@ class GRASSVectorPolyDataWriterTest(unittest.TestCase):
 
     def testTopoReaderWriterBoundaries(self):
         init = vtkGRASSInit()
+        init.Init("GRASSVectorPolyDataReaderWriterTest")
+        init.ExitOnErrorOn()
         rs = vtkGRASSVectorTopoPolyDataReader()
         rs.SetFeatureTypeToBoundary()
         rs.SetVectorName("boundary_county@user1")
@@ -79,6 +87,8 @@ class GRASSVectorPolyDataWriterTest(unittest.TestCase):
 
     def testTopoReaderWriterCentroids(self):
         init = vtkGRASSInit()
+        init.Init("GRASSVectorPolyDataReaderWriterTest")
+        init.ExitOnErrorOn()
         rs = vtkGRASSVectorTopoPolyDataReader()
         rs.SetFeatureTypeToCentroid()
         rs.SetVectorName("boundary_county@user1")
@@ -92,6 +102,8 @@ class GRASSVectorPolyDataWriterTest(unittest.TestCase):
 
     def testTopoReaderWriterPoints(self):
         init = vtkGRASSInit()
+        init.Init("GRASSVectorPolyDataReaderWriterTest")
+        init.ExitOnErrorOn()
         rs = vtkGRASSVectorTopoPolyDataReader()
         rs.SetFeatureTypeToPoints()
         rs.SetVectorName("boundary_county@user1")
@@ -104,6 +116,6 @@ class GRASSVectorPolyDataWriterTest(unittest.TestCase):
         writer.Update()
 
 if __name__ == '__main__':
-    suite = unittest.TestLoader().loadTestsFromTestCase(GRASSVectorPolyDataWriterTest)
+    suite = unittest.TestLoader().loadTestsFromTestCase(GRASSVectorPolyDataReaderWriterTest)
     unittest.TextTestRunner(verbosity=2).run(suite)
 

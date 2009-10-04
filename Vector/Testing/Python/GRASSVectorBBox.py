@@ -22,6 +22,8 @@ class GRASSVectorBBoxTest(unittest.TestCase):
 
         #Initiate grass
         init = vtkGRASSInit()
+        init.Init("GRASSVectorBBoxTest")
+        init.ExitOnErrorOn()
         self.box = vtkGRASSVectorBBox()
         self.box.SetBox(100, 50, 200, 150, 200, 0)
 

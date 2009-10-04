@@ -26,7 +26,11 @@ from libvtkGRASSBridgeVectorPython import *
 from libvtkGRASSBridgeCommonPython import *
 
 # Init grass variables
+
 init = vtkGRASSInit()
+init.Init("VectorDelaunayTriangulation")
+init.ExitOnErrorOn()
+
 
 # Now build the pipeline
 # read the vector map without creating topology

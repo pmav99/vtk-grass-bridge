@@ -17,6 +17,9 @@
  * \brief This class should be instanciated in the program at first
  *        It calls the G_gisinit() method of grass, to initialize the grass environment
  *
+ * An error function can be set to catch the grass G_fatal_error calles and avoid
+ * exit of the program.
+ *
  * \author Soeren Gebbert
  * \author Berlin, Germany Aug. 2009
  * \author soerengebbert@googlemail.com
@@ -39,6 +42,13 @@ class VTK_GRASS_BRIDGE_COMMON_EXPORT vtkGRASSInit : public vtkObjectGRASSErrorHa
 public:
   static  vtkGRASSInit *New();
   vtkTypeRevisionMacro(vtkGRASSInit,vtkObjectGRASSErrorHandler);
+  
+  //! \brief Exit if an error within grass occures -> in case G_fatal_error() was called.
+  void ExitOnErrorOn();
+  //! \brief Do not exit on error -> in case G_fatal_error() was called.
+  void ExitOnErrorOff();
+  //!\brief Init GRASS
+  void Init(const char *name);
 
 protected:
   vtkGRASSInit();

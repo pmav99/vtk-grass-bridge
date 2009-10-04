@@ -22,7 +22,11 @@ from libvtkGRASSBridgeIOPython import *
 from libvtkGRASSBridgeCommonPython import *
 
 #Initiate grass
+
 init = vtkGRASSInit()
+init.Init("RasterImageReader")
+init.ExitOnErrorOn()
+
 #List all raster maps
 maplister = vtkGRASSRasterMapLister()
 name = maplister.GetFileNames().GetValue(0)

@@ -39,6 +39,10 @@ extern "C" {
                     this->InsertNextError(vgb_error_message); \
                     return -1;}
 
+#define CATCH_VINT (int num)  } else { \
+                    this->InsertNextError(vgb_error_message); \
+                    return num;}
+
 #define CATCH_VOID  } else { \
                     this->InsertNextError(vgb_error_message); \
                     return;}

@@ -22,6 +22,8 @@ class GRASSVectorMapReaderWriterTest(unittest.TestCase):
 
         #Initiate grass
         init = vtkGRASSInit()
+        init.Init("GRASSVectorMapReaderWriterTest")
+        init.ExitOnErrorOn()
 
     def test1NoTopoWriter(self):
         reader = vtkGRASSVectorMapNoTopoReader()
