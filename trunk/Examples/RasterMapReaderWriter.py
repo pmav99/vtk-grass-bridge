@@ -22,7 +22,11 @@ from libvtkGRASSBridgeIOPython import *
 from libvtkGRASSBridgeCommonPython import *
 
 #Initiate grass
+
 init = vtkGRASSInit()
+init.Init("RasterMapReaderWriter")
+init.ExitOnErrorOn()
+
 
 #The region settings
 region = vtkGRASSRegion()

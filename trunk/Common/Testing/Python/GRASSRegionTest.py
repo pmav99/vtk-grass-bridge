@@ -21,7 +21,10 @@ from libvtkGRASSBridgeCommonPython import *
 
 class GRASSRegionTest(unittest.TestCase):
     def testSmoke(self):
-	init = vtkGRASSInit()
+
+        init = vtkGRASSInit()
+        init.Init("GRASSRegionTest")
+        init.ExitOnErrorOn()
 
         ret = region = vtkGRASSRegion()
         if ret != True:

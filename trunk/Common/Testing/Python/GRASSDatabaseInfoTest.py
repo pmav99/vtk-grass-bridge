@@ -22,6 +22,8 @@ class GRASSDatabaseInfoTest(unittest.TestCase):
     def testSmoke(self):
 
         init = vtkGRASSInit()
+        init.Init("GRASSDatabaseInfoTest")
+        init.ExitOnErrorOn()
 
         dbinfo = vtkGRASSDatabaseInfo()
         print dbinfo

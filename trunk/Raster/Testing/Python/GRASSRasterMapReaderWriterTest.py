@@ -24,7 +24,9 @@ from libvtkGRASSBridgeCommonPython import *
 
 class GRASSRasterMapReaderWriterTest(unittest.TestCase):
     def testSimpleReadWriteCycleDCELL(self):
-	init = vtkGRASSInit()
+        init = vtkGRASSInit()
+        init.Init("GRASSRasterMapReaderWriterTest")
+        init.ExitOnErrorOn()
 
         region = vtkGRASSRegion()
         region.ReadCurrentRegion()
@@ -65,7 +67,9 @@ class GRASSRasterMapReaderWriterTest(unittest.TestCase):
         reader.CloseMap()
 
     def testSimpleReadWriteCycleFCELL(self):
-	init = vtkGRASSInit()
+        init = vtkGRASSInit()
+        init.Init("GRASSRasterMapReaderWriterTest")
+        init.ExitOnErrorOn()
 
         region = vtkGRASSRegion()
         region.ReadCurrentRegion()
@@ -106,7 +110,9 @@ class GRASSRasterMapReaderWriterTest(unittest.TestCase):
         reader.CloseMap()
 
     def testSimpleReadWriteCycleCELL(self):
-	init = vtkGRASSInit()
+        init = vtkGRASSInit()
+        init.Init("GRASSRasterMapReaderWriterTest")
+        init.ExitOnErrorOn()
 
         region = vtkGRASSRegion()
         region.ReadCurrentRegion()

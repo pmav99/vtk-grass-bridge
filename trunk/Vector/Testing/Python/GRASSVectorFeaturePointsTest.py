@@ -22,6 +22,8 @@ class GRASSVectorLinePointsTest(unittest.TestCase):
 
         #Initiate grass
         init = vtkGRASSInit()
+        init.Init("GRASSVectorLinePointsTest")
+        init.ExitOnErrorOn()
         self.points = vtkGRASSVectorFeaturePoints()
         self.points.AppendPoint(0.0, 0.0, 0.0)
         self.points.AppendPoint(1.0, 0.0, 0.0)

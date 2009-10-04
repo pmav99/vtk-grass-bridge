@@ -28,6 +28,8 @@ class GRASSVectorPolyDataReaderTest(unittest.TestCase):
 
     def testNoTopoReader(self):
         init = vtkGRASSInit()
+        init.Init("GRASSVectorPolyDataReaderTest")
+        init.ExitOnErrorOn()
         rs = vtkGRASSVectorPolyDataReader()
         rs.SetVectorName("boundary_county@user1")
         rs.Update()
@@ -39,6 +41,8 @@ class GRASSVectorPolyDataReaderTest(unittest.TestCase):
 
     def testTopoReaderAreas(self):
         init = vtkGRASSInit()
+        init.Init("GRASSVectorPolyDataReaderTest")
+        init.ExitOnErrorOn()
         rs = vtkGRASSVectorTopoPolyDataReader()
         rs.SetFeatureTypeToArea()
         rs.SetVectorName("boundary_county@user1")
@@ -51,6 +55,8 @@ class GRASSVectorPolyDataReaderTest(unittest.TestCase):
 
     def testTopoReaderLines(self):
         init = vtkGRASSInit()
+        init.Init("GRASSVectorPolyDataReaderTest")
+        init.ExitOnErrorOn()
         rs = vtkGRASSVectorTopoPolyDataReader()
         rs.SetFeatureTypeToLines()
         rs.SetVectorName("boundary_county@user1")
@@ -63,6 +69,8 @@ class GRASSVectorPolyDataReaderTest(unittest.TestCase):
 
     def testTopoReaderBoundaries(self):
         init = vtkGRASSInit()
+        init.Init("GRASSVectorPolyDataReaderTest")
+        init.ExitOnErrorOn()
         rs = vtkGRASSVectorTopoPolyDataReader()
         rs.SetFeatureTypeToBoundary()
         rs.SetVectorName("boundary_county@user1")
@@ -75,6 +83,8 @@ class GRASSVectorPolyDataReaderTest(unittest.TestCase):
 
     def testTopoReaderCentroids(self):
         init = vtkGRASSInit()
+        init.Init("GRASSVectorPolyDataReaderTest")
+        init.ExitOnErrorOn()
         rs = vtkGRASSVectorTopoPolyDataReader()
         rs.SetFeatureTypeToCentroid()
         rs.SetVectorName("boundary_county@user1")
@@ -87,6 +97,8 @@ class GRASSVectorPolyDataReaderTest(unittest.TestCase):
 
     def testTopoReaderPoints(self):
         init = vtkGRASSInit()
+        init.Init("GRASSVectorPolyDataReaderTest")
+        init.ExitOnErrorOn()
         rs = vtkGRASSVectorTopoPolyDataReader()
         rs.SetFeatureTypeToPoints()
         rs.SetVectorName("boundary_county@user1")

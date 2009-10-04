@@ -26,6 +26,10 @@
 #% description: Build vector topology
 #%End
 #%Flag
+#% key: s
+#% description: Show the input and output map in a vtk window after computation
+#%End
+#%Flag
 #% key: w
 #% description: Write the triangulated map as vtk xml file to the current working directoy named <output>.vtk
 #%End
@@ -67,6 +71,8 @@
 #%End
 
 #include the grass, VTK and vtkGRASSBridge Python libraries
+from libvtkFilteringPython import *
+from libvtkRenderingPython import *
 from libvtkGraphicsPython import *
 from libvtkIOPython import *
 from libvtkImagingPython import *
@@ -75,16 +81,21 @@ from libvtkGRASSBridgeCommonPython import *
 import grass.script as grass
 
 
-def main(options):
+def main():
     input = options['input']
     output = options['output']
     alpha = options['alpha']
     tolerance = options['tolerance']
     build_topo = int(flags['t'])
     write_vtk = int(flags['w'])
+    show = int(flags['s'])
 
     # Initiate GRASS
+
     init = vtkGRASSInit()
+    init.Init("v.delaunay2d")
+    init.ExitOnErrorOn()
+
 
     # Now build the pipeline
     # read the vector map without creating topology
@@ -113,8 +124,30 @@ def main(options):
         xmlwriter.SetFileName(output + ".vtk")
         xmlwriter.SetInputConnection(delaunay.GetOutputPort())
         xmlwriter.Write()
+    
+    if show == 1:
+        normals = vtkPolyDataNormals()
+        normals.SetInputConnection(delaunay.GetOutputPort())
+        mapMesh = vtkPolyDataMapper()
+        mapMesh.SetInputConnection(normals.GetOutputPort())
+        meshActor = vtkActor()
+        meshActor.SetMapper(mapMesh)
+
+        ren = vtkRenderer()
+        renWin =vtkRenderWindow()
+        renWin.AddRenderer(ren)
+        iren = vtkRenderWindowInteractor()
+        iren.SetRenderWindow(renWin)
+
+        ren.AddActor(meshActor)
+        ren.SetBackground(1, 1, 1)
+        renWin.SetSize(800, 600)
+
+        iren.Initialize()
+        renWin.Render()
+        iren.Start()
 
 
 if __name__ == "__main__":
     options, flags = grass.parser()
-    main(options)
+    main()

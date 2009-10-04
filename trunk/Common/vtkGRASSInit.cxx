@@ -56,5 +56,30 @@ vtkGRASSInit::vtkGRASSInit()
     // Set the error routine
     G_set_error_routine(vgb_error_handler);
 	G_sleep_on_error(0);
-    G_gisinit("vtkGRASSInit");
+}
+
+//----------------------------------------------------------------------------
+
+void vtkGRASSInit::ExitOnErrorOff()
+{
+    // Set the error routine
+    G_set_error_routine(vgb_error_handler);
+
+}
+
+//----------------------------------------------------------------------------
+
+void vtkGRASSInit::ExitOnErrorOn()
+{
+    // Set the error routine
+    G_unset_error_routine();
+
+}
+
+//----------------------------------------------------------------------------
+
+void vtkGRASSInit::Init(const char *name)
+{
+    // Init GRASS
+    G_gisinit(name);
 }
