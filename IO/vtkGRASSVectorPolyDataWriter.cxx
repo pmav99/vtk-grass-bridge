@@ -12,7 +12,7 @@
  * GNU General Public License for more details.
  */
 #include <vtkDataSetAttributes.h>
-#include "vtkGRASSVectorPolyDataReader.h"
+#include "vtkGRASSVectorPolyDataWriter.h"
 
 #include <vtkCellArray.h>
 #include <vtkCellData.h>
@@ -20,31 +20,33 @@
 #include <vtkPoints.h>
 #include <vtkPolyData.h>
 #include <vtkSmartPointer.h>
-#include "vtkGRASSVectorMapTopoReader.h"
-#include "vtkGRASSVectorMapNoTopoReader.h"
+#include "vtkGRASSVectorMapWriter.h"
 #include "vtkGRASSVectorMapBase.h"
 #include "vtkGRASSVectorFeaturePoints.h"
 #include <vtkIdList.h>
 #include "vtkGRASSVectorFeatureCats.h"
+#include "vtkGRASSVectorMapWriter.h"
+#include <vtkInformationVector.h>
+#include <vtkInformation.h>
 
-
-vtkCxxRevisionMacro(vtkGRASSVectorPolyDataReader, "$Revision: 1.1 $");
-vtkStandardNewMacro(vtkGRASSVectorPolyDataReader);
+vtkCxxRevisionMacro(vtkGRASSVectorPolyDataWriter, "$Revision: 1.1 $");
+vtkStandardNewMacro(vtkGRASSVectorPolyDataWriter);
 
 //----------------------------------------------------------------------------
 
-vtkGRASSVectorPolyDataReader::vtkGRASSVectorPolyDataReader()
+vtkGRASSVectorPolyDataWriter::vtkGRASSVectorPolyDataWriter()
 {
     this->Mapset = NULL;
     this->VectorName = NULL;
     this->CategoryArrayName = NULL;
     this->SetCategoryArrayName("cats");
-    this->SetNumberOfInputPorts(0);
+    this->SetNumberOfInputPorts(1);
+    this->SetNumberOfOutputPorts(0);
 }
 
 //----------------------------------------------------------------------------
 
-vtkGRASSVectorPolyDataReader::~vtkGRASSVectorPolyDataReader()
+vtkGRASSVectorPolyDataWriter::~vtkGRASSVectorPolyDataWriter()
 {
     if (this->VectorName)
         delete [] this->VectorName;
@@ -55,7 +57,7 @@ vtkGRASSVectorPolyDataReader::~vtkGRASSVectorPolyDataReader()
 //----------------------------------------------------------------------------
 
 void
-vtkGRASSVectorPolyDataReader::PrintSelf(ostream& os, vtkIndent indent)
+vtkGRASSVectorPolyDataWriter::PrintSelf(ostream& os, vtkIndent indent)
 {
     this->Superclass::PrintSelf(os, indent);
     os << indent << "Vector name: "
@@ -67,11 +69,17 @@ vtkGRASSVectorPolyDataReader::PrintSelf(ostream& os, vtkIndent indent)
 
 //----------------------------------------------------------------------------
 
-int
-vtkGRASSVectorPolyDataReader::RequestData(vtkInformation*,
-                                          vtkInformationVector**,
-                                          vtkInformationVector* outputVector)
+//----------------------------------------------------------------------------
+int vtkGRASSVectorPolyDataWriter::RequestData(
+  vtkInformation *vtkNotUsed(request),
+  vtkInformationVector **inputVector,
+  vtkInformationVector *vtkNotUsed(outputVector))
 {
+  // get the info objects
+  vtkInformation *inInfo = inputVector[0]->GetInformationObject(0);
+
+  // get the input and ouptut
+  vtkDataSet *input = vtkDataSet::SafeDownCast(inInfo->Get(vtkDataObject::DATA_OBJECT()));
     int i;
     vtkIdType id;
 
@@ -81,59 +89,25 @@ vtkGRASSVectorPolyDataReader::RequestData(vtkInformation*,
         return -1;
     }
 
-    vtkGRASSVectorMapNoTopoReader *reader = vtkGRASSVectorMapNoTopoReader::New();
+    vtkGRASSVectorMapWriter *writer = vtkGRASSVectorMapWriter::New();
 
 
-    if (!reader->OpenMap(this->VectorName))
+    if (!writer->OpenMap(this->VectorName, 1))
     {
         vtkErrorMacro( << "Unable to open vector map " << this->VectorName);
-        reader->Delete();
+        writer->Delete();
         return -1;
     }
 
-    this->SetMapset(reader->GetMapset());
+    this->SetMapset(writer->GetMapset());
 
     vtkGRASSVectorFeatureCats *cats = vtkGRASSVectorFeatureCats::New();
     vtkGRASSVectorFeaturePoints *features = vtkGRASSVectorFeaturePoints::New();
 
-    vtkPolyData* output = vtkPolyData::GetData(outputVector);
-    output->Allocate(1);
-
-    vtkPoints *points = vtkPoints::New();
-
-    vtkIntArray *categories = vtkIntArray::New();
-    categories->SetNumberOfComponents(1);
-    categories->SetName(this->CategoryArrayName);
-
-    vtkIdList *ids = vtkIdList::New();
-
-
-    // Read every feature in vector map
-    while (reader->ReadNextFeature(features, cats) > 0)
-    {
-        for(i = 0; i < features->GetNumberOfPoints(); i++)
-        {
-            double *point = features->GetPoint(i);
-            id = points->InsertNextPoint(point[0], point[1], point[2]);
-            ids->InsertNextId(id);
-        }
-        output->InsertNextCell(features->GetVTKCellId(), ids);
-        ids->Initialize();
-
-        categories->InsertNextValue(cats->GetCat(1));
-    }
-    ids->Delete();
-
-    // Store the points in the output data object.
-    output->SetPoints(points);
-    output->GetCellData()->SetScalars(categories);
-
-    reader->CloseMap();
-    categories->Delete();
-    points->Delete();
-    reader->Delete();
     cats->Delete();
     features->Delete();
+    writer->CloseMap();
+    writer->Delete();
 
     return 1;
 }

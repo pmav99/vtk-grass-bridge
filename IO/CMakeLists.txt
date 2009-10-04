@@ -11,6 +11,7 @@ vtkGRASSRasterImageReader.cxx
 vtkGRASSRasterImageWriter.cxx
 vtkGRASSRasterToImageReader.cxx
 vtkGRASSVectorPolyDataReader.cxx
+vtkGRASSVectorPolyDataWriter.cxx
 vtkGRASSVectorTopoPolyDataReader.cxx
 )
 
@@ -19,6 +20,7 @@ vtkGRASSRasterImageReader.h
 vtkGRASSRasterImageWriter.h
 vtkGRASSRasterToImageReader.h
 vtkGRASSVectorPolyDataReader.h
+vtkGRASSVectorPolyDataWriter.h
 vtkGRASSVectorTopoPolyDataReader.h
 vtkGRASSBridgeIOWin32Header.h
 )

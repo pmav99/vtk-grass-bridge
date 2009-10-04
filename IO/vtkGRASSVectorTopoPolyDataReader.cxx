@@ -178,6 +178,7 @@ vtkGRASSVectorTopoPolyDataReader::RequestData(vtkInformation*,
     output->SetPoints(points);
 
     //Cleanup
+    reader->CloseMap();
     ids->Delete();
     categories->Delete();
     points->Delete();
