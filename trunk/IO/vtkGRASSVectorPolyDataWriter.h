@@ -54,6 +54,12 @@ public:
   vtkSetStringMacro(CategoryArrayName);
   //! \brief Get the name of the category array
   vtkGetStringMacro(CategoryArrayName);
+  //! \brief Build topology of grass vector map
+  vtkSetMacro(BuildTopo, int);
+  //! \brief Build topology of grass vector map
+  vtkGetMacro(BuildTopo, int);
+  //! \brief Build topology of grass vector map
+  vtkBooleanMacro(BuildTopo, int);
 
 protected:
   vtkGRASSVectorPolyDataWriter();
@@ -62,6 +68,7 @@ protected:
   char* VectorName;
   char* Mapset;
   char *CategoryArrayName;
+  int BuildTopo;
 
   vtkSetStringMacro(Mapset);
 

@@ -64,6 +64,19 @@ public:
      */
 
     virtual int WriteFeature(int type, vtkGRASSVectorFeaturePoints *points, vtkGRASSVectorFeatureCats *cats) ;
+    /*!
+      \brief Writes new feature to the end of file (table)
+     *
+     * The feature type must be stored in points
+
+      \param points feature geometry with feature type
+      \param cats feature categories
+
+      \return new feature id (level 2) or offset into file where the feature starts (level 1)
+     */
+
+    virtual int WriteFeature(vtkGRASSVectorFeaturePoints *points, vtkGRASSVectorFeatureCats *cats){this->WriteFeature(
+            points->GetFeatureType(), points, cats);}
 
     /*!
        \brief Delete feature
