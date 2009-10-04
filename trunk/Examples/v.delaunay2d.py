@@ -4,8 +4,9 @@
 #
 # MODULE:       v.delaunay2d
 # AUTHOR(S):    Soeren Gebbert
-# PURPOSE:      Demonstrate the usage of VTK and vtkGRASSBridge to implement 
-#               grass modules
+# PURPOSE:      Delaunay 2d triangulation using the vtkDelaunay2D class.
+#               The created vtk triangles will be converted into the grass
+#               vector feature face.
 #
 # COPYRIGHT:    (C) 2009 Soeren Gebbert
 #
@@ -16,9 +17,17 @@
 #############################################################################
 
 #%Module
-#% description: Delaunay 2d triangulation using vtkDelaunay2D
+#% description: Delaunay 2d triangulation using the vtkDelaunay2D class. The created triangles will be converted into the grass vector feature face.
 #% keywords: vector
-#% keywords: dekaunay
+#% keywords: delaunay
+#%End
+#%Flag
+#% key: t
+#% description: Build vector topology
+#%End
+#%Flag
+#% key: w
+#% description: Write the triangulated map as vtk xml file to the current working directoy named <output>.vtk
 #%End
 #%Option
 #% key: input
@@ -66,18 +75,20 @@ from libvtkGRASSBridgeCommonPython import *
 import grass.script as grass
 
 
-def main():
+def main(options):
     input = options['input']
     output = options['output']
     alpha = options['alpha']
     tolerance = options['tolerance']
-    
+    build_topo = int(flags['t'])
+    write_vtk = int(flags['w'])
+
     # Initiate GRASS
     init = vtkGRASSInit()
 
     # Now build the pipeline
     # read the vector map without creating topology
-    reader = vtkGRASSVectorPolyDataReader() # The reader does not need topology information
+    reader = vtkGRASSVectorPolyDataReader() 
     reader.SetVectorName(input)
 
     # start the delaunay triangulation
@@ -90,16 +101,20 @@ def main():
     writer = vtkGRASSVectorPolyDataWriter()
     writer.SetVectorName(output)
     writer.SetInputConnection(delaunay.GetOutputPort())
-    writer.BuildTopoOff()
+    if build_topo == 1:
+        writer.BuildTopoOn()
+    else:
+        writer.BuildTopoOff()
     writer.Update()
 
-    # write the data as XML with base64 encoding for visualisation
-    xmlwriter = vtkXMLPolyDataWriter()
-    xmlwriter.SetFileName(output + ".vtk")
-    xmlwriter.SetInputConnection(delaunay.GetOutputPort())
-    xmlwriter.Write()
+    # write optionally the vtk data as XML file for visualisation purposes
+    if write_vtk == 1:
+        xmlwriter = vtkXMLPolyDataWriter()
+        xmlwriter.SetFileName(output + ".vtk")
+        xmlwriter.SetInputConnection(delaunay.GetOutputPort())
+        xmlwriter.Write()
 
 
 if __name__ == "__main__":
     options, flags = grass.parser()
-    main()
+    main(options)
