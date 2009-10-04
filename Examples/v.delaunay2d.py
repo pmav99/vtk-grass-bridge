@@ -1,0 +1,105 @@
+#!/usr/bin/env python
+#
+############################################################################
+#
+# MODULE:       v.delaunay2d
+# AUTHOR(S):    Soeren Gebbert
+# PURPOSE:      Demonstrate the usage of VTK and vtkGRASSBridge to implement 
+#               grass modules
+#
+# COPYRIGHT:    (C) 2009 Soeren Gebbert
+#
+#               This program is free software under the GNU General Public
+#               License (>=v2). Read the file COPYING that comes with GRASS
+#               for details.
+#
+#############################################################################
+
+#%Module
+#% description: Delaunay 2d triangulation using vtkDelaunay2D
+#% keywords: vector
+#% keywords: dekaunay
+#%End
+#%Option
+#% key: input
+#% type: string
+#% required: yes
+#% multiple: no
+#% key_desc: name
+#% description: Name of input vector map
+#% gisprompt: old,vect,vector
+#%End
+#%Option
+#% key: output
+#% type: string
+#% required: yes
+#% multiple: no
+#% key_desc: name
+#% description: Name for output vector map
+#% gisprompt: new,vect,vector
+#%End
+#%Option
+#% key: alpha
+#% type: double
+#% required: no
+#% multiple: no
+#% key_desc: alpha
+#% answer: 0
+#% description: Specify alpha (or distance) value to control output of this filter. For a non-zero alpha value, only edges or triangles contained within a sphere centered at mesh vertices will be output. Otherwise, only triangles will be output.
+#%End
+#%Option
+#% key: tolerance
+#% type: double
+#% required: no
+#% multiple: no
+#% key_desc: tolerance
+#% answer: 0
+#% description: Specify a tolerance to control discarding of closely spaced points. This tolerance is specified as a fraction of the diagonal length of the bounding box of the points.
+#%End
+
+#include the grass, VTK and vtkGRASSBridge Python libraries
+from libvtkGraphicsPython import *
+from libvtkIOPython import *
+from libvtkImagingPython import *
+from libvtkGRASSBridgeIOPython import *
+from libvtkGRASSBridgeCommonPython import *
+import grass.script as grass
+
+
+def main():
+    input = options['input']
+    output = options['output']
+    alpha = options['alpha']
+    tolerance = options['tolerance']
+    
+    # Initiate GRASS
+    init = vtkGRASSInit()
+
+    # Now build the pipeline
+    # read the vector map without creating topology
+    reader = vtkGRASSVectorPolyDataReader() # The reader does not need topology information
+    reader.SetVectorName(input)
+
+    # start the delaunay triangulation
+    delaunay = vtkDelaunay2D()
+    delaunay.SetInputConnection(reader.GetOutputPort())
+    delaunay.SetAlpha(float(alpha))
+    delaunay.SetTolerance(float(tolerance))
+
+    # write the data grass vector map
+    writer = vtkGRASSVectorPolyDataWriter()
+    writer.SetVectorName(output)
+    writer.SetInputConnection(delaunay.GetOutputPort())
+    writer.BuildTopoOff()
+    writer.Update()
+
+    # write the data as XML with base64 encoding for visualisation
+    xmlwriter = vtkXMLPolyDataWriter()
+    xmlwriter.SetFileName(output + ".vtk")
+    xmlwriter.SetInputConnection(delaunay.GetOutputPort())
+    xmlwriter.Write()
+
+
+if __name__ == "__main__":
+    options, flags = grass.parser()
+    main()
