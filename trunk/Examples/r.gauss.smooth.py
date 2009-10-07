@@ -58,12 +58,6 @@ def main():
     output = options['output']
     show = int(flags['s'])
 
-    # Initiate GRASS
-    init = vtkGRASSInit()
-    init.Init("r.gauss.smooth")
-    init.ExitOnErrorOn()
-
-
     # Raster map reader
     reader = vtkGRASSRasterImageReader()
     reader.SetRasterName(input)
@@ -101,5 +95,10 @@ def main():
         viewInt2.Start()
 
 if __name__ == "__main__":
+    # Initiate GRASS
+    init = vtkGRASSInit()
+    init.Init("r.gauss.smooth")
+    init.ExitOnErrorOn()
+    
     options, flags = grass.parser()
     main()

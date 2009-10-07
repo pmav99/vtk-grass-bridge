@@ -115,7 +115,7 @@ public:
     virtual double GetBottom() {return this->box.B;}
 
     /*!
-     * \brief return the box content as an double array with 6 entries
+     * \brief return the box content as double array with 6 entries
      *
      * Pos 0: north
      * Pos 1: south

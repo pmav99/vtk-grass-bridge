@@ -1,12 +1,12 @@
 1.) Implement a grass module base class which calls the reader and writer
-2.) Implement raster to vector modules based on the following algorithmns:
+2.) Implement raster to vector modules based on the following algorithms:
     # vtkProjectedTerrainPath
     # vtkGreedyTerrainDecimation
     # vtkImageToPolyDataFilter  
     # vtkRecursiveDividingCubes
-    # 
-2.) Implement vector to vector modules based on the following algorithmns:
+
+2.) Implement vector to vector modules based on the following algorithms:
     # vtkPolyDataPointSampler
     # vtkSmoothPolyDataFilter
     # vtkTriangleFilter
-    # 
+ 

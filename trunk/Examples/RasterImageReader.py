@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 #
 #  Program: vtkGRASSBridge
 #  COPYRIGHT: (C) 2009 by Soeren Gebbert, soerengebbert@googlemail.com
@@ -22,7 +23,6 @@ from libvtkGRASSBridgeIOPython import *
 from libvtkGRASSBridgeCommonPython import *
 
 #Initiate grass
-
 init = vtkGRASSInit()
 init.Init("RasterImageReader")
 init.ExitOnErrorOn()
