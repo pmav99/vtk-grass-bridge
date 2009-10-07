@@ -1,5 +1,5 @@
 #summary VTK GRASS triangulation result of the r.to.tin python module
-#labels TIN,vtkGreedyTerrainDecimation,heightraster,VTKGRASS,r.to.tin
+#labels TIN,vtkGreedyTerrainDecimation,raster,VTK,r.to.tin,GRASS,triangulation
 = VTK GRASS example results of r.to.tin =
 
 This page shows some results of the vtk-grass-bridge module r.to.tin, which uses grass as database unit and vtk as data processing unit.
