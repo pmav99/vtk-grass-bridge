@@ -4,8 +4,8 @@
 #
 # MODULE:       r.to.tin
 # AUTHOR(S):    Soeren Gebbert
-# PURPOSE:      Demonstrate the usage of VTK and vtkGRASSBridge to implement 
-#               grass modules
+# PURPOSE:      Create a triangulated irregular network TIN based on
+#               an elevation raster map.
 #
 # COPYRIGHT:    (C) 2009 Soeren Gebbert
 #
@@ -70,6 +70,7 @@ from libvtkIOPython import *
 from libvtkRenderingPython import *
 from libvtkGRASSBridgeIOPython import *
 from libvtkGRASSBridgeCommonPython import *
+from vtkGRASSBridgeModuleBase import *
 import grass.script as grass
 
 
@@ -93,58 +94,26 @@ def main():
     filter = vtkGreedyTerrainDecimation()
     filter.SetInputConnection(reader.GetOutputPort())
     filter.SetErrorMeasureToNumberOfTriangles ()
+    filter.SetNumberOfTriangles (int(trinum))
+    filter.BoundaryVertexDeletionOn ()
+    filter.ComputeNormalsOn ()
 #    filter.SetErrorMeasureToSpecifiedReduction ()
 #    filter.SetErrorMeasureToAbsoluteError ()
 #    filter.SetErrorMeasureToRelativeError ()
-    filter.SetNumberOfTriangles (int(trinum))
-    filter.BoundaryVertexDeletionOn ()
 #    filter.BoundaryVertexDeletionOff ()
-    filter.ComputeNormalsOn ()
 #    filter.ComputeNormalsOff ()
 #    filter.SetReduction (1)
 #    filter.SetAbsoluteError (0.00001)
 #    filter.SetRelativeError (0.00001)
 
-    # write the data grass vector map
-    writer = vtkGRASSVectorPolyDataWriter()
-    writer.SetVectorName(output)
-    writer.SetInputConnection(filter.GetOutputPort())
-    if build_topo == 1:
-        writer.BuildTopoOn()
-    else:
-        writer.BuildTopoOff()
-    writer.Update()
-
-    # write optionally the vtk data as XML file for visualisation purposes
-    if write_vtk == 1:
-        xmlwriter = vtkXMLPolyDataWriter()
-        xmlwriter.SetFileName(output + ".vtk")
-        xmlwriter.SetInputConnection(filter.GetOutputPort())
-        xmlwriter.Write()
-
-    if show == 1:
-        normals = vtkPolyDataNormals()
-        normals.SetInputConnection(filter.GetOutputPort())
-        mapMesh = vtkPolyDataMapper()
-        mapMesh.SetInputConnection(normals.GetOutputPort())
-        meshActor = vtkActor()
-        meshActor.SetMapper(mapMesh)
-
-        ren = vtkRenderer()
-        renWin =vtkRenderWindow()
-        renWin.AddRenderer(ren)
-        iren = vtkRenderWindowInteractor()
-        iren.SetRenderWindow(renWin)
-
-        ren.AddActor(meshActor)
-        ren.SetBackground(1, 1, 1)
-        renWin.SetSize(800, 600)
-
-        iren.Initialize()
-        renWin.Render()
-        iren.Start()
-
+    # Generate the output
+    generateVectorOutput(build_topo, output, filter, write_vtk, show)
 
 if __name__ == "__main__":
+    # Initiate GRASS
+    init = vtkGRASSInit()
+    init.Init("r.to.tin")
+    init.ExitOnErrorOn()
+
     options, flags = grass.parser()
     main()

@@ -78,6 +78,7 @@ from libvtkIOPython import *
 from libvtkImagingPython import *
 from libvtkGRASSBridgeIOPython import *
 from libvtkGRASSBridgeCommonPython import *
+from vtkGRASSBridgeModuleBase import *
 import grass.script as grass
 
 
@@ -90,13 +91,6 @@ def main():
     write_vtk = int(flags['w'])
     show = int(flags['s'])
 
-    # Initiate GRASS
-
-    init = vtkGRASSInit()
-    init.Init("v.delaunay2d")
-    init.ExitOnErrorOn()
-
-
     # Now build the pipeline
     # read the vector map without creating topology
     reader = vtkGRASSVectorPolyDataReader() 
@@ -108,46 +102,14 @@ def main():
     delaunay.SetAlpha(float(alpha))
     delaunay.SetTolerance(float(tolerance))
 
-    # write the data grass vector map
-    writer = vtkGRASSVectorPolyDataWriter()
-    writer.SetVectorName(output)
-    writer.SetInputConnection(delaunay.GetOutputPort())
-    if build_topo == 1:
-        writer.BuildTopoOn()
-    else:
-        writer.BuildTopoOff()
-    writer.Update()
-
-    # write optionally the vtk data as XML file for visualisation purposes
-    if write_vtk == 1:
-        xmlwriter = vtkXMLPolyDataWriter()
-        xmlwriter.SetFileName(output + ".vtk")
-        xmlwriter.SetInputConnection(delaunay.GetOutputPort())
-        xmlwriter.Write()
-    
-    if show == 1:
-        normals = vtkPolyDataNormals()
-        normals.SetInputConnection(delaunay.GetOutputPort())
-        mapMesh = vtkPolyDataMapper()
-        mapMesh.SetInputConnection(normals.GetOutputPort())
-        meshActor = vtkActor()
-        meshActor.SetMapper(mapMesh)
-
-        ren = vtkRenderer()
-        renWin =vtkRenderWindow()
-        renWin.AddRenderer(ren)
-        iren = vtkRenderWindowInteractor()
-        iren.SetRenderWindow(renWin)
-
-        ren.AddActor(meshActor)
-        ren.SetBackground(1, 1, 1)
-        renWin.SetSize(800, 600)
-
-        iren.Initialize()
-        renWin.Render()
-        iren.Start()
-
+    # Generate the output
+    generateVectorOutput(build_topo, output, delaunay, write_vtk, show)
 
 if __name__ == "__main__":
+    # Initiate GRASS
+    init = vtkGRASSInit()
+    init.Init("v.delaunay2d")
+    init.ExitOnErrorOn()
+    
     options, flags = grass.parser()
     main()
