@@ -46,4 +46,4 @@ Resulting vector map visualized with Paraview:
 
 http://vtk-grass-bridge.googlecode.com/files/elev_ned_30m_tin50000.png
 
-<wiki:gadget url="http://www.ohloh.net/p/446320/widgets/project_thin_badge.xml" height="36"/>
+<wiki:gadget url="http://www.ohloh.net/p/446320/widgets/project_thin_badge.xml" height="36" border="0"/>
