@@ -1,6 +1,0 @@
-#summary project statistic of vtk-grass-bridge
-
-= Project statistic provided by ohloh =
-
-|| <wiki:gadget url="http://www.ohloh.net/p/446320/widgets/project_languages.xml" width="350" height="180" border="0" /> || <wiki:gadget url="http://www.ohloh.net/p/446320/widgets/project_factoids.xml" width="350" height="180" border="0" /> ||
-|| <wiki:gadget url="http://www.ohloh.net/p/446320/widgets/project_cocomo.xml" width="350" height="240"  border="0" /> || <wiki:gadget url="http://www.ohloh.net/p/446320/widgets/project_basic_stats.xml" with="350" height="240" border="0"/> ||
