@@ -19,6 +19,7 @@
 #include <vtkGRASSVectorFeaturePoints.h>
 #include <vtkGRASSVectorFeatureCats.h>
 #include <vtkGRASSDefines.h>
+#include "vtkGRASSVectorDBInterface.h"
 
 
 vtkCxxRevisionMacro(vtkGRASSVectorMapBase, "$Revision: 1.18 $");
@@ -34,6 +35,7 @@ vtkGRASSVectorMapBase::vtkGRASSVectorMapBase()
     this->VectorName = NULL;
     this->Initiated = false;
     this->TotalNumberOfPoints = 0;
+    this->dbAccess = vtkGRASSVectorDBInterface::New();
 }
 
 //----------------------------------------------------------------------------
@@ -43,6 +45,8 @@ vtkGRASSVectorMapBase::~vtkGRASSVectorMapBase()
     this->CloseMap();
     if (this->VectorName)
         delete [] this->VectorName;
+
+    this->dbAccess->Delete();
 }
 
 //----------------------------------------------------------------------------
@@ -93,6 +97,10 @@ vtkGRASSVectorMapBase::OpenMapReadOnly(const char *name)
         G_free(mapset);
 
     this->Open = true;
+
+    this->dbAccess->SetFieldNumber(1);
+    this->dbAccess->InitializeDB(this);
+
     return true;
 }
 
@@ -194,6 +202,9 @@ vtkGRASSVectorMapBase::CloseMap()
     this->Open = false;
     this->Initiated = false;
     this->TotalNumberOfPoints = 0;
+
+    this->dbAccess->ShutdownDB();
+
     return true;
 }
 
