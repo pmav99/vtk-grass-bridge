@@ -189,7 +189,7 @@ public:
         else return -1; CATCH_INT
     }
     /*!
-       \brief Check if areaof vector map is alive
+       \brief Check if area of vector map is alive
      *
      * \param area id
      *

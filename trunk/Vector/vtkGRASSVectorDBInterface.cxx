@@ -27,7 +27,6 @@ vtkStandardNewMacro(vtkGRASSVectorDBInterface);
 vtkGRASSVectorDBInterface::vtkGRASSVectorDBInterface() {
     this->Initialized = false;
     this->driver = NULL;
-    this->column = NULL;
     this->table = NULL;
     this->FieldNumber = 1;
 
@@ -69,7 +68,6 @@ bool vtkGRASSVectorDBInterface::InitializeDB(vtkGRASSVectorMapBase *VectorMap) {
         if (db_describe_table(this->driver, &this->table_name, &this->table) != DB_OK) {
             G_fatal_error(("Unable to describe table <%s>"), this->fieldInfo->table);
         }
-        this->NumberOfColumns = db_get_table_number_of_columns(this->table);
 
     } else
         return false;
