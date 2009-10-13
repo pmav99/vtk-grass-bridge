@@ -14,7 +14,7 @@
  */
 
 /*!
- * \brief This is the base class for read/write access to a vector map. database tables
+ * \brief This is the base class for read/write access to vector map database tables
  *
  * This class provides an interface to read grass vector map database tables.
  *
@@ -30,6 +30,7 @@
 #include "vtkGRASSBridgeVectorWin32Header.h"
 #include "vtkGRASSVectorMapBase.h"
 #include "vtkGRASSDefines.h"
+#include "vtkGRASSVectorDBColumn.h"
 
 extern "C" {
 #include <grass/gis.h>
@@ -48,8 +49,6 @@ public:
     vtkTypeRevisionMacro(vtkGRASSVectorDBInterface, vtkObjectGRASSErrorHandler);
     void PrintSelf(ostream& os, vtkIndent indent);
 
-    virtual bool StartDriver();
-
     virtual const char *GetDatabaseName(){
         if(this->fieldInfo)
         return this->fieldInfo->database;
@@ -67,7 +66,6 @@ public:
         return this->fieldInfo->key;
         else return NULL;
     }
-
     virtual const char *GetName(){
         if(this->fieldInfo)
         return this->fieldInfo->name;
@@ -82,11 +80,9 @@ public:
     virtual bool IsInitialized() {
         return this->Initialized;
     }
-
+    
     vtkSetMacro(FieldNumber, int);
     vtkGetMacro(FieldNumber, int);
-    vtkGetMacro(NumberOfColumns, int);
-
 
 protected:
     vtkGRASSVectorDBInterface();
@@ -100,14 +96,11 @@ protected:
     virtual bool ShutdownDB();
 
     int FieldNumber;
-    int NumberOfColumns;
-
     //BTX
     dbDriver *driver;
     dbHandle handle;
     dbCursor cursor;
     dbTable *table;
-    dbColumn *column;
     dbString table_name;
     dbString dbsql;
     dbString valstr;
