@@ -25,7 +25,10 @@ vtkStandardNewMacro(vtkGRASSVectorDBTable);
 //----------------------------------------------------------------------------
 
 vtkGRASSVectorDBTable::vtkGRASSVectorDBTable() {
-
+    this->driver = NULL;
+    this->table = NULL;
+    this->handle = NULL;
+    this->cursor = NULL;
 }
 
 //----------------------------------------------------------------------------
