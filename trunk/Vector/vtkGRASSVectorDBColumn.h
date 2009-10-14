@@ -241,7 +241,6 @@ public:
     }
 
     //BTX
-
     dbColumn *GetPointer() {
         return this->column;
     }
@@ -253,7 +252,6 @@ protected:
 
     //BTX
     void SetColumn(dbColumn *column);
-
     dbColumn *column;
     //ETX
 

@@ -48,21 +48,31 @@ public:
     vtkTypeRevisionMacro(vtkGRASSVectorDBTable, vtkObjectGRASSErrorHandler);
     void PrintSelf(ostream& os, vtkIndent indent);
 
-    vtkGetObjectMacro(Column, vtkGRASSVectorDBColumn);
+    int GetNumberOfRows(){
+        if(this->cursor)
+            db_get_num_rows(this->cursor);
+        else
+            return -1;
+    }
+
+    int GetNumberOfColumns(){
+        if(this->table)
+            return db_get_table_number_of_columns(this->table);
+        else
+            return -1;
+    }
     
 protected:
     vtkGRASSVectorDBTable();
     ~vtkGRASSVectorDBTable();
 
-    vtkSetObjectMacro(Column, vtkGRASSVectorDBColumn);
-
     //!\brief Initialize the database, to be called by the VectorMap reader/writer
-    virtual bool InitializeTable(dbTable *table, dbDriver *driver, dbHandle handle, dbCursor cursor);
+    virtual bool InitializeTable(dbTable *table, dbDriver *driver, dbHandle *handle, dbCursor *cursor);
 
     //BTX
     dbDriver *driver;
-    dbHandle handle;
-    dbCursor cursor;
+    dbHandle *handle;
+    dbCursor *cursor;
     dbTable *table;
     //ETX
 
