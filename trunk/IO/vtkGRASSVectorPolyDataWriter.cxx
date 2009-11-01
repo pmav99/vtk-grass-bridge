@@ -55,6 +55,8 @@ vtkGRASSVectorPolyDataWriter::~vtkGRASSVectorPolyDataWriter()
         delete [] this->VectorName;
     if (this->Mapset)
         delete [] this->Mapset;
+    if (this->CategoryArrayName)
+        delete [] this->CategoryArrayName;
 }
 
 //----------------------------------------------------------------------------
@@ -94,7 +96,7 @@ vtkGRASSVectorPolyDataWriter::RequestData(
         return -1;
     }
 
-    vtkGRASSVectorMapWriter *writer = vtkGRASSVectorMapWriter::New();
+    VGB_CREATE(vtkGRASSVectorMapWriter, writer);
 
 
     if (!writer->OpenMap(this->VectorName, 1))
@@ -106,9 +108,9 @@ vtkGRASSVectorPolyDataWriter::RequestData(
 
     this->SetMapset(writer->GetMapset());
 
-    vtkGRASSVectorFeatureCats *cats = vtkGRASSVectorFeatureCats::New();
-    vtkGRASSVectorFeaturePoints *feature = vtkGRASSVectorFeaturePoints::New();
-    vtkGRASSVectorFeaturePoints *centroid = vtkGRASSVectorFeaturePoints::New();
+    VGB_CREATE(vtkGRASSVectorFeatureCats, cats);
+    VGB_CREATE(vtkGRASSVectorFeaturePoints, feature);
+    VGB_CREATE(vtkGRASSVectorFeaturePoints, centroid);
 
     // We write the data per cell
     for (i = 0; i < input->GetNumberOfCells(); i++)
@@ -192,16 +194,10 @@ vtkGRASSVectorPolyDataWriter::RequestData(
         }
     }
 
-    cats->Delete();
-    feature->Delete();
-    centroid->Delete();
-
     if (this->BuildTopo > 0)
         writer->CloseMap(true);
     else
         writer->CloseMap(false);
-
-    writer->Delete();
 
     return 1;
 }

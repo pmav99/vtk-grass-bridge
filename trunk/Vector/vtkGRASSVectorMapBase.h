@@ -33,7 +33,7 @@
 #include "vtkGRASSBridgeVectorWin32Header.h"
 #include "vtkGRASSDefines.h"
 
-class vtkGRASSVectorDBInterface;
+//class vtkGRASSVectorDBInterface;
 class vtkGRASSVectorFeaturePoints;
 class vtkGRASSVectorFeatureCats;
 class vtkGRASSVectorBBox;
@@ -46,7 +46,7 @@ extern "C" {
 class VTK_GRASS_BRIDGE_VECTOR_EXPORT vtkGRASSVectorMapBase : public vtkObjectGRASSErrorHandler {
 public:
     //BTX
-    friend class vtkGRASSVectorDBInterface;
+    //friend class vtkGRASSVectorDBInterface;
     //ETX
     static vtkGRASSVectorMapBase *New();
     vtkTypeRevisionMacro(vtkGRASSVectorMapBase, vtkObjectGRASSErrorHandler);
@@ -270,7 +270,7 @@ protected:
     bool Initiated;
     bool Open;
     char *VectorName;
-    vtkGRASSVectorDBInterface *dbAccess;
+    //vtkGRASSVectorDBInterface *dbAccess;
 
     //BTX
     struct Map_info map;

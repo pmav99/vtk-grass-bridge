@@ -43,6 +43,8 @@ vtkGRASSRasterMapBase::vtkGRASSRasterMapBase()
     this->Row = NULL;
     this->RegionUsage = VTK_GRASS_REGION_CURRENT;
     this->RasterBuff = (void*) NULL;
+    this->NullValue = -9999;
+    this->UseGRASSNulleValue = 1;
 }
 
 //----------------------------------------------------------------------------
@@ -209,17 +211,44 @@ vtkGRASSRasterMapBase::GetRow(int idx)
     if (this->MapType == CELL_TYPE)
         for (i = 0; i < this->NumberOfCols; i++, ptr = G_incr_void_ptr(ptr, size))
         {
-            this->Row->SetTuple1(i, (double) *(CELL*) ptr);
+            if(this->UseGRASSNulleValue)
+            {
+                if(Rast_is_c_null_value((CELL*) ptr))
+                    this->Row->SetTuple1(i, this->NullValue);
+                else
+                    this->Row->SetTuple1(i, (double) *(CELL*) ptr);
+            }else
+            {
+                this->Row->SetTuple1(i, (double) *(CELL*) ptr);
+            }
         }
     if (this->MapType == FCELL_TYPE)
         for (i = 0; i < this->NumberOfCols; i++, ptr = G_incr_void_ptr(ptr, size))
         {
-            this->Row->SetTuple1(i, (double) *(FCELL*) ptr);
+            if(this->UseGRASSNulleValue)
+            {
+                if(Rast_is_f_null_value((FCELL*) ptr))
+                    this->Row->SetTuple1(i, this->NullValue);
+                else
+                this->Row->SetTuple1(i, (double) *(FCELL*) ptr);
+            }else
+            {
+                this->Row->SetTuple1(i, (double) *(FCELL*) ptr);
+            }
         }
     if (this->MapType == DCELL_TYPE)
         for (i = 0; i < this->NumberOfCols; i++, ptr = G_incr_void_ptr(ptr, size))
         {
-            this->Row->SetTuple1(i, (double) *(DCELL*) ptr);
+            if(this->UseGRASSNulleValue)
+            {
+                if(Rast_is_d_null_value((DCELL*) ptr))
+                    this->Row->SetTuple1(i, this->NullValue);
+                else
+                    this->Row->SetTuple1(i, (double) *(DCELL*) ptr);
+            }else
+            {
+                this->Row->SetTuple1(i, (double) *(DCELL*) ptr);
+            }
         }
 
     return this->Row;

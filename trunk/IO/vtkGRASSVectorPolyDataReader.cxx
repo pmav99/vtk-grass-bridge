@@ -81,7 +81,7 @@ vtkGRASSVectorPolyDataReader::RequestData(vtkInformation*,
         return -1;
     }
 
-    vtkGRASSVectorMapNoTopoReader *reader = vtkGRASSVectorMapNoTopoReader::New();
+    VGB_CREATE(vtkGRASSVectorMapNoTopoReader, reader);
 
 
     if (!reader->OpenMap(this->VectorName))
@@ -93,19 +93,19 @@ vtkGRASSVectorPolyDataReader::RequestData(vtkInformation*,
 
     this->SetMapset(reader->GetMapset());
 
-    vtkGRASSVectorFeatureCats *cats = vtkGRASSVectorFeatureCats::New();
-    vtkGRASSVectorFeaturePoints *features = vtkGRASSVectorFeaturePoints::New();
+    VGB_CREATE(vtkGRASSVectorFeatureCats, cats);
+    VGB_CREATE(vtkGRASSVectorFeaturePoints, features);
 
     vtkPolyData* output = vtkPolyData::GetData(outputVector);
     output->Allocate(1);
 
-    vtkPoints *points = vtkPoints::New();
+    VGB_CREATE(vtkPoints, points);
 
-    vtkIntArray *categories = vtkIntArray::New();
+    VGB_CREATE(vtkIntArray, categories);
     categories->SetNumberOfComponents(1);
     categories->SetName(this->CategoryArrayName);
 
-    vtkIdList *ids = vtkIdList::New();
+    VGB_CREATE(vtkIdList, ids);
 
 
     // Read every feature in vector map
@@ -122,18 +122,12 @@ vtkGRASSVectorPolyDataReader::RequestData(vtkInformation*,
 
         categories->InsertNextValue(cats->GetCat(1));
     }
-    ids->Delete();
 
     // Store the points in the output data object.
     output->SetPoints(points);
     output->GetCellData()->SetScalars(categories);
 
     reader->CloseMap();
-    categories->Delete();
-    points->Delete();
-    reader->Delete();
-    cats->Delete();
-    features->Delete();
 
     return 1;
 }

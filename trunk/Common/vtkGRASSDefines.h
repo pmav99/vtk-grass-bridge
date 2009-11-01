@@ -13,6 +13,8 @@
 */
 
 
+#include "vtkSmartPointer.h"
+
 /** Global preprocessor definitions for vtkGRASSBridge
 */
 #define VTK_GRASS_REGION_DEFAULT 0
@@ -50,6 +52,11 @@ extern "C" {
 #define CATCH_BOOL  } else { \
                     this->InsertNextError(vgb_error_message); \
                     return false;}
+
+
+#define VGB_CREATE(type, name) \
+  vtkSmartPointer<type> name = vtkSmartPointer<type>::New()
+
 
 extern threadLocal jmp_buf vgb_stack_buffer;    /*to save the most important CPU register for each thread*/
 extern threadLocal const char* vgb_error_message;

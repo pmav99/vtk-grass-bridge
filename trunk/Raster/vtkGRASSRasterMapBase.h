@@ -77,11 +77,27 @@ public:
   //! \brief Returns true if the map is open
   //! \return true for open, false for not open
   virtual bool IsOpen() {return this->Open;}
+
+  //! \brief Null value which should replace the default grass null value for CELL, FCELL andDCELL maps
+  //! to enable the NullValue, set the this->UseGRASSNulleValueOff()
+  vtkSetMacro(NullValue, double);
+  //! \brief Null value which should replace the default grass null value for CELL, FCELL andDCELL maps
+  //! to enable the NullValue, set the this->UseGRASSNulleValueOff() 
+  vtkGetMacro(NullValue, double);
+
+
+  //! \brief Use the grass NULL value to be stored in the vtkDataArray
+  vtkGetMacro(UseGRASSNulleValue, int);
+  //! \brief Use the grass NULL value to be stored in the vtkDataArray
+  vtkBooleanMacro(UseGRASSNulleValue, int);
   
 
 protected:
   vtkGRASSRasterMapBase();
   ~vtkGRASSRasterMapBase();
+
+
+  vtkSetMacro(UseGRASSNulleValue, int);
 
   int RegionUsage;
   bool Open; // True if the raster file was opened
@@ -91,6 +107,9 @@ protected:
   int NumberOfCols;
   char *RasterName;
   char *Mapset;
+  double NullValue;
+  int UseGRASSNulleValue;
+
   vtkGRASSRegion *Region;
   vtkGRASSHistory *History;
   //BTX

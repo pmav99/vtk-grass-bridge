@@ -22,6 +22,10 @@
 #% keywords: tin
 #%End
 #%Flag
+#% key: f
+#% description: Filter null values
+#%End
+#%Flag
 #% key: t
 #% description: Build vector topology
 #%End
@@ -60,6 +64,52 @@
 #% answer: 20000
 #% description: Specify the number of triangles to produce on output. (It is a good idea to make sure this is less than a tessellated mesh at full resolution.) You need to set this value only when the error measure is set to NumberOfTriangles.
 #%End
+#%Option
+#% key: aerror
+#% type: double
+#% required: no
+#% multiple: no
+#% key_desc: aerror
+#% answer: 0.1
+#% description: Specify the absolute error of the mesh; that is, the error in height between the decimated mesh and the original height field. You need to set this value only when the error measure is set to AbsoluteError.
+#%End
+#%Option
+#% key: rerror
+#% type: double
+#% required: no
+#% multiple: no
+#% key_desc: aerror
+#% answer: 0.1
+#% description: Specify the relative error of the mesh; that is, the error in height between the decimated mesh and the original height field normalized by the diagonal of the image. You need to set this value only when the error measure is set to RelativeError.
+#%End
+#%Option
+#% key: reduction
+#% type: double
+#% required: no
+#% multiple: no
+#% key_desc: reduction
+#% answer: 0.1
+#% description: Specify the relative error of the mesh; that is, the error in height between the decimated mesh and the original height field normalized by the diagonal of the image. You need to set this value only when the error measure is set to RelativeError.
+#%End
+#%Option
+#% key: mode
+#% type: string
+#% required: no
+#% multiple: no
+#% key_desc: mode
+#% options: reduction,trinum,aerror,rerror
+#% answer: reduction
+#% description: Specify how to terminate the algorithm: either as an absolute number of triangles, a relative number of triangles (normalized by the full resolution mesh), an absolute error (in the height field), or relative error (normalized by the length of the diagonal of the image).
+#%End
+#%Option
+#% key: null
+#% type: string
+#% required: no
+#% multiple: no
+#% key_desc: mode
+#% answer: -9999
+#% description: The value to be used for grass null values in vtk
+#%End
 
 #include the grass, VTK and vtkGRASSBridge Python libraries
 from libvtkFilteringPython import *
@@ -77,10 +127,16 @@ import grass.script as grass
 def main():
     input = options['input']
     output = options['output']
-    trinum = options['trinum']
+    trinum = int(options['trinum'])
+    aerror = float(options['aerror'])
+    null = float(options['null'])
+    reduction = float(options['reduction'])
+    mode = options['mode']
+    rerror = float(options['rerror'])
     build_topo = int(flags['t'])
     write_vtk = int(flags['w'])
     show = int(flags['s'])
+    thres = int(flags['f'])
 
     # Initiate GRASS
     init = vtkGRASSInit()
@@ -89,25 +145,45 @@ def main():
     reader = vtkGRASSRasterImageReader()
     reader.SetRasterName(input)
     reader.UseCurrentRegion()
+    #reader.SetNullValue(null);
 
     # The VTK filter
     filter = vtkGreedyTerrainDecimation()
     filter.SetInputConnection(reader.GetOutputPort())
-    filter.SetErrorMeasureToNumberOfTriangles ()
-    filter.SetNumberOfTriangles (int(trinum))
     filter.BoundaryVertexDeletionOn ()
-    filter.ComputeNormalsOn ()
-#    filter.SetErrorMeasureToSpecifiedReduction ()
-#    filter.SetErrorMeasureToAbsoluteError ()
-#    filter.SetErrorMeasureToRelativeError ()
+#    filter.ComputeNormalsOn ()
+    if mode == "trinum":
+        filter.SetErrorMeasureToNumberOfTriangles ()
+    if mode == "reduction":
+        filter.SetErrorMeasureToSpecifiedReduction ()
+    if mode == "aerror":
+        filter.SetErrorMeasureToAbsoluteError ()
+    if mode == "rerror":
+        filter.SetErrorMeasureToRelativeError ()
 #    filter.BoundaryVertexDeletionOff ()
-#    filter.ComputeNormalsOff ()
-#    filter.SetReduction (1)
-#    filter.SetAbsoluteError (0.00001)
-#    filter.SetRelativeError (0.00001)
+    filter.ComputeNormalsOff ()
+    filter.SetReduction (reduction)
+    filter.SetAbsoluteError (aerror)
+    filter.SetRelativeError (rerror)
+    filter.SetNumberOfTriangles (trinum)
+    filter.Update()
 
-    # Generate the output
-    generateVectorOutput(build_topo, output, filter, write_vtk, show)
+    if thres == 1:
+        print "Start thresholde filter"
+        threshold = vtkThreshold()
+        threshold.SetInputConnection(filter.GetOutputPort())
+        threshold.ThresholdByUpper (null + 2)
+        threshold.AllScalarsOff()
+        threshold.Update()
+
+        print "Extract polydata"
+        geometry = vtkGeometryFilter()
+        geometry.SetInputConnection(threshold.GetOutputPort())
+        geometry.Update()
+        generateVectorOutput(build_topo, output, geometry, write_vtk, show)
+    else:
+        # Generate the output
+        generateVectorOutput(build_topo, output, filter, write_vtk, show)
 
 if __name__ == "__main__":
     # Initiate GRASS

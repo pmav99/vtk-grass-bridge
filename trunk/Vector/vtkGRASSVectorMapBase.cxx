@@ -35,7 +35,7 @@ vtkGRASSVectorMapBase::vtkGRASSVectorMapBase()
     this->VectorName = NULL;
     this->Initiated = false;
     this->TotalNumberOfPoints = 0;
-    this->dbAccess = vtkGRASSVectorDBInterface::New();
+    //VGB_CREATE(vtkGRASSVectorDBInterface, this->dbAccess);
 }
 
 //----------------------------------------------------------------------------
@@ -45,8 +45,6 @@ vtkGRASSVectorMapBase::~vtkGRASSVectorMapBase()
     this->CloseMap();
     if (this->VectorName)
         delete [] this->VectorName;
-
-    this->dbAccess->Delete();
 }
 
 //----------------------------------------------------------------------------
@@ -98,8 +96,8 @@ vtkGRASSVectorMapBase::OpenMapReadOnly(const char *name)
 
     this->Open = true;
 
-    this->dbAccess->SetFieldNumber(1);
-    this->dbAccess->InitializeDB(this);
+    //this->dbAccess->SetFieldNumber(1);
+    //this->dbAccess->InitializeDB(this);
 
     return true;
 }
@@ -203,7 +201,7 @@ vtkGRASSVectorMapBase::CloseMap()
     this->Initiated = false;
     this->TotalNumberOfPoints = 0;
 
-    this->dbAccess->ShutdownDB();
+    //this->dbAccess->ShutdownDB();
 
     return true;
 }
@@ -220,8 +218,8 @@ vtkGRASSVectorMapBase::GetTotalNumberOfPoints()
 
     this->RewindMap();
 
-    vtkGRASSVectorFeaturePoints *points = vtkGRASSVectorFeaturePoints::New();
-    vtkGRASSVectorFeatureCats *cats = vtkGRASSVectorFeatureCats::New();
+    VGB_CREATE(vtkGRASSVectorFeaturePoints, points);
+    VGB_CREATE(vtkGRASSVectorFeatureCats, cats);
 
     if (!setjmp(vgb_stack_buffer))
     {
@@ -238,9 +236,6 @@ vtkGRASSVectorMapBase::GetTotalNumberOfPoints()
     }
 
     this->RewindMap();
-
-    points->Delete();
-    cats->Delete();
 
     this->Initiated = true;
 
