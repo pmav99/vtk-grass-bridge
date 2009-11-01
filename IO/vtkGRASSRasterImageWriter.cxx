@@ -66,7 +66,7 @@ vtkGRASSRasterImageWriterExecute(vtkGRASSRasterImageWriter *self, vtkImageData* 
 
     vtkGRASSRasterMapWriter *map = self->GetRasterMap();
     // Largest array available
-    vtkDoubleArray *row = vtkDoubleArray::New();
+    VGB_CREATE(vtkDoubleArray, row);
     row->SetNumberOfTuples(map->GetNumberOfCols());
 
     // Loop through output pixel
@@ -82,7 +82,6 @@ vtkGRASSRasterImageWriterExecute(vtkGRASSRasterImageWriter *self, vtkImageData* 
             map->PutNextRow(row);
         }
     }
-    row->Delete();
 }
 
 //----------------------------------------------------------------------------
@@ -96,7 +95,7 @@ vtkGRASSRasterImageWriter::SimpleExecute(vtkImageData* input, vtkImageData* outp
 
     input->GetDimensions(dims);
 
-    vtkGRASSRegion *region = vtkGRASSRegion::New();
+    VGB_CREATE(vtkGRASSRegion, region);
 
     // SetThe region of the raster map
     if (this->RegionUsage == VTK_GRASS_REGION_CURRENT)
@@ -149,7 +148,6 @@ vtkGRASSRasterImageWriter::SimpleExecute(vtkImageData* input, vtkImageData* outp
 
     // All work is done. now we can close the map
     this->RasterMap->CloseMap();
-    region->Delete();
 
     return;
 }

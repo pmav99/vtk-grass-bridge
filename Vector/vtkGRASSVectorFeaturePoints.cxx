@@ -15,6 +15,7 @@
 
 #include "vtkGRASSVectorFeaturePoints.h"
 #include "vtkGRASSVectorBBox.h"
+#include "vtkGRASSDefines.h"
 #include <vtkObjectFactory.h>
 #include <vtkCellType.h>
 
@@ -73,7 +74,7 @@ vtkGRASSVectorFeaturePoints::GetPointDistanceFromLine(double x, double y, double
 
 vtkGRASSVectorBBox *vtkGRASSVectorFeaturePoints::GetBoundingBox()
 {
-    vtkGRASSVectorBBox *box = vtkGRASSVectorBBox::New();
+    VGB_CREATE(vtkGRASSVectorBBox, box);
     Vect_line_box(this->points, box->GetPointer());
     return box;
 }
