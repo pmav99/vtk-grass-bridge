@@ -14,6 +14,7 @@ vtkGRASSVectorMapLister.cxx
 vtkGRASSRegion.cxx
 vtkObjectGRASSErrorHandler.cxx
 vtkGRASSInit.cxx
+vtkGRASSMessagingInterface.cxx
 )
 
 SET (Common_H
@@ -24,6 +25,7 @@ vtkGRASSVectorMapLister.h
 vtkGRASSRegion.h
 vtkGRASSInit.h
 vtkObjectGRASSErrorHandler.h
+vtkGRASSMessagingInterface.h
 vtkGRASSBridgeCommonWin32Header.h
 )
 
