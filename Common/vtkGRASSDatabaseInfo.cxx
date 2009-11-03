@@ -14,6 +14,7 @@
 
 #include "vtkGRASSDatabaseInfo.h"
 #include <vtkObjectFactory.h>
+#include "vtkGRASSDefines.h"
 
 extern "C" {
 #include <grass/gis.h>
@@ -32,10 +33,10 @@ vtkGRASSDatabaseInfo::vtkGRASSDatabaseInfo() {
     this->CurrentLocationTitle = NULL;
     this->CurrentMapsetName = NULL;
     this->GisBasePath = NULL;
+    this->Projection = 0;
 
     this->AvailableMapSets = vtkStringArray::New();
 
-    //G_gisinit("vtkGRASSDatabaseInfo");
 
     this->Refresh();
 }
@@ -62,6 +63,7 @@ vtkGRASSDatabaseInfo::~vtkGRASSDatabaseInfo() {
 
 bool vtkGRASSDatabaseInfo::Refresh(){
 
+  TRY
   this->AvailableMapSets->Initialize();
 
   this->SetCurrentLocationName(G_location());
@@ -69,6 +71,7 @@ bool vtkGRASSDatabaseInfo::Refresh(){
   this->SetCurrentLocationTitle(G_myname());
   this->SetGisBasePath(G_gisbase());
   this->SetCurrentLocationPath(G_location_path());
+  this->SetProjection(G_projection());
 
   char ** mapsets = G_available_mapsets();
   
@@ -78,6 +81,7 @@ bool vtkGRASSDatabaseInfo::Refresh(){
    this->AvailableMapSets->InsertNextValue(mapsets[count]);
    count++;
   }
+  CATCH_BOOL
 
   return true;
 
@@ -93,6 +97,7 @@ void vtkGRASSDatabaseInfo::PrintSelf(ostream& os, vtkIndent indent) {
     os << indent << "CurrentLocationTitle: " << (this->CurrentLocationTitle?this->CurrentLocationTitle : "none") << endl;
     os << indent << "CurrentMapsetName: " << (this->CurrentMapsetName?this->CurrentMapsetName : "none") << endl;
     os << indent << "GisBasePath: " << (this->GisBasePath?this->GisBasePath : "none") << endl;
+    os << indent << "Projection: " << (this->Projection) << endl;
 
     os << indent << "Available Mapsets: " << endl;
     int i;

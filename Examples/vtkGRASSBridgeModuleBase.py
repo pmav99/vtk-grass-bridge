@@ -21,16 +21,20 @@ from libvtkGraphicsPython import *
 from libvtkIOPython import *
 from libvtkImagingPython import *
 from libvtkGRASSBridgeIOPython import *
+from libvtkGRASSBridgeCommonPython import *
 import grass.script as grass
 
 
 def generateVectorOutput(build_topo, output, filter, write_vtk, show):
 
+    gm = vtkGRASSMessagingInterface()
+    gm.Message("write vector into grass database")
     # write the data grass vector map
     writer = vtkGRASSVectorPolyDataWriter()
     writer.SetVectorName(output)
     writer.SetInputConnection(filter.GetOutputPort())
     if build_topo == 1:
+        gm.Message("build topology")
         writer.BuildTopoOn()
     else:
         writer.BuildTopoOff()
@@ -38,12 +42,14 @@ def generateVectorOutput(build_topo, output, filter, write_vtk, show):
 
     # write optionally the vtk data as XML file for visualisation purposes
     if write_vtk == 1:
+        gm.Message("write VTK file")
         xmlwriter = vtkXMLPolyDataWriter()
         xmlwriter.SetFileName(output + ".vtk")
         xmlwriter.SetInputConnection(filter.GetOutputPort())
         xmlwriter.Write()
     
     if show == 1:
+        gm.Message("show visulization")
         normals = vtkPolyDataNormals()
         normals.SetInputConnection(filter.GetOutputPort())
         mapMesh = vtkPolyDataMapper()

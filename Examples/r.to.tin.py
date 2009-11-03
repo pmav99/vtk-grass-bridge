@@ -16,7 +16,7 @@
 #############################################################################
 
 #%Module
-#% description: Convert a hight raster map into a vector map
+#% description: Convert a hight raster map into a vector map with the vtkGreedyTerrainDecimation filter class
 #% keywords: raster
 #% keywords: vector
 #% keywords: tin
@@ -79,7 +79,7 @@
 #% required: no
 #% multiple: no
 #% key_desc: aerror
-#% answer: 0.1
+#% answer: 1
 #% description: Specify the relative error of the mesh; that is, the error in height between the decimated mesh and the original height field normalized by the diagonal of the image. You need to set this value only when the error measure is set to RelativeError.
 #%End
 #%Option
@@ -88,7 +88,7 @@
 #% required: no
 #% multiple: no
 #% key_desc: reduction
-#% answer: 0.1
+#% answer: 0.95
 #% description: Specify the relative error of the mesh; that is, the error in height between the decimated mesh and the original height field normalized by the diagonal of the image. You need to set this value only when the error measure is set to RelativeError.
 #%End
 #%Option
@@ -125,6 +125,9 @@ import grass.script as grass
 
 
 def main():
+    gm = vtkGRASSMessagingInterface()
+
+    # Read the options
     input = options['input']
     output = options['output']
     trinum = int(options['trinum'])
@@ -138,52 +141,64 @@ def main():
     show = int(flags['s'])
     thres = int(flags['f'])
 
-    # Initiate GRASS
-    init = vtkGRASSInit()
+    gm.Message("Start")
 
+    gm.Message("Reading the raster data")
     # Raster map reader
     reader = vtkGRASSRasterImageReader()
     reader.SetRasterName(input)
     reader.UseCurrentRegion()
     #reader.SetNullValue(null);
+    reader.Update()
 
-    # The VTK filter
+    gm.VerboseMessage("Initializing the vtkGreedyTerrainDecimation filter")
+    # The vtkGreedyTerrainDecimation filter
     filter = vtkGreedyTerrainDecimation()
     filter.SetInputConnection(reader.GetOutputPort())
     filter.BoundaryVertexDeletionOn ()
-#    filter.ComputeNormalsOn ()
     if mode == "trinum":
+        gm.Message("processing with triangle number " + str(trinum))
         filter.SetErrorMeasureToNumberOfTriangles ()
-    if mode == "reduction":
+        filter.SetNumberOfTriangles (trinum)
+    elif mode == "reduction":
+        gm.Message("processing with reduction " + str(reduction))
         filter.SetErrorMeasureToSpecifiedReduction ()
-    if mode == "aerror":
+        filter.SetReduction (reduction)
+    elif mode == "aerror":
+        gm.Message("processing with absolut error " + str(aerror))
         filter.SetErrorMeasureToAbsoluteError ()
-    if mode == "rerror":
+        filter.SetAbsoluteError (aerror)
+    elif mode == "rerror":
+        gm.Message("processing with relative error " + str(rerror))
         filter.SetErrorMeasureToRelativeError ()
-#    filter.BoundaryVertexDeletionOff ()
+        filter.SetRelativeError (rerror)
+    filter.BoundaryVertexDeletionOn ()
     filter.ComputeNormalsOff ()
-    filter.SetReduction (reduction)
-    filter.SetAbsoluteError (aerror)
-    filter.SetRelativeError (rerror)
-    filter.SetNumberOfTriangles (trinum)
     filter.Update()
 
+    # Use threshold based on null value
     if thres == 1:
-        print "Start thresholde filter"
+        gm.Message("processing threshold filtering")
         threshold = vtkThreshold()
         threshold.SetInputConnection(filter.GetOutputPort())
-        threshold.ThresholdByUpper (null + 2)
-        threshold.AllScalarsOff()
+        threshold.ThresholdByUpper (null + 0.00001)
+        threshold.AllScalarsOn()
+        threshold.SetPointsDataTypeToDouble ()
+        threshold.SetComponentModeToUseAny ()
         threshold.Update()
-
-        print "Extract polydata"
+        # exrtract polydata from unstructured grid
+        gm.Message("Extract polydata from unstructured grid")
         geometry = vtkGeometryFilter()
         geometry.SetInputConnection(threshold.GetOutputPort())
         geometry.Update()
+        # write the vector data back to grass
         generateVectorOutput(build_topo, output, geometry, write_vtk, show)
     else:
+        gm.Message("processing without filtering")
         # Generate the output
         generateVectorOutput(build_topo, output, filter, write_vtk, show)
+
+    gm.Message("Finished")
 
 if __name__ == "__main__":
     # Initiate GRASS
