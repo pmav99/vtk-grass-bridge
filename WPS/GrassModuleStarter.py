@@ -1,16 +1,11 @@
-# To change this template, choose Tools | Templates
-# and open the template in the editor.
-
 # The format of the input file
 # [System]
 #  WorkDir=/tmp
 # [GRASS]
-#  Path=
-#  Location=
-#  Mapset=
-#
-# [Module]
-# Identifier=v.buffer
+#  GISBASE=
+#  GRASS_ADDON_PATH=
+#  GRASS_VERSION=
+#  Module=v.buffer
 #
 # [ComplexData]
 #  Identifier=input
@@ -96,19 +91,134 @@ GRASS_MAPSET_NAME = "PERMANENT"
 class ComplexData():
     """This class saves the complex in- and output data
     of a wps execution request"""
-    def __init__(self):
+    def __init__(self, file):
+        self.__file = file
         self.identifer = ""
         self.mimeType = ""
-        self.encoding = ""
+        self.__parseFile()
+    def __parseFile(self):
+        for i in range(3):
+            string = self.__file.readline()
+            if string == "":
+                return
+            splitstring = string.split('=')
+            if len(splitstring) > 1:
+                if splitstring[0].upper().find("IDENTIFIER") != -1:
+                    self.identifier = splitstring[1]
+                    print self.identifier
+                if splitstring[0].upper().find("MIMETYPE") != -1:
+                    self.mimeType = splitstring[1]
+                    print self.mimeType
+
+    
+class ComplexOutput(ComplexData):
+    pass
 
 ###############################################################################
 
 class LiteralData():
     """This class saves the literal in- and output data
     of a wps execution request"""
-    def __init__(self):
+    def __init__(self, file):
+        self.__file = file
+        self.identifier = ""
         self.value = ""
         self.type = "" #double, integer, string
+        self.__parseFile()
+    def __parseFile(self):
+        for i in range(3):
+            string = self.__file.readline()
+            if string == "":
+                return
+            splitstring = string.split('=')
+            if len(splitstring) > 1:
+                if splitstring[0].upper().find("IDENTIFIER") != -1:
+                    self.identifier = splitstring[1]
+                    print self.identifier
+                if splitstring[0].upper().find("VALUE") != -1:
+                    self.value = splitstring[1]
+                    print self.value
+                if splitstring[0].upper().find("TYPE") != -1:
+                    self.type = splitstring[1]
+                    print self.type
+
+###############################################################################
+
+class InputParameter():
+    """This class parses and stores the key-value input parameter"""
+    def __init__(self):
+        self.workDir = ""
+        self.grassGisBase = ""
+        self.grassAddonPath = ""
+        self.grassVersion = ""
+        self.grassModule = ""
+        self.complexDataList = []
+        self.complexOutputList = []
+        self.literalDataList = []
+        self.__fileName = ""
+
+    def parseFile(self, filename):
+        self.__filename = filename
+
+        if os.path.isfile(filename) == False:
+            raise IOError
+
+        self.__file = open(filename, 'r')
+
+        while True:
+            string = self.__file.readline()
+            if string == "":
+                break
+
+            if string.upper().find("[SYSTEM]") != -1:
+                print string.upper()
+                self.__parseSystem()
+
+            if string.upper().find("[GRASS]") != -1:
+                print string.upper()
+                self.__parseGrass()
+
+            if string.upper().find("[COMPLEXDATA]") != -1:
+                print string.upper()
+                self.complexDataList.append(ComplexData(self.__file))
+
+            if string.upper().find("[COMPLEXOUTPUT]") != -1:
+                print string.upper()
+                self.complexOutputList.append(ComplexOutput(self.__file))
+
+            if string.upper().find("[LITERALDATA]") != -1:
+                print string.upper()
+                self.literalDataList.append(LiteralData(self.__file))
+
+    def __parseSystem(self):
+        string = self.__file.readline()
+        if string == "":
+            return
+        splitstring = string.split('=')
+        if len(splitstring) > 1:
+            self.workDir = splitstring[1]
+            print self.workDir
+
+    def __parseGrass(self):
+        for i in range(3):
+            string = self.__file.readline()
+            if string == "":
+                return
+            splitstring = string.split('=')
+            if len(splitstring) > 1:
+                if splitstring[0].upper().find("GISBASE") != -1:
+                    self.grassGisBase = splitstring[1]
+                    print self.grassGisBase
+                if splitstring[0].upper().find("GRASS_ADDON_PATH") != -1:
+                    self.grassAddonPath = splitstring[1]
+                    print self.grassAddonPath
+                if splitstring[0].upper().find("GRASS_VERSION") != -1:
+                    self.grassVersion = splitstring[1]
+                    print self.grassVersion
+                if splitstring[0].upper().find("MODULE") != -1:
+                    self.grassModule = splitstring[1]
+                    print self.grassModule
+
 
 ###############################################################################
 
@@ -205,8 +315,15 @@ class GrassWindFile():
 
 if __name__ == "__main__":
 
+    input = InputParameter()
+    input.parseFile("input.txt")
+
+    exit()
+
+    workDir = input.workDir
+
     # create a temporal directory for the location and mapset creation
-    gisdbase = tempfile.mkdtemp()
+    gisdbase = tempfile.mkdtemp(workDir)
 
     os.mkdir(os.path.join(gisdbase, GRASS_LOCATION_NAME))
     os.mkdir(os.path.join(gisdbase, GRASS_LOCATION_NAME, GRASS_MAPSET_NAME))
@@ -218,7 +335,7 @@ if __name__ == "__main__":
     genv.env["GIS_LOCK"] = str(os.getpid())
     genv.env["GISBASE"] = "/home/soeren/src/grass7.0/grass_trunk/dist.i686-pc-linux-gnu"
     genv.env["GISRC"] = os.path.join(gisdbase, "gisrc")
-    genv.env["LD_LIBRARY_PATH"] = "/home/soeren/src/grass7.0/grass_trunk/dist.i686-pc-linux-gnu/lib"
+    genv.env["LD_LIBRARY_PATH"] = str(os.path.join(genv.env["GISBASE"], "lib"))
     genv.env["GRASS_VERSION"] = "7.0.svn"
     genv.env["GRASS_ADDON_PATH"] = ""
     genv.env["PATH"] = str(os.path.join(genv.env["GISBASE"], "bin") + ":" + os.path.join(genv.env["GISBASE"], "scripts"))
@@ -275,7 +392,6 @@ if __name__ == "__main__":
     proc.communicate()
     # remove the created directory
     try:
-        a = 1
         os.rmdir(gisdbase)
     except:
         pass
