@@ -24,12 +24,15 @@ from subprocess import Popen
 import os
 import os.path
 import tempfile
+from ParameterParser import *
+from GrassSettings import *
 
 GRASS_LOCATION_NAME = "startLocation"
 GRASS_WORK_LOCATION = "workLocation"
 GRASS_MAPSET_NAME = "PERMANENT"
 
-# The format of the input file
+# The format of the input file is defined as:
+#
 # [System]
 #  WorkDir= temporal created locations and mapsets are put in this directory
 #  OutputDir= The output of the grass module is put in tis directory
@@ -41,6 +44,7 @@ GRASS_MAPSET_NAME = "PERMANENT"
 #
 # [ComplexData]
 #  Identifier=input
+#  PathToFile=/tmp/srtm90.tiff
 #  MimeType=text/xml
 #  Encoding=UTF-8
 #  Schema=http://schemas.opengis.net/gml/3.1.0/polygon.xsd
@@ -51,13 +55,15 @@ GRASS_MAPSET_NAME = "PERMANENT"
 #  Value=true
 #
 # [ComplexOutput]
-#  Identifier=output.gml
+#  Identifier=output
+#  PathToFile=/tmp/srtm90contour.gml
 #  MimeType=text/xml
 #  Encoding=UTF-8
 #  Schema=http://schemas.opengis.net/gml/3.1.0/polygon.xsd
 #
 #
 # Example with multiple LiteralData
+
 """
 [System]
  WorkDir=/tmp
@@ -69,11 +75,11 @@ GRASS_MAPSET_NAME = "PERMANENT"
  Module=r.contour
 
 [ComplexData]
- Identifier=/tmp/srtm90.tiff
+ Identifier=input
+ PathToFile=/tmp/srtm90.tiff
  MimeType=image/tiff
  Encoding=
  Schema=
-
 
 [LiteralData]
  Identifier=levels
@@ -85,321 +91,23 @@ GRASS_MAPSET_NAME = "PERMANENT"
  DataType=double
  Value=100
 
-
 [LiteralData]
  Identifier=levels
  DataType=double
  Value=200
-
 
 [LiteralData]
  Identifier=levels
  DataType=double
  Value=300
 
-
 [ComplexOutput]
  Identifier=output
+ PathToFile=/tmp/srtm90contour.gml
  MimeType=text/xml
  Encoding=UTF-8
  Schema=http://schemas.opengis.net/gml/3.1.0/polygon.xsd
 """
-
-###############################################################################
-###############################################################################
-###############################################################################
-
-class ComplexData():
-    """This class saves the complex in- and output data
-    of a wps execution request"""
-    ############################################################################
-    def __init__(self, file):
-        self.__file = file
-        self.identifer = ""
-        self.mimeType = ""
-        self.__parseFile()
-
-    ############################################################################
-    def __parseFile(self):
-        for i in range(3):
-            string = self.__file.readline()
-            if string == "":
-                return
-            splitstring = string.split('=')
-            if len(splitstring) > 1:
-                if splitstring[0].upper().find("IDENTIFIER") != -1:
-                    self.identifier = splitstring[1].rstrip()
-                    print self.identifier
-                if splitstring[0].upper().find("MIMETYPE") != -1:
-                    self.mimeType = splitstring[1].rstrip()
-                    print self.mimeType
-
-###############################################################################
-###############################################################################
-###############################################################################
-    
-class ComplexOutput(ComplexData):
-    """The same as ComplexData, but used for name convenience"""
-    pass
-
-###############################################################################
-###############################################################################
-###############################################################################
-
-class LiteralData():
-    """This class saves the literal in- and output data
-    of a wps execution request"""
-    ############################################################################
-    def __init__(self, file):
-        self.__file = file
-        self.identifier = ""
-        self.value = ""
-        self.type = "" #double, integer, string
-        self.__parseFile()
-
-    ############################################################################
-    def __parseFile(self):
-        for i in range(3):
-            string = self.__file.readline()
-            if string == "":
-                return
-            splitstring = string.split('=')
-            if len(splitstring) > 1:
-                if splitstring[0].upper().find("IDENTIFIER") != -1:
-                    self.identifier = splitstring[1].rstrip()
-                    print self.identifier
-                if splitstring[0].upper().find("VALUE") != -1:
-                    self.value = splitstring[1].rstrip()
-                    print self.value
-                if splitstring[0].upper().find("TYPE") != -1:
-                    self.type = splitstring[1].rstrip()
-                    print self.type
-
-###############################################################################
-###############################################################################
-###############################################################################
-
-class InputParameter():
-    """This class parses and stores the key-value input parameter of
-    a wps execusion request"""
-    ############################################################################
-    def __init__(self):
-        self.workDir = ""
-        self.grassGisBase = ""
-        self.grassAddonPath = ""
-        self.grassVersion = ""
-        self.grassModule = ""
-        self.complexDataList = []
-        self.complexOutputList = []
-        self.literalDataList = []
-        self.__fileName = ""
-
-    ############################################################################
-    def parseFile(self, filename):
-        """Parse the key-value pairs and call the appropriate subroutines and
-        classes"""
-        self.__filename = filename
-
-        if os.path.isfile(filename) == False:
-            raise IOError
-
-        self.__file = open(filename, 'r')
-
-        while True:
-            string = self.__file.readline()
-            if string == "":
-                break
-
-            if string.upper().find("[SYSTEM]") != -1:
-                print string.upper()
-                self.__parseSystem()
-
-            if string.upper().find("[GRASS]") != -1:
-                print string.upper()
-                self.__parseGrass()
-
-            if string.upper().find("[COMPLEXDATA]") != -1:
-                print string.upper()
-                self.complexDataList.append(ComplexData(self.__file))
-
-            if string.upper().find("[COMPLEXOUTPUT]") != -1:
-                print string.upper()
-                self.complexOutputList.append(ComplexOutput(self.__file))
-
-            if string.upper().find("[LITERALDATA]") != -1:
-                print string.upper()
-                self.literalDataList.append(LiteralData(self.__file))
-
-    ############################################################################
-    def __parseSystem(self):
-        """Parse and store the sytem relevant variables"""
-        for i in range(2):
-            string = self.__file.readline()
-            if string == "":
-                return
-            splitstring = string.split('=')
-            if len(splitstring) > 1:
-                if splitstring[0].upper().find("WORKDIR") != -1:
-                    self.workDir = splitstring[1].rstrip()
-                    print self.workDir
-                if splitstring[0].upper().find("OUTPUTDIR") != -1:
-                    self.outputDir = splitstring[1].rstrip()
-                    print self.outputDir
-
-    ############################################################################
-    def __parseGrass(self):
-        """Parse and store the grass relevant variables"""
-        for i in range(4):
-            string = self.__file.readline()
-            if string == "":
-                return
-            splitstring = string.split('=')
-            if len(splitstring) > 1:
-                if splitstring[0].upper().find("GISBASE") != -1:
-                    self.grassGisBase = splitstring[1].rstrip()
-                    print self.grassGisBase
-                if splitstring[0].upper().find("GRASS_ADDON_PATH") != -1:
-                    self.grassAddonPath = splitstring[1].rstrip()
-                    print self.grassAddonPath
-                if splitstring[0].upper().find("GRASS_VERSION") != -1:
-                    self.grassVersion = splitstring[1].rstrip()
-                    print self.grassVersion
-                if splitstring[0].upper().find("MODULE") != -1:
-                    self.grassModule = splitstring[1].rstrip()
-                    print self.grassModule
-
-
-###############################################################################
-###############################################################################
-###############################################################################
-
-class GrassEnvironment():
-    """This class saves and sets grass environment variables"""
-
-    ############################################################################
-    def __init__(self):
-        self.env = {"GISBASE":"", "GISRC":"", "LD_LIBRARY_PATH":"",\
-        "GRASS_ADDON_PATH":"", "GRASS_VERSION":""}
-
-    ############################################################################
-    def getEnvVariables(self):
-        for key in self.env:
-            try:
-                self.env[key] = os.getenv(key, self.env[key])
-            except:
-                raise
-
-    ############################################################################
-    def setEnvVariables(self):
-        for key in self.env:
-            try:
-                value = self.env[key]
-                origValue = os.getenv(key)
-                if origValue:
-                    value  += ":"+origValue
-                os.putenv(key,value)
-                os.environ[key] = value
-            except:
-                raise
-
-###############################################################################
-###############################################################################
-###############################################################################
-
-class GrassGisRC():
-    """This class takes care of the correct creation of the gisrc file"""
-    ############################################################################
-    def __init__(self):
-        self.locationName = GRASS_LOCATION_NAME
-        self.mapset = GRASS_MAPSET_NAME
-        self.gisdbase = ""
-        self.__gisrcFile = ""
-
-    ############################################################################
-    def __init__(self, gisdbase, locationName, mapset):
-        self.locationName = locationName
-        self.mapset = mapset
-        self.gisdbase = gisdbase
-        self.__gisrcFile = ""
-        self.__tmpDir = ""
-
-    ############################################################################
-    def rewriteFile(self):
-        if self.__gisrcFile != "":
-            self.__writeFile()
-        else:
-            raise IOError
-
-    ############################################################################
-    def writeFile(self, tempdir):
-        if os.path.isdir(tempdir):
-            try:
-               self.__gisrcFile = os.path.join(tempdir, "gisrc")
-               self.__writeFile()
-            except:
-                raise
-
-    ############################################################################
-    def __writeFile(self):
-        try:
-            gisrc = open(self.__gisrcFile, 'w')
-            gisrc.write("LOCATION_NAME: %s\n" % self.locationName)
-            gisrc.write("MAPSET: %s\n" % self.mapset)
-            gisrc.write("DIGITIZER: none\n")
-            gisrc.write("GISDBASE: %s\n" % self.gisdbase)
-            gisrc.write("OVERWRITE: 1\n")
-            gisrc.write("GRASS_GUI: text\n")
-            gisrc.close()
-        except:
-            raise
-
-    ############################################################################
-    def getFileName(self):
-        return self.__gisrcFile
-
-###############################################################################
-###############################################################################
-###############################################################################
-
-class GrassWindFile():
-    """This class takes care of thr correct creation of grass WIND and
-    DEFAULT_WIND files in the start location"""
-    ############################################################################
-    def __init__(self, gisdbase, location, mapset):
-        """ Create the WIND and if needed the DEFAULT_WIND file """
-        self.__windFile = ""
-        self.__windname = "WIND"
-
-        if mapset == "PERMANENT":
-            """If PERMANENT is used as mapset, the DEFAULT_WIND file will
-            be created too"""
-            self.__windFile = os.path.join(gisdbase, location, mapset, "DEFAULT_WIND" )
-            self.__write()
-
-        self.__windFile = os.path.join(gisdbase, location, mapset, "WIND")
-        self.__write()
-
-    ############################################################################
-    def __write(self):
-        try:
-            wind =open(self.__windFile,'w')
-            wind.write("""proj:       0\n""")
-            wind.write("""zone:       0\n""")
-            wind.write("""north:      100\n""")
-            wind.write("""south:      0\n""")
-            wind.write("""east:       100\n""")
-            wind.write("""west:       0\n""")
-            wind.write("""cols:       100\n""")
-            wind.write("""rows:       100\n""")
-            wind.write("""e-w resol:  1\n""")
-            wind.write("""n-s resol:  1\n""")
-            wind.close()
-        except:
-            raise
-
-    ############################################################################
-    def getFileName(self):
-        return self.__windFile
 
 ###############################################################################
 ###############################################################################
@@ -499,6 +207,12 @@ class GrassModuleStarter():
         except:
             raise
 
+        # Create the input parameter of literal data
+        self.__createLiteralInputMap()
+
+        for i in self.inputMap:
+            print "## Input: ", i, self.inputMap[i]
+
         # start the grass module
         try:
             self.__startGrassModule()
@@ -530,13 +244,13 @@ class GrassModuleStarter():
     def __importData(self):
         print "Import data"
 
-        
         list = self.inputParameter.complexDataList
 
-        # The list must be not empty
+        # The list may be empty
         if len(list) == 0:
-            raise IOError
+            return
 
+        #Debug
         #proc = Popen(["g.region", '-p'])
         #proc.communicate()
 
@@ -547,17 +261,16 @@ class GrassModuleStarter():
         self.gisrc.locationName = GRASS_WORK_LOCATION
         self.gisrc.rewriteFile()
 
+        #Debug
         #proc = Popen(["g.region", '-p'])
         #proc.communicate()
         
         # Link the inputs into the location
         for i in list:
-            print i.identifier
-            print i.mimeType
             self.__linkInput(i)
 
-            proc = Popen(["r.info", str(self.inputMap[i.identifier])])
-            proc.communicate()
+            #proc = Popen(["r.info", str(self.inputMap[i.identifier])])
+            #proc.communicate()
 
     ############################################################################
     def __isRaster(self, input):
@@ -583,8 +296,9 @@ class GrassModuleStarter():
         """Creat a new work location based on the input dataset"""
         print "Create new location"
         # TODO: implement correct and meaningful error handling and error messages
+        
         if self.__isRaster(input) != "":
-            proc = Popen(["r.in.gdal", "input=" + input.identifier, "location=" + GRASS_WORK_LOCATION , "-ec", "output=undefined"])
+            proc = Popen(["r.in.gdal", "input=" + input.pathToFile, "location=" + GRASS_WORK_LOCATION , "-ec", "output=undefined"])
             proc.communicate()
 
             if proc.returncode != 0:
@@ -592,7 +306,7 @@ class GrassModuleStarter():
 
         # create a new location based on the first input
         elif self.__isVector(input) != "":
-            proc = Popen(["v.in.ogr", "input=" + input.identifier, "location=" + GRASS_WORK_LOCATION , "output=undefined"])
+            proc = Popen(["v.in.ogr", "input=" + input.pathToFile, "location=" + GRASS_WORK_LOCATION , "output=undefined"])
             proc.communicate()
 
             if proc.returncode != 0:
@@ -609,14 +323,14 @@ class GrassModuleStarter():
         inputName = "input_" + str(self.inputCounter)
 
         if self.__isRaster(input) != "":
-            proc = Popen(["r.external", "input=" + input.identifier, "output=" + inputName])
+            proc = Popen(["r.external", "input=" + input.pathToFile, "output=" + inputName])
             proc.communicate()
 
             if proc.returncode != 0:
                 raise IOError
 
         elif self.__isVector(input) != "":
-            proc = Popen(["v.external", "dsn=" + input.identifier, "output=" + inputName])
+            proc = Popen(["v.external", "dsn=" + input.pathToFile, "output=" + inputName])
             proc.communicate()
 
             if proc.returncode != 0:
@@ -624,7 +338,11 @@ class GrassModuleStarter():
         else:
             raise IOError
 
-        self.inputMap[input.identifier] = inputName
+        # Connect the values if multiple defined
+        if self.inputMap.has_key(input.identifier):
+            self.inputMap[input.identifier] += "," + inputName
+        else:
+            self.inputMap[input.identifier] = inputName
         self.inputCounter += 1
 
     ############################################################################
@@ -635,7 +353,7 @@ class GrassModuleStarter():
 
         # import the data via gdal
         if self.__isRaster(input) != "":
-            proc = Popen(["r.in.gdal", "input=" + input.identifier, "output=" + inputName])
+            proc = Popen(["r.in.gdal", "input=" + input.pathToFile, "output=" + inputName])
             proc.communicate()
 
             if proc.returncode != 0:
@@ -643,7 +361,7 @@ class GrassModuleStarter():
 
         # import the data via ogr
         elif self.__isVector(input) != "":
-            proc = Popen(["v.in.ogr", "input=" + input.identifier, "output=" + inputName])
+            proc = Popen(["v.in.ogr", "input=" + input.pathToFile, "output=" + inputName])
             proc.communicate()
             
             if proc.returncode != 0:
@@ -651,8 +369,28 @@ class GrassModuleStarter():
         else:
             raise IOError
 
-        self.inputMap[input.identifier] = inputName
+        # Connect the values if multiple defined
+        if self.inputMap.has_key(input.identifier):
+            self.inputMap[input.identifier] += "," + inputName
+        else:
+            self.inputMap[input.identifier] = inputName
         self.inputCounter += 1
+
+    ############################################################################
+    def __createLiteralInputMap(self):
+        """Create the entries of the input map for literal data"""
+        list = self.inputParameter.literalDataList
+
+        # The list may be empty
+        if len(list) == 0:
+            return
+
+        for i in list:
+            # Connect the values if multiple defined
+            if self.inputMap.has_key(i.identifier):
+                self.inputMap[i.identifier] += "," + i.value
+            else:
+                self.inputMap[i.identifier] = i.value
 
     ############################################################################
     def __startGrassModule(self):
