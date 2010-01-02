@@ -171,6 +171,9 @@ class GrassModuleStarter():
         self.inputMap = {}
         self.outputMap = {}
 
+        # the pid of the process which is currently executed, to be used for suspending
+        self.runPID = -1
+
         self.inputParameter = InputParameter()
         try:
             self.inputParameter.parseFile(inputfile)
@@ -322,20 +325,24 @@ class GrassModuleStarter():
         
         if self.__isRaster(input) != "":
             proc = Popen(["r.in.gdal", "input=" + input.pathToFile, "location=" + GRASS_WORK_LOCATION , "-ec", "output=undefined"])
+            self.runPID = proc.pid
+            print self.runPID
             proc.communicate()
 
             if proc.returncode != 0:
                 print "Unable to create new grass location based on input map"
                 raise IOError
 
-        # create a new location based on the first input
-        elif self.__isVector(input) != "":
-            proc = Popen(["v.in.ogr", "input=" + input.pathToFile, "location=" + GRASS_WORK_LOCATION , "output=undefined"])
-            proc.communicate()
+        # Not yet implemented
+        #elif self.__isVector(input) != "":
+        #    proc = Popen(["v.in.ogr", "input=" + input.pathToFile, "location=" + GRASS_WORK_LOCATION , "output=undefined"])
+        #    self.runPID = proc.pid
+        #    print self.runPID
+        #    proc.communicate()
 
-            if proc.returncode != 0:
-                print "Unable to create new grass location based on input map"
-                raise IOError
+        #    if proc.returncode != 0:
+        #        print "Unable to create new grass location based on input map"
+        #        raise IOError
         else:
             raise IOError
 
@@ -349,19 +356,24 @@ class GrassModuleStarter():
 
         if self.__isRaster(input) != "":
             proc = Popen(["r.external", "input=" + input.pathToFile, "output=" + inputName])
+            self.runPID = proc.pid
+            print self.runPID
             proc.communicate()
 
             if proc.returncode != 0:
                 print "Unable to link the raster map into the grass mapset"
                 raise IOError
 
-        elif self.__isVector(input) != "":
-            proc = Popen(["v.external", "dsn=" + input.pathToFile, "output=" + inputName])
-            proc.communicate()
+        # import the data via ogr !!! NOT TESTED OR INCOMPLETE
+        #elif self.__isVector(input) != "":
+        #    proc = Popen(["v.external", "dsn=" + input.pathToFile, "output=" + inputName])
+        #    self.runPID = proc.pid
+        #    print self.runPID
+        #    proc.communicate()
 
-            if proc.returncode != 0:
-                print "Unable to link the vector map into the grass mapset"
-                raise IOError
+        #    if proc.returncode != 0:
+        #        print "Unable to link the vector map into the grass mapset"
+        #        raise IOError
         else:
             raise IOError
 
@@ -381,18 +393,22 @@ class GrassModuleStarter():
         # import the data via gdal
         if self.__isRaster(input) != "":
             proc = Popen(["r.in.gdal", "input=" + input.pathToFile, "output=" + inputName])
+            self.runPID = proc.pid
+            print self.runPID
             proc.communicate()
 
             if proc.returncode != 0:
                 raise IOError
 
-        # import the data via ogr
-        elif self.__isVector(input) != "":
-            proc = Popen(["v.in.ogr", "input=" + input.pathToFile, "output=" + inputName])
-            proc.communicate()
-            
-            if proc.returncode != 0:
-                raise IOError
+        # import the data via ogr !!! NOT TESTED OR INCOMPLETE
+        #elif self.__isVector(input) != "":
+        #    proc = Popen(["v.in.ogr", "input=" + input.pathToFile, "output=" + inputName])
+        #    self.runPID = proc.pid
+        #    print self.runPID
+        #    proc.communicate()
+        #
+        #    if proc.returncode != 0:
+        #        raise IOError
         else:
             raise IOError
 
@@ -452,6 +468,8 @@ class GrassModuleStarter():
             # import the data via gdal
             if self.__isRaster(output) != "":
                 proc = Popen(["r.out.gdal", "input=" + outputName, "format=" + self.__isRaster(output), "output=" + output.pathToFile])
+                self.runPID = proc.pid
+                print self.runPID
                 proc.communicate()
 
                 if proc.returncode != 0:
@@ -460,6 +478,8 @@ class GrassModuleStarter():
             # import the data via ogr
             elif self.__isVector(output) != "":
                 proc = Popen(["v.out.ogr", "input=" + outputName, "format=" + self.__isVector(output),"dsn=" + output.pathToFile])
+                self.runPID = proc.pid
+                print self.runPID
                 proc.communicate()
 
                 if proc.returncode != 0:
@@ -486,6 +506,8 @@ class GrassModuleStarter():
 
         print parameterMap
         proc = Popen(parameterMap)
+        self.runPID = proc.pid
+        print self.runPID
         proc.communicate()
 
         if proc.returncode != 0:
@@ -496,13 +518,22 @@ class GrassModuleStarter():
 ###############################################################################
 ###############################################################################
 
-if __name__ == "__main__":
+def main():
     """The main function which will be called if the script is executed directly"""
-    parser = OptionParser()
+
+    usage = "usage: %prog --file inputfile.txt"
+    description = "Use %prog to process geo-data with grass without the need to explicitely " +\
+                  "generate a grass location and the import/export of the input and output geo-data. " +\
+                  "This may helpful for WPS server or other web services providing grass geo-processing."
+    parser = OptionParser(usage=usage, description=description)
     parser.add_option("-f", "--file", dest="filename",
-                      help="The input file", metavar="FILE")
+                      help="The path to the input file", metavar="FILE")
 
     (options, args) = parser.parse_args()
 
     starter = GrassModuleStarter(options.filename)
     exit(0)
+
+###############################################################################
+if __name__ == "__main__":
+    main()
