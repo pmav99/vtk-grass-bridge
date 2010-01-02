@@ -24,14 +24,12 @@
  DataType=double
  Value=500
 
-
 [ComplexOutput]
  Identifier=accumulation
  PathToFile=/tmp/elev_srtm_30m_acc.tiff
  MimeType=image/tiff
  Encoding=
  Schema=
-
 
 [ComplexOutput]
  Identifier=basin
@@ -40,8 +38,7 @@
  Encoding=
  Schema=
 
-
-[ComplexOutput]
+<[ComplexOutput]
  Identifier=stream
  PathToFile=/tmp/elev_srtm_30m_stream.tiff
  MimeType=image/tiff
