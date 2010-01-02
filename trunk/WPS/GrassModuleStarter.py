@@ -1,8 +1,10 @@
 ################################################################################
 # Author:	Soeren Gebbert
-#               Parts of this code are from the great pyWPS from Jachym Cepicky
+#               Parts of this code are from the great pyWPS from Jachym Cepicky:
+#               http://pywps.wald.intevation.org/
 #
 # Copyright (C) 2009 Soeren Gebbert
+#               mail to: soerengebbert <at> googlemail <dot> com
 #
 # License:
 #
@@ -21,6 +23,7 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
 from subprocess import Popen
+from optparse import OptionParser
 import os
 import os.path
 import tempfile
@@ -31,11 +34,16 @@ GRASS_LOCATION_NAME = "startLocation"
 GRASS_WORK_LOCATION = "workLocation"
 GRASS_MAPSET_NAME = "PERMANENT"
 
+# This module needs an input file for processing. All input and output parameter
+# are defined within this file. The file parser expects an input file exactly as
+# defined below. All key names must be specified. New-lines between the key names are forbidden.
+#
 # The format of the input file is defined as:
 #
 # [System]
 #  WorkDir= temporal created locations and mapsets are put in this directory
 #  OutputDir= The output of the grass module is put in tis directory
+#
 # [GRASS]
 #  GISBASE= the gisbase directory of grass
 #  GRASS_ADDON_PATH= path to addon modules
@@ -68,6 +76,7 @@ GRASS_MAPSET_NAME = "PERMANENT"
 [System]
  WorkDir=/tmp
  OutputDir=/tmp
+ 
 [GRASS]
  GISBASE=/home/soeren/src/grass7.0/grass_trunk/dist.i686-pc-linux-gnu
  GRASS_ADDON_PATH=
@@ -116,32 +125,41 @@ GRASS_MAPSET_NAME = "PERMANENT"
 class GrassModuleStarter():
     """This class does the following:
 
-     The goal is to process the input data in the coordinate system of the input data
-     We need to use r.in.gdal/v.in.ogr and v/r.external to import the data into a newly created grass location
-     we start the grass module within this location
-     We are using r.external.out/r.out.gdal and v.out.ogr to export the result data
-     We cleanup after
+     The goal is to process the input data within grass in its coordinate system without a direct import
+       and export
 
-     This is the execution schema:
-     Parse the input parameter and create the parameter map (GISBASE; work dir, ...)
-     Create a temporal directory in the work-dir based on temporal directoy creation of python
-     Create a temporal location and PERMANENT mapset to execute the ogr and gdal import modules
-     * Create the environment for grass (GIS_LOCK, GISRC, GISBASE ...)
-     * Write the gisrc file in the PERMANENT directory
-     * create the WIND and DEFAULT_WIND file in the PERMANENT directory of the new location
-     Now create a new location/mapset with the coordinate system of the first complex input 
-     * Use r.in.gdal or v.in.ogr to create the new location without actually importing the map,
-       log stdout and stderr of the import modules
-     * Rewrite the gisrc with new location name (we work in PERMANENT mapset)
-     Link all other maps via r/v.external into the new location, log stdout and stderr
-     execute the grass module, log only stderr
-     In case raster output should be created, use r.external.out to force the direct creation
-       of images output files
-     otherwise export the output with v.out.ogr, log stdout and stderr
-     remove the temporal directory
+     Main steps are:
+
+     1.) Parse the input file (may be KVP from a WPS execution request)
+     2.) Create the new grass location with r.in.gdal or v.in.ogr with the input coordinate system
+     3.) Use r.in.gdal/v.in.ogr and v/r.external to import the data into a newly created grass location
+     4.) Start the grass module within this location
+     5.) Use r.external.out/r.out.gdal and v.out.ogr to export the result data
+     6.) Cleanup
+
+     The steps in more detail:
+     
+     1.) Parse the input parameter and create the parameter map (GISBASE; work dir, ...)
+     2.) Create a temporal directory in the work-dir based on temporal directoy creation of python
+     3.) Create a temporal location and PERMANENT mapset to execute the ogr and gdal import modules
+         * Create the environment for grass (GIS_LOCK, GISRC, GISBASE ...)
+         * Write the gisrc file in the PERMANENT directory
+         * create the WIND and DEFAULT_WIND file in the PERMANENT directory of the new location
+     4.) Now create a new location/mapset with the coordinate system of the first complex input
+         * Use r.in.gdal or v.in.ogr to create the new location without actually importing the map,
+           log stdout and stderr of the import modules
+         * Rewrite the gisrc with new location name (we work in PERMANENT mapset)
+     5.) Link all other maps via r/v.external into the new location, log stdout and stderr
+     6.) Start the grass module, log only stderr
+     7.) In case raster output should be created, use r.external.out to force the direct creation
+         of images output files, otherwise export the output with v.out.ogr, log stdout and stderr
+     8.) Remove the temporal directory and exit properly
+
      In case an error occured, return an error code and write the error protocoll to stderr
-     exit
+     Create meaningful logfiles, so the user will be informed properly what was going wrong
+       in case of an error (TODO)
 
+    This python script is based on grass 7
     """
     ############################################################################
     def __init__(self, inputfile):
@@ -149,7 +167,7 @@ class GrassModuleStarter():
         self.inputCounter = 0
         self.outputCounter = 0
 
-        # These maos are used to create the parameter for the grass command
+        # These maps are used to create the parameter for the grass command
         self.inputMap = {}
         self.outputMap = {}
 
@@ -271,11 +289,13 @@ class GrassModuleStarter():
         for i in list:
             self.__linkInput(i)
 
+            #Debug
             #proc = Popen(["r.info", str(self.inputMap[i.identifier])])
             #proc.communicate()
 
     ############################################################################
     def __isRaster(self, input):
+        """Check for raster input"""
         if input.mimeType.upper() == "IMAGE/TIFF":
             print "Raster is TIFF"
             return "GTiff"
@@ -287,7 +307,8 @@ class GrassModuleStarter():
 
     ############################################################################
     def __isVector(self, input):
-        if input.mimeType.upper() == "TEXT/XML" and input.mimeType.upper().find("gml") != -1:
+        """Check for vector input"""
+        if input.mimeType.upper() == "TEXT/XML" and input.schema.upper().find("GML") != -1:
             print "Vector is gml"
             return "GML"
         else:
@@ -295,7 +316,7 @@ class GrassModuleStarter():
 
     ############################################################################
     def __createInputLocation(self, input):
-        """Creat a new work location based on the input dataset"""
+        """Creat a new work location based on an input dataset"""
         print "Create new location"
         # TODO: implement correct and meaningful error handling and error messages
         
@@ -304,6 +325,7 @@ class GrassModuleStarter():
             proc.communicate()
 
             if proc.returncode != 0:
+                print "Unable to create new grass location based on input map"
                 raise IOError
 
         # create a new location based on the first input
@@ -312,6 +334,7 @@ class GrassModuleStarter():
             proc.communicate()
 
             if proc.returncode != 0:
+                print "Unable to create new grass location based on input map"
                 raise IOError
         else:
             raise IOError
@@ -329,6 +352,7 @@ class GrassModuleStarter():
             proc.communicate()
 
             if proc.returncode != 0:
+                print "Unable to link the raster map into the grass mapset"
                 raise IOError
 
         elif self.__isVector(input) != "":
@@ -336,6 +360,7 @@ class GrassModuleStarter():
             proc.communicate()
 
             if proc.returncode != 0:
+                print "Unable to link the vector map into the grass mapset"
                 raise IOError
         else:
             raise IOError
@@ -463,11 +488,21 @@ class GrassModuleStarter():
         proc = Popen(parameterMap)
         proc.communicate()
 
+        if proc.returncode != 0:
+            print "Error while executing the grass module"
+            raise IOError
+
 ###############################################################################
 ###############################################################################
 ###############################################################################
 
 if __name__ == "__main__":
+    """The main function which will be called if the script is executed directly"""
+    parser = OptionParser()
+    parser.add_option("-f", "--file", dest="filename",
+                      help="The input file", metavar="FILE")
 
-    starter = GrassModuleStarter("input2.txt")
+    (options, args) = parser.parse_args()
+
+    starter = GrassModuleStarter(options.filename)
     exit(0)

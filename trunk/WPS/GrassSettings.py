@@ -1,8 +1,10 @@
 ################################################################################
 # Author:	Soeren Gebbert
-#               Parts of this code are from the great pyWPS from Jachym Cepicky
+#               Parts of this code are from the great pyWPS from Jachym Cepicky:
+#               http://pywps.wald.intevation.org/
 #
 # Copyright (C) 2009 Soeren Gebbert
+#               mail to: soerengebbert <at> googlemail <dot> com
 #
 # License:
 #
@@ -113,7 +115,7 @@ class GrassGisRC():
 
 class GrassWindFile():
     """This class takes care of thr correct creation of grass WIND and
-    DEFAULT_WIND files in the start location"""
+    DEFAULT_WIND files using a dummy region"""
     ############################################################################
     def __init__(self, gisdbase, location, mapset):
         """ Create the WIND and if needed the DEFAULT_WIND file """
@@ -121,8 +123,7 @@ class GrassWindFile():
         self.__windname = "WIND"
 
         if mapset == "PERMANENT":
-            """If PERMANENT is used as mapset, the DEFAULT_WIND file will
-            be created too"""
+            #If PERMANENT is used as mapset, the DEFAULT_WIND file will be created too
             self.__windFile = os.path.join(gisdbase, location, mapset, "DEFAULT_WIND" )
             self.__write()
 
