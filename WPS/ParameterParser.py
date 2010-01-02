@@ -1,7 +1,10 @@
 ################################################################################
 # Author:	Soeren Gebbert
+#               Parts of this code are from the great pyWPS from Jachym Cepicky:
+#               http://pywps.wald.intevation.org/
 #
 # Copyright (C) 2009 Soeren Gebbert
+#               mail to: soerengebbert <at> googlemail <dot> com
 #
 # License:
 #
@@ -31,11 +34,13 @@ class ComplexData():
         self.identifer = ""
         self.pathToFile = ""
         self.mimeType = ""
+        self.schema = ""
+        self.encoding = ""
         self.__parseFile()
 
     ############################################################################
     def __parseFile(self):
-        for i in range(3):
+        for i in range(5):
             string = self.__file.readline()
             if string == "":
                 return
@@ -50,6 +55,12 @@ class ComplexData():
                 if splitstring[0].upper().find("MIMETYPE") != -1:
                     self.mimeType = splitstring[1].rstrip()
                     print self.mimeType
+                if splitstring[0].upper().find("ENCODING") != -1:
+                    self.encoding = splitstring[1].rstrip()
+                    print self.encoding
+                if splitstring[0].upper().find("SCHEMA") != -1:
+                    self.schema = splitstring[1].rstrip()
+                    print self.schema
 
 ###############################################################################
 ###############################################################################
