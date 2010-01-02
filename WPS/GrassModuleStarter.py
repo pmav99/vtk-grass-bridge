@@ -209,15 +209,17 @@ class GrassModuleStarter():
 
         # Create the input parameter of literal data
         self.__createLiteralInputMap()
-
-        for i in self.inputMap:
-            print "## Input: ", i, self.inputMap[i]
+        # Create the output map for data export
+        self.__createOutputMap()
 
         # start the grass module
         try:
             self.__startGrassModule()
         except:
             raise
+
+        # now export the results
+        self.__exportOutput()
         
         # remove the created directory
         try:
@@ -276,7 +278,7 @@ class GrassModuleStarter():
     def __isRaster(self, input):
         if input.mimeType.upper() == "IMAGE/TIFF":
             print "Raster is TIFF"
-            return "TIFF"
+            return "GTiff"
         elif input.mimeType.upper() == "IMAGE/PNG":
             print "Raster is PNG"
             return "PNG"
@@ -386,15 +388,80 @@ class GrassModuleStarter():
             return
 
         for i in list:
+            # Boolean values are unique and have no values
+            if i.type.upper() == "BOOLEAN":
+                self.inputMap[i.identifier] = ""
             # Connect the values if multiple defined
-            if self.inputMap.has_key(i.identifier):
+            elif self.inputMap.has_key(i.identifier):
                 self.inputMap[i.identifier] += "," + i.value
             else:
                 self.inputMap[i.identifier] = i.value
 
     ############################################################################
+    def __createOutputMap(self):
+        """Create the entries of the input map for literal data"""
+        list = self.inputParameter.complexOutputList
+
+        # The list may be empty
+        if len(list) == 0:
+            return
+
+        for i in list:
+            outputName = "output_" + str(self.outputCounter)
+            # Ignoreif multiple defined
+            if self.outputMap.has_key(i.identifier):
+                pass
+            else:
+                self.outputMap[i.identifier] = outputName
+
+            self.outputCounter += 1
+
+    ############################################################################
+    def __exportOutput(self):
+        """Export the output"""
+        # TODO: implement correct and meaningful error handling and error messages
+
+        for output in self.inputParameter.complexOutputList:
+            outputName = self.outputMap[output.identifier]
+
+            # import the data via gdal
+            if self.__isRaster(output) != "":
+                proc = Popen(["r.out.gdal", "input=" + outputName, "format=" + self.__isRaster(output), "output=" + output.pathToFile])
+                proc.communicate()
+
+                if proc.returncode != 0:
+                    raise IOError
+
+            # import the data via ogr
+            elif self.__isVector(output) != "":
+                proc = Popen(["v.out.ogr", "input=" + outputName, "format=" + self.__isVector(output),"dsn=" + output.pathToFile])
+                proc.communicate()
+
+                if proc.returncode != 0:
+                    raise IOError
+            else:
+                raise IOError
+
+    ############################################################################
     def __startGrassModule(self):
+        """Create the parameter list and start the grass module"""
         print "Start GRASS module ", self.inputParameter.grassModule
+        parameterMap = []
+
+        parameterMap.append(self.inputParameter.grassModule)
+
+        for i in self.inputMap:
+            if self.inputMap[i] != "":
+                parameterMap.append(i + "=" + self.inputMap[i])
+            else:
+                parameterMap.append(i)
+
+        for i in self.outputMap:
+            parameterMap.append(i + "=" + self.outputMap[i])
+
+        print parameterMap
+        proc = Popen(parameterMap)
+        proc.communicate()
 
 ###############################################################################
 ###############################################################################
@@ -402,5 +469,5 @@ class GrassModuleStarter():
 
 if __name__ == "__main__":
 
-    starter = GrassModuleStarter("input.txt")
+    starter = GrassModuleStarter("input2.txt")
     exit(0)
