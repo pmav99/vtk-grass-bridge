@@ -1,6 +1,7 @@
 [System]
  WorkDir=/tmp
  OutputDir=/tmp
+
 [GRASS]
  GISBASE=/home/soeren/src/grass7.0/grass_trunk/dist.i686-pc-linux-gnu
  GRASS_ADDON_PATH=
@@ -38,7 +39,7 @@
  Encoding=
  Schema=
 
-<[ComplexOutput]
+[ComplexOutput]
  Identifier=stream
  PathToFile=/tmp/elev_srtm_30m_stream.tiff
  MimeType=image/tiff
