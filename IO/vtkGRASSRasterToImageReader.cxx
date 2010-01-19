@@ -169,10 +169,7 @@ void vtkGRASSRasterToImageReaderExecute(vtkGRASSRasterToImageReader *self,
     for (idxZ = outExt[4]; idxZ <= outExt[5]; idxZ++) {
         for (idxY = outExt[2]; !self->GetAbortExecute() && idxY <= outExt[3]; idxY++) {
 
-            if (Rast_get_row(fd, raster, rowcount, out_type) < 0) {
-                fprintf(stderr, "Unable to read row %i\n", rowcount);
-	    return;
-            }
+            Rast_get_row(fd, raster, rowcount, out_type);
             rowcount--;
 
             for (idxX = outExt[0], ptr = raster; idxX <= outExt[1]; idxX++, ptr = G_incr_void_ptr(ptr, Rast_cell_size(out_type))) {

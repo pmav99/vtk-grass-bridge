@@ -53,6 +53,11 @@ extern "C" {
                     this->InsertNextError(vgb_error_message); \
                     return false;}
 
+#define CATCH_NULL  } else { \
+                    this->InsertNextError(vgb_error_message); \
+                    return NULL;}
+
+
 
 #define VGB_CREATE(type, name) \
   vtkSmartPointer<type> name = vtkSmartPointer<type>::New()

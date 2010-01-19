@@ -55,12 +55,11 @@ public:
 
   //! \brief Open old raster map for reading
   virtual bool OpenMap(char *name);
-  //! \brief Write a rast row, returns the current position
+  //! \brief Write a rast row, returns 1 on success, -1 in case of an error
   virtual int PutNextRow(vtkDataArray *data);
   //! \brief close Map and write a short history
   virtual bool CloseMap();
   //! \brief the current position of the row in the new raster map
-  vtkGetMacro(RowCount, int);
   vtkSetStringMacro(MapTitle);
   vtkGetStringMacro(MapTitle);
   
@@ -70,7 +69,6 @@ protected:
 
 private:
 
-    int RowCount;
     char* MapTitle;
 
     vtkGRASSRasterMapWriter(const vtkGRASSRasterMapWriter&);  // Not implemented.

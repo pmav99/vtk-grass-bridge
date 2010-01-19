@@ -151,30 +151,18 @@ vtkGRASSRasterMapReader::GetRange(double range[2])
 bool
 vtkGRASSRasterMapReader::CloseMap()
 {
-    int error = 0;
-    if (this->Open == true && this->Map != -1)
+    // Cleaning up the null buffer for reuse
+    if (this->NullBuff)
     {
-         TRY if (Rast_close(this->Map) != 1)
-                error = 1;
-         CATCH_BOOL
-
-        if (error == 1)
-        {
-            char buff[1024];
-            G_snprintf(buff, 1024, "class: %s line: %i Unable to close raster map %s.",
-                       this->GetClassName(), __LINE__, this->RasterName);
-            this->InsertNextError(buff);
-            return false;
-        }
+        G_free(this->NullBuff);
+        this->NullBuff = (char*) NULL;
     }
-    // This flag is important and must be set by open and close methods
-    this->Open = false;
 
     // Cleaning up the raster buffer for reuse
     if (this->RasterBuff)
     {
         G_free(this->RasterBuff);
-        this->RasterBuff = (void*) NULL;
+        this->RasterBuff = (double*) NULL;
     }
     // Cleaning up the vtkDataArray for reuse
     if (this->Row)
@@ -182,6 +170,14 @@ vtkGRASSRasterMapReader::CloseMap()
         this->Row->Delete();
         this->Row = NULL;
     }
+
+    if (this->Open == true && this->Map != -1)
+    {
+         TRY Rast_close(this->Map);
+         CATCH_BOOL
+    }
+    // This flag is important and must be set by open and close methods
+    this->Open = false;
 
     return true;
 }

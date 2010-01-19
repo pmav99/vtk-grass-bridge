@@ -15,6 +15,7 @@
 #include "vtkGRASSRasterMapBase.h"
 #include "vtkGRASSRasterToImageReader.h"
 #include <vtkStringArray.h>
+#include <vtkCharArray.h>
 #include <vtkObjectFactory.h>
 #include <vtkDataArray.h>
 #include <vtkIntArray.h>
@@ -41,8 +42,10 @@ vtkGRASSRasterMapBase::vtkGRASSRasterMapBase()
     this->NumberOfCols = 0;
     this->Open = false;
     this->Row = NULL;
+    this->NullRow = vtkSmartPointer<vtkCharArray>::New();
     this->RegionUsage = VTK_GRASS_REGION_CURRENT;
-    this->RasterBuff = (void*) NULL;
+    this->RasterBuff = (double*) NULL;
+    this->NullBuff = (char*) NULL;
     this->NullValue = -9999;
     this->UseGRASSNulleValue = 1;
 }
@@ -51,8 +54,6 @@ vtkGRASSRasterMapBase::vtkGRASSRasterMapBase()
 
 vtkGRASSRasterMapBase::~vtkGRASSRasterMapBase()
 {
-
-
     this->CloseMap();
 
     if (this->RasterName)
@@ -62,9 +63,6 @@ vtkGRASSRasterMapBase::~vtkGRASSRasterMapBase()
 
     this->Region->Delete();
     this->History->Delete();
-
-    if (this->Row)
-        this->Row->Delete();
 
     if (this->RasterBuff)
         G_free(this->RasterBuff);
@@ -142,11 +140,11 @@ vtkGRASSRasterMapBase::SetUpRasterBuffer()
     if (this->Row == NULL)
     {
         if (this->MapType == CELL_TYPE)
-            this->Row = vtkIntArray::New();
+            this->Row = vtkSmartPointer<vtkIntArray>::New();
         if (this->MapType == FCELL_TYPE)
-            this->Row = vtkFloatArray::New();
+            this->Row = vtkSmartPointer<vtkFloatArray>::New();
         if (this->MapType == DCELL_TYPE)
-            this->Row = vtkDoubleArray::New();
+            this->Row = vtkSmartPointer<vtkDoubleArray>::New();
 
         this->Row->SetNumberOfTuples(this->NumberOfCols);
         this->MapType = Rast_get_map_type(this->Map);
@@ -154,23 +152,18 @@ vtkGRASSRasterMapBase::SetUpRasterBuffer()
 
     if (this->RasterBuff == NULL)
     {
-        this->RasterBuff = Rast_allocate_buf(this->MapType);
+        this->RasterBuff = Rast_allocate_d_buf();
     }
 
     return true;
 }
-
 
 //----------------------------------------------------------------------------
 
 vtkDataArray *
 vtkGRASSRasterMapBase::GetRow(int idx)
 {
-
-    void *ptr;
     int i;
-    int size;
-    int error = 0;
     char buff[1024];
 
     if (idx < 0 || idx > this->NumberOfCols - 1)
@@ -182,74 +175,51 @@ vtkGRASSRasterMapBase::GetRow(int idx)
     }
 
     this->SetUpRasterBuffer();
-    if (!setjmp(vgb_stack_buffer))
-    {
-        if (Rast_get_row(this->Map, this->RasterBuff, idx, this->MapType) < 0)
-        {
-            error = 1;
+    TRY Rast_get_d_row(this->Map, this->RasterBuff, idx);
+    CATCH_NULL
 
+    for (i = 0; i < this->NumberOfCols; i++)
+    {
+        if(this->UseGRASSNulleValue)
+        {
+            if(Rast_is_d_null_value(&this->RasterBuff[i]))
+                this->Row->SetTuple1(i, this->NullValue);
+            else
+                this->Row->SetTuple1(i, this->RasterBuff[i]);
+        }else
+        {
+            this->Row->SetTuple1(i, this->RasterBuff[i]);
         }
     }
-    else
-    {
-        this->InsertNextError(vgb_error_message);
-        return NULL;
-    }
 
-    if (error == 1)
+    return this->Row;
+}
+
+//----------------------------------------------------------------------------
+
+vtkCharArray *
+vtkGRASSRasterMapBase::GetNullRow(int idx)
+{
+    int i;
+    char buff[1024];
+
+    if (idx < 0 || idx > this->NumberOfCols - 1)
     {
-        G_snprintf(buff, 1024, "class: %s line: %i Unable to read row %i.",
+        G_snprintf(buff, 1024, "class: %s line: %i The index %i is out of range.",
                    this->GetClassName(), __LINE__, idx);
         this->InsertNextError(buff);
         return NULL;
     }
 
-    // copy data
-    size = Rast_cell_size(this->MapType);
-    ptr = this->RasterBuff;
+    this->SetUpRasterBuffer();
+    TRY Rast_get_null_value_row(this->Map, this->NullBuff, idx);
+    CATCH_NULL
 
-    if (this->MapType == CELL_TYPE)
-        for (i = 0; i < this->NumberOfCols; i++, ptr = G_incr_void_ptr(ptr, size))
-        {
-            if(this->UseGRASSNulleValue)
-            {
-                if(Rast_is_c_null_value((CELL*) ptr))
-                    this->Row->SetTuple1(i, this->NullValue);
-                else
-                    this->Row->SetTuple1(i, (double) *(CELL*) ptr);
-            }else
-            {
-                this->Row->SetTuple1(i, (double) *(CELL*) ptr);
-            }
-        }
-    if (this->MapType == FCELL_TYPE)
-        for (i = 0; i < this->NumberOfCols; i++, ptr = G_incr_void_ptr(ptr, size))
-        {
-            if(this->UseGRASSNulleValue)
-            {
-                if(Rast_is_f_null_value((FCELL*) ptr))
-                    this->Row->SetTuple1(i, this->NullValue);
-                else
-                this->Row->SetTuple1(i, (double) *(FCELL*) ptr);
-            }else
-            {
-                this->Row->SetTuple1(i, (double) *(FCELL*) ptr);
-            }
-        }
-    if (this->MapType == DCELL_TYPE)
-        for (i = 0; i < this->NumberOfCols; i++, ptr = G_incr_void_ptr(ptr, size))
-        {
-            if(this->UseGRASSNulleValue)
-            {
-                if(Rast_is_d_null_value((DCELL*) ptr))
-                    this->Row->SetTuple1(i, this->NullValue);
-                else
-                    this->Row->SetTuple1(i, (double) *(DCELL*) ptr);
-            }else
-            {
-                this->Row->SetTuple1(i, (double) *(DCELL*) ptr);
-            }
-        }
+    for (i = 0; i < this->NumberOfCols; i++)
+    {
+        this->NullRow->SetValue(i, this->NullBuff[i]);
+    }
 
-    return this->Row;
+    return this->NullRow;
 }
+
