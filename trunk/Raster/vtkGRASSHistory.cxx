@@ -198,14 +198,7 @@ bool
 vtkGRASSHistory::WriteHistory(char *rastername)
 {
     char buff[1024];
-    TRY
-    if(Rast_write_history(rastername, &this->hist) == -1)
-    {
-        G_snprintf(buff, 1024, "class: %s line: %i Unable to write history file of map %s.",
-                   this->GetClassName(), __LINE__, rastername);
-        this->InsertNextError(buff);
-        return false;
-    }
+    TRY Rast_write_history(rastername, &this->hist);
     CATCH_BOOL
 
     this->SetRasterName(rastername);

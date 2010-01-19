@@ -38,6 +38,8 @@ extern "C"{
 #include <grass/raster.h>
 }
 
+class vtkCharArray;
+
 
 class VTK_GRASS_BRIDGE_RASTER_EXPORT vtkGRASSRasterMapBase : public vtkObjectGRASSErrorHandler
 {
@@ -69,6 +71,7 @@ public:
 
   //! \brief Read a row of the map and return the content as vtkDataArray
   virtual vtkDataArray *GetRow(int idx);
+  virtual vtkCharArray *GetNullRow(int idx);
 
   vtkGetMacro(MapType, int);
   vtkGetMacro(NumberOfRows, int);
@@ -118,8 +121,10 @@ protected:
 //  struct Categories cats;
 //  struct History hist;
 //  struct TimeStamp ts;
-  vtkDataArray *Row;
-  void *RasterBuff;
+  vtkSmartPointer<vtkDataArray> Row;
+  vtkSmartPointer<vtkCharArray> NullRow;
+  double *RasterBuff;
+  char *NullBuff;
   //ETX
   // Colortable, history and cats, timestamp are needed
 
@@ -134,8 +139,6 @@ protected:
   vtkSetStringMacro(Mapset);
   vtkSetMacro(MapType, int);
   vtkSetMacro(RegionUsage, int);
-
-  vtkGetObjectMacro(Row, vtkDataArray);
 
 private:
   vtkGRASSRasterMapBase(const vtkGRASSRasterMapBase&);  // Not implemented.

@@ -7,67 +7,67 @@
 # GRASS_FOUND, If false, do not try to use GRASS.
 
 FIND_PATH(GRASS_INCLUDE_DIR grass/gis.h
-  /1/gebbert/src/grass_trunk/dist.i686-pc-linux-gnu/include
+  /home/soeren/src/grass_trunk/dist.i686-pc-linux-gnu/include
   /usr/local/include
   /usr/include
 )
 
 FIND_LIBRARY(GRASS_gis_LIBRARY grass_gis
-  /1/gebbert/src/grass_trunk/dist.i686-pc-linux-gnu/lib
+  /home/soeren/src/grass_trunk/dist.i686-pc-linux-gnu/lib
   /usr/local/lib
   /usr/lib
 )
 
 FIND_LIBRARY(GRASS_raster_LIBRARY grass_raster
-  /1/gebbert/src/grass_trunk/dist.i686-pc-linux-gnu/lib
+  /home/soeren/src/grass_trunk/dist.i686-pc-linux-gnu/lib
   /usr/local/lib
   /usr/lib
 )
 
 FIND_LIBRARY(GRASS_g3d_LIBRARY grass_g3d
-  /1/gebbert/src/grass_trunk/dist.i686-pc-linux-gnu/lib
+  /home/soeren/src/grass_trunk/dist.i686-pc-linux-gnu/lib
   /usr/local/lib
   /usr/lib
 )
 
 FIND_LIBRARY(GRASS_vector_LIBRARY grass_vector
-  /1/gebbert/src/grass_trunk/dist.i686-pc-linux-gnu/lib
+  /home/soeren/src/grass_trunk/dist.i686-pc-linux-gnu/lib
   /usr/local/lib
   /usr/lib
 )
 
 FIND_LIBRARY(GRASS_gmath_LIBRARY grass_gmath
-  /1/gebbert/src/grass_trunk/dist.i686-pc-linux-gnu/lib
+  /home/soeren/src/grass_trunk/dist.i686-pc-linux-gnu/lib
   /usr/local/lib
   /usr/lib
 )
 
 FIND_LIBRARY(GRASS_gpde_LIBRARY grass_gpde
-  /1/gebbert/src/grass_trunk/dist.i686-pc-linux-gnu/lib
+  /home/soeren/src/grass_trunk/dist.i686-pc-linux-gnu/lib
   /usr/local/lib
   /usr/lib
 )
 
 FIND_LIBRARY(GRASS_dbmibase_LIBRARY grass_dbmibase
-  /1/gebbert/src/grass_trunk/dist.i686-pc-linux-gnu/lib
+  /home/soeren/src/grass_trunk/dist.i686-pc-linux-gnu/lib
   /usr/local/lib
   /usr/lib
 )
 
 FIND_LIBRARY(GRASS_dbmidriver_LIBRARY grass_dbmidriver
-  /1/gebbert/src/grass_trunk/dist.i686-pc-linux-gnu/lib
+  /home/soeren/src/grass_trunk/dist.i686-pc-linux-gnu/lib
   /usr/local/lib
   /usr/lib
 )
 
 FIND_LIBRARY(GRASS_dbmiclient_LIBRARY grass_dbmiclient
-  /1/gebbert/src/grass_trunk/dist.i686-pc-linux-gnu/lib
+  /home/soeren/src/grass_trunk/dist.i686-pc-linux-gnu/lib
   /usr/local/lib
   /usr/lib
 )
 
 FIND_LIBRARY(GRASS_datetime_LIBRARY grass_datetime
-  /1/gebbert/src/grass_trunk/dist.i686-pc-linux-gnu/lib
+  /home/soeren/src/grass_trunk/dist.i686-pc-linux-gnu/lib
   /usr/local/lib
   /usr/lib
 )
