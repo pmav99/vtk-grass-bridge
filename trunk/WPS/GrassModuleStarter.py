@@ -49,6 +49,10 @@ GRASS_MAPSET_NAME = "PERMANENT"
 #  GRASS_ADDON_PATH= path to addon modules
 #  GRASS_VERSION= the version of grass
 #  Module= the name of the module which should be executed
+#  LOCATION=Name of an existing location which should be used for processing, the mapsets are generated temporal
+#  LinkInput=TRUE/FALSE Try to link the input into the generated/existing location
+#  IgnoreInputProjection=TRUE/FALSE Ignore the projection settings when trying to import the input data (ignored if LinkInput is true)
+#  UseXYLocation=TRUE/FALSE create only a XY location/mapset and import all data ignoring the projection information. The resolution will be set based on LiteralData or based on the first input raster resolution
 #
 # [ComplexData]
 #  Identifier=input
