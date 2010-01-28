@@ -143,7 +143,7 @@ GRASS_MAPSET_NAME = "PERMANENT"
 class GrassModuleStarter():
     """This class does the following:
 
-     The goal is to process the input data within grass in its coordinate system without a direct import
+     The goal is to process the input data within grass in its own coordinate system without import
        and export
 
      Main steps are:
@@ -268,7 +268,7 @@ class GrassModuleStarter():
         try:
             print "Remove ", self.gisdbase
             os.rmdir(self.gisdbase)
-       except:
+        except:
             pass
 
     ############################################################################
@@ -296,8 +296,8 @@ class GrassModuleStarter():
             return
 
         #Debug
-        proc = Popen(["g.region", '-p'])
-        proc.communicate()
+        #proc = Popen(["g.region", '-p'])
+        #proc.communicate()
 
         # Create a new location based on the first input map
         self.__createInputLocation(list[0])
@@ -310,8 +310,8 @@ class GrassModuleStarter():
         self.__setRegionResolution()
         
         #Debug
-        proc = Popen(["g.region", '-p'])
-        proc.communicate()
+        #proc = Popen(["g.region", '-p'])
+        #proc.communicate()
 
         if self.inputParameter.linkInput == "FALSE":
             for i in list:
@@ -347,13 +347,22 @@ class GrassModuleStarter():
             return ""
 
     ############################################################################
+    def __isTextFile(self, input):
+        """Check for vector input"""
+        if input.mimeType.upper() == "TEXT/PLAIN":
+            print "Text file"
+            return "TXT"
+        else:
+            return ""
+
+    ############################################################################
     def __createInputLocation(self, input):
         """Creat a new work location based on an input dataset"""
         print "Create new location"
         # TODO: implement correct and meaningful error handling and error messages
         
         if self.__isRaster(input) != "":
-            proc = Popen(["r.in.gdal", "input=" + input.pathToFile, "location=" + GRASS_WORK_LOCATION , "-e", "output=undefined"])
+            proc = Popen(["r.in.gdal", "input=" + input.pathToFile, "location=" + GRASS_WORK_LOCATION , "-ie", "output=undefined"])
             self.runPID = proc.pid
             print self.runPID
             proc.communicate()
@@ -362,9 +371,8 @@ class GrassModuleStarter():
                 print "Unable to create new grass location based on input map"
                 raise IOError
 
-        # Not yet implemented
         elif self.__isVector(input) != "":
-            proc = Popen(["v.in.ogr", "dsn=" + input.pathToFile, "location=" + GRASS_WORK_LOCATION , "-e", "output=undefined"])
+            proc = Popen(["v.in.ogr", "dsn=" + input.pathToFile, "location=" + GRASS_WORK_LOCATION , "-ie", "output=undefined"])
             self.runPID = proc.pid
             print self.runPID
             proc.communicate()
@@ -372,6 +380,9 @@ class GrassModuleStarter():
             if proc.returncode != 0:
                 print "Unable to create new grass location based on input map"
                 raise IOError
+            
+        elif self.__isTextFile(input) != "":
+            return
         else:
             raise IOError
 
@@ -415,10 +426,16 @@ class GrassModuleStarter():
             print self.runPID
             proc.communicate()
 
+            # If the linking fails, import the data with r.in.gdal
             if proc.returncode != 0:
-                print "Unable to link the raster map into the grass mapset"
-                raise IOError
-
+                print "Unable to link the raster map, try to import."
+                try:
+                    self.__importInput(input)
+                except:
+                    print "Unable to link or import the raster map into the grass mapset"
+                    raise IOError
+                return
+            
             proc = Popen(["r.info", inputName ])
             proc.communicate()
 
@@ -441,7 +458,10 @@ class GrassModuleStarter():
 #
 #            proc = Popen(["v.info", inputName ])
 #            proc.communicate()
-            
+
+        elif self.__isTextFile(input) != "":
+            self.__updateInputMap(input, input.pathToFile)
+            return
         else:
             raise IOError
 
@@ -483,6 +503,10 @@ class GrassModuleStarter():
             proc = Popen(["v.info", inputName ])
             proc.communicate()
 
+        # Text input file, no need to create a new name or for import, use the path as input
+        elif self.__isTextFile(input) != "":
+            self.__updateInputMap(input, input.pathToFile)
+            return
         else:
             raise IOError
 
@@ -518,7 +542,7 @@ class GrassModuleStarter():
 
     ############################################################################
     def __createOutputMap(self):
-        """Create the entries of the input map for literal data"""
+        """Create the entries of the output map for literal data"""
         list = self.inputParameter.complexOutputList
 
         # The list may be empty
@@ -527,7 +551,7 @@ class GrassModuleStarter():
 
         for i in list:
             outputName = "output_" + str(self.outputCounter)
-            # Ignoreif multiple defined
+            # Ignore if multiple defined
             if self.outputMap.has_key(i.identifier):
                 pass
             else:
@@ -543,9 +567,9 @@ class GrassModuleStarter():
         for output in self.inputParameter.complexOutputList:
             outputName = self.outputMap[output.identifier]
 
-            # import the data via gdal
+            # export the data via gdal
             if self.__isRaster(output) != "":
-                proc = Popen(["r.out.gdal", "input=" + outputName, "format=" + self.__isRaster(output), "output=" + output.pathToFile])
+                proc = Popen(["r.out.gdal", "-c", "input=" + outputName, "format=" + self.__isRaster(output), "output=" + output.pathToFile])
                 self.runPID = proc.pid
                 print self.runPID
                 proc.communicate()
@@ -553,7 +577,7 @@ class GrassModuleStarter():
                 if proc.returncode != 0:
                     raise IOError
 
-            # import the data via ogr
+            # export the data via ogr
             elif self.__isVector(output) != "":
                 proc = Popen(["v.out.ogr", "input=" + outputName, "format=" + self.__isVector(output),"dsn=" + output.pathToFile])
                 self.runPID = proc.pid
@@ -574,7 +598,7 @@ class GrassModuleStarter():
         parameterMap.append(self.inputParameter.grassModule)
 
         for i in self.inputMap:
-            # filter the resolution adjustment and the stdout output from the input parameter!
+            # filter the resolution adjustment and the stdout output from the parameter list!
             if i != "ns_resolution" and i != "ew_resolution":
                 if self.inputMap[i] != "":
                     parameterMap.append(i + "=" + self.inputMap[i])
