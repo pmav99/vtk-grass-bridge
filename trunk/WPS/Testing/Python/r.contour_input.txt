@@ -7,6 +7,10 @@
  GRASS_ADDON_PATH=
  GRASS_VERSION=7.0.svn
  Module=r.contour
+ LOCATION=
+ LinkInput=FALSE
+ IgnoreProjection=TRUE
+ UseXYLocation=FALSE
 
 [ComplexData]
  Identifier=input
@@ -23,22 +27,22 @@
 [LiteralData]
  Identifier=levels
  DataType=double
- Value=40
+ Value=1100
 
 [LiteralData]
  Identifier=levels
  DataType=double
- Value=80
+ Value=1300
 
 [LiteralData]
  Identifier=levels
  DataType=double
- Value=120
+ Value=1500
 
 [LiteralData]
  Identifier=levels
  DataType=double
- Value=160
+ Value=1700
 
 [ComplexOutput]
  Identifier=output

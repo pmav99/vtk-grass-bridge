@@ -120,6 +120,10 @@ class InputParameter():
         self.complexDataList = []
         self.complexOutputList = []
         self.literalDataList = []
+        self.location = ""
+        self.linkInput = "TRUE"
+        self.ignoreProjection = "FALSE"
+        self.useXYLocation = "FALSE"
         self.__fileName = ""
 
     ############################################################################
@@ -174,10 +178,11 @@ class InputParameter():
                     self.outputDir = splitstring[1].rstrip()
                     print self.outputDir
 
+
     ############################################################################
     def __parseGrass(self):
         """Parse and store the grass relevant variables"""
-        for i in range(4):
+        for i in range(8):
             string = self.__file.readline()
             if string == "":
                 return
@@ -195,4 +200,15 @@ class InputParameter():
                 if splitstring[0].upper().find("MODULE") != -1:
                     self.grassModule = splitstring[1].rstrip()
                     print self.grassModule
-
+                if splitstring[0].upper().find("LOCATION") != -1:
+                    self.location = splitstring[1].rstrip()
+                    print self.location
+                if splitstring[0].upper().find("LINKINPUT") != -1:
+                    self.linkInput = splitstring[1].rstrip()
+                    print self.linkInput
+                if splitstring[0].upper().find("IGNOREPROJECTION") != -1:
+                    self.ignoreProjection = splitstring[1].rstrip()
+                    print self.ignoreProjection
+                if splitstring[0].upper().find("USRXYLOCATION") != -1:
+                    self.useXYLocation = splitstring[1].rstrip()
+                    print self.useXYLocation
