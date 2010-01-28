@@ -8,8 +8,8 @@
  GRASS_VERSION=7.0.svn
  Module=r.contour
  LOCATION=
- LinkInput=FALSE
- IgnoreProjection=TRUE
+ LinkInput=TRUE
+ IgnoreProjection=FALSE
  UseXYLocation=FALSE
 
 [ComplexData]
