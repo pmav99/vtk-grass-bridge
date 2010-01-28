@@ -7,6 +7,10 @@
  GRASS_ADDON_PATH=
  GRASS_VERSION=7.0.svn
  Module=r.watershed
+ LOCATION=
+ LinkInput=TRUE
+ IgnoreProjection=FALSE
+ UseXYLocation=FALSE
 
 [ComplexData]
  Identifier=elevation

@@ -49,10 +49,10 @@ GRASS_MAPSET_NAME = "PERMANENT"
 #  GRASS_ADDON_PATH= path to addon modules
 #  GRASS_VERSION= the version of grass
 #  Module= the name of the module which should be executed
-#  LOCATION=Name of an existing location which should be used for processing, the mapsets are generated temporal
-#  LinkInput=TRUE/FALSE Try to link the input into the generated/existing location
-#  IgnoreInputProjection=TRUE/FALSE Ignore the projection settings when trying to import the input data (ignored if LinkInput is true)
-#  UseXYLocation=TRUE/FALSE create only a XY location/mapset and import all data ignoring the projection information. The resolution will be set based on LiteralData or based on the first input raster resolution
+#  LOCATION=Name of an existing location with an existing mapset PERMANENT, which should be used for processing, the mapsets are generated temporaly
+#  LinkInput=TRUE/FALSE Try to link the input into the generated/existing location, default is TRUE
+#  IgnoreProjection=TRUE/FALSE Ignore the projection settings when trying to import the input data (ignored if LinkInput is true), default is FALSE
+#  UseXYLocation=TRUE/FALSE create only a XY location/mapset and import all data ignoring the projection information. The resolution will be set based on LiteralData or based on the first input raster resolution, default is FALSE
 #
 # [ComplexData]
 #  Identifier=input
@@ -63,7 +63,7 @@ GRASS_MAPSET_NAME = "PERMANENT"
 #
 # [LiteralData]
 #  Identifier=-p
-#  DataType=boolean
+#  DataType=boolean/integer/double/string
 #  Value=true
 #
 # [ComplexOutput]
@@ -86,13 +86,27 @@ GRASS_MAPSET_NAME = "PERMANENT"
  GRASS_ADDON_PATH=
  GRASS_VERSION=7.0.svn
  Module=r.contour
-
+ LOCATION=
+ LinkInput=TRUE
+ IgnoreProjection=FALSE
+ UseXYLocation=FALSE
+ 
 [ComplexData]
  Identifier=input
  PathToFile=/tmp/srtm90.tiff
  MimeType=image/tiff
  Encoding=
  Schema=
+
+[LiteralData]
+ Identifier=ns_resolution
+ DataType=double
+ Value=10
+
+[LiteralData]
+ Identifier=sw_resolution
+ DataType=double
+ Value=10
 
 [LiteralData]
  Identifier=levels
@@ -153,9 +167,10 @@ class GrassModuleStarter():
          * Use r.in.gdal or v.in.ogr to create the new location without actually importing the map,
            log stdout and stderr of the import modules
          * Rewrite the gisrc with new location name (we work in PERMANENT mapset)
-     5.) Link all other maps via r/v.external into the new location, log stdout and stderr
-     6.) Start the grass module, log only stderr
-     7.) In case raster output should be created, use r.external.out to force the direct creation
+     5.) Link all other maps via r/v.external(TODO) into the new location, log stdout and stderr
+         or import with r.in.gdal or v.in.org. This can be specified in the input file
+     6.) Start the grass module, log stdout and stderr, provide the stdout as file
+     7.) In case raster output should be created use r.out.gdal or use r.external.out(TODO) to force the direct creation
          of images output files, otherwise export the output with v.out.ogr, log stdout and stderr
      8.) Remove the temporal directory and exit properly
 
@@ -163,7 +178,7 @@ class GrassModuleStarter():
      Create meaningful logfiles, so the user will be informed properly what was going wrong
        in case of an error (TODO)
 
-    This python script is based on grass 7
+    This python script is based on the latest grass7 svn version
     """
     ############################################################################
     def __init__(self, inputfile):
@@ -184,6 +199,11 @@ class GrassModuleStarter():
         except:
             raise
 
+        # Create the input parameter of literal data
+        self.__createLiteralInputMap()
+        # Create the output map for data export
+        self.__createOutputMap()
+        
         # Create a temporal directory for the location and mapset creation
         if self.inputParameter.workDir != "":
             try:
@@ -232,11 +252,6 @@ class GrassModuleStarter():
         except:
             raise
 
-        # Create the input parameter of literal data
-        self.__createLiteralInputMap()
-        # Create the output map for data export
-        self.__createOutputMap()
-
         # start the grass module
         try:
             self.__startGrassModule()
@@ -244,13 +259,16 @@ class GrassModuleStarter():
             raise
 
         # now export the results
-        self.__exportOutput()
+        try:
+            self.__exportOutput()
+        except:
+            raise
         
         # remove the created directory
         try:
             print "Remove ", self.gisdbase
             os.rmdir(self.gisdbase)
-        except:
+       except:
             pass
 
     ############################################################################
@@ -278,8 +296,8 @@ class GrassModuleStarter():
             return
 
         #Debug
-        #proc = Popen(["g.region", '-p'])
-        #proc.communicate()
+        proc = Popen(["g.region", '-p'])
+        proc.communicate()
 
         # Create a new location based on the first input map
         self.__createInputLocation(list[0])
@@ -288,13 +306,20 @@ class GrassModuleStarter():
         self.gisrc.locationName = GRASS_WORK_LOCATION
         self.gisrc.rewriteFile()
 
-        #Debug
-        #proc = Popen(["g.region", '-p'])
-        #proc.communicate()
+        # Set the region resolution in case resolution values are provided as literal data
+        self.__setRegionResolution()
         
-        # Link the inputs into the location
-        for i in list:
-            self.__linkInput(i)
+        #Debug
+        proc = Popen(["g.region", '-p'])
+        proc.communicate()
+
+        if self.inputParameter.linkInput == "FALSE":
+            for i in list:
+                self.__importInput(i)
+        else:
+            # Link the inputs into the location
+            for i in list:
+                self.__linkInput(i)
 
             #Debug
             #proc = Popen(["r.info", str(self.inputMap[i.identifier])])
@@ -328,7 +353,7 @@ class GrassModuleStarter():
         # TODO: implement correct and meaningful error handling and error messages
         
         if self.__isRaster(input) != "":
-            proc = Popen(["r.in.gdal", "input=" + input.pathToFile, "location=" + GRASS_WORK_LOCATION , "-ec", "output=undefined"])
+            proc = Popen(["r.in.gdal", "input=" + input.pathToFile, "location=" + GRASS_WORK_LOCATION , "-e", "output=undefined"])
             self.runPID = proc.pid
             print self.runPID
             proc.communicate()
@@ -338,17 +363,39 @@ class GrassModuleStarter():
                 raise IOError
 
         # Not yet implemented
-        #elif self.__isVector(input) != "":
-        #    proc = Popen(["v.in.ogr", "input=" + input.pathToFile, "location=" + GRASS_WORK_LOCATION , "output=undefined"])
-        #    self.runPID = proc.pid
-        #    print self.runPID
-        #    proc.communicate()
+        elif self.__isVector(input) != "":
+            proc = Popen(["v.in.ogr", "dsn=" + input.pathToFile, "location=" + GRASS_WORK_LOCATION , "-e", "output=undefined"])
+            self.runPID = proc.pid
+            print self.runPID
+            proc.communicate()
 
-        #    if proc.returncode != 0:
-        #        print "Unable to create new grass location based on input map"
-        #        raise IOError
+            if proc.returncode != 0:
+                print "Unable to create new grass location based on input map"
+                raise IOError
         else:
             raise IOError
+
+    ############################################################################
+    def __setRegionResolution(self):
+        # Set the region resolution accordingly to the literal input parameters
+        print "Set the region resolution"
+        values = 0
+        ns = 10.0
+        ew = 10.0
+        for i in self.inputMap:
+            if i == "ns_resolution" and self.inputMap[i] != "":
+                print "Noticed ns_resolution"
+                values += 1
+            if i == "ew_resolution" and self.inputMap[i] != "":
+                print "Notices ew_resolution"
+                values += 1
+
+            if values == 2:
+                proc = Popen(["g.region", "ewres=" + str(ew), "nsres=" + str(ns)])
+                proc.communicate()
+                if proc.returncode != 0:
+                    print "Unable to set the region resolution"
+                    raise IOError
 
     ############################################################################
     def __linkInput(self, input):
@@ -359,7 +406,11 @@ class GrassModuleStarter():
         inputName = "input_" + str(self.inputCounter)
 
         if self.__isRaster(input) != "":
-            proc = Popen(["r.external", "input=" + input.pathToFile, "output=" + inputName])
+            if self.inputParameter.ignoreProjection == "FALSE":
+                proc = Popen(["r.external", "input=" + input.pathToFile, "output=" + inputName])
+            else:
+                proc = Popen(["r.external", "-o", "input=" + input.pathToFile, "output=" + inputName])
+
             self.runPID = proc.pid
             print self.runPID
             proc.communicate()
@@ -368,25 +419,33 @@ class GrassModuleStarter():
                 print "Unable to link the raster map into the grass mapset"
                 raise IOError
 
-        # import the data via ogr !!! NOT TESTED OR INCOMPLETE
-        #elif self.__isVector(input) != "":
-        #    proc = Popen(["v.external", "dsn=" + input.pathToFile, "output=" + inputName])
-        #    self.runPID = proc.pid
-        #    print self.runPID
-        #    proc.communicate()
+            proc = Popen(["r.info", inputName ])
+            proc.communicate()
 
-        #    if proc.returncode != 0:
-        #        print "Unable to link the vector map into the grass mapset"
-        #        raise IOError
+        elif self.__isVector(input) != "":
+            # Linking does not work properly right now for GML -> no random access, so we import the vector data
+            self.__importInput(input)
+            return
+
+#            print "Linking of vector data is currently not supported"
+#            raise IOError
+#            # We need to check at first the layer within the vector dataset
+#            proc = Popen(["v.external", "dsn=" + input.pathToFile, "layer=tmp", "output=" + inputName])
+#            self.runPID = proc.pid
+#            print self.runPID
+#            proc.communicate()
+#
+#            if proc.returncode != 0:
+#                print "Unable to link the vector map into the grass mapset"
+#                raise IOError
+#
+#            proc = Popen(["v.info", inputName ])
+#            proc.communicate()
+            
         else:
             raise IOError
 
-        # Connect the values if multiple defined
-        if self.inputMap.has_key(input.identifier):
-            self.inputMap[input.identifier] += "," + inputName
-        else:
-            self.inputMap[input.identifier] = inputName
-        self.inputCounter += 1
+        self.__updateInputMap(input, inputName)
 
     ############################################################################
     def __importInput(self, input):
@@ -394,9 +453,13 @@ class GrassModuleStarter():
 
         inputName = "input_" + str(self.inputCounter)
 
-        # import the data via gdal
+        # import the raster data via gdal
         if self.__isRaster(input) != "":
-            proc = Popen(["r.in.gdal", "input=" + input.pathToFile, "output=" + inputName])
+            if self.inputParameter.ignoreProjection == "FALSE":
+                proc = Popen(["r.in.gdal", "input=" + input.pathToFile, "output=" + inputName])
+            else:
+                proc = Popen(["r.in.gdal", "-o", "input=" + input.pathToFile, "output=" + inputName])
+                
             self.runPID = proc.pid
             print self.runPID
             proc.communicate()
@@ -404,18 +467,29 @@ class GrassModuleStarter():
             if proc.returncode != 0:
                 raise IOError
 
-        # import the data via ogr !!! NOT TESTED OR INCOMPLETE
-        #elif self.__isVector(input) != "":
-        #    proc = Popen(["v.in.ogr", "input=" + input.pathToFile, "output=" + inputName])
-        #    self.runPID = proc.pid
-        #    print self.runPID
-        #    proc.communicate()
-        #
-        #    if proc.returncode != 0:
-        #        raise IOError
+            proc = Popen(["r.info", inputName ])
+            proc.communicate()
+            
+        # import the vector data via ogr
+        elif self.__isVector(input) != "":
+            proc = Popen(["v.in.ogr", "dsn=" + input.pathToFile, "output=" + inputName])
+            self.runPID = proc.pid
+            print self.runPID
+            proc.communicate()
+        
+            if proc.returncode != 0:
+                raise IOError
+
+            proc = Popen(["v.info", inputName ])
+            proc.communicate()
+
         else:
             raise IOError
 
+        self.__updateInputMap(input, inputName)
+
+    ############################################################################
+    def __updateInputMap(self, input, inputName):
         # Connect the values if multiple defined
         if self.inputMap.has_key(input.identifier):
             self.inputMap[input.identifier] += "," + inputName
@@ -433,7 +507,7 @@ class GrassModuleStarter():
             return
 
         for i in list:
-            # Boolean values are unique and have no values
+            # Boolean values are unique and have no values eg -p or --o
             if i.type.upper() == "BOOLEAN":
                 self.inputMap[i.identifier] = ""
             # Connect the values if multiple defined
@@ -500,10 +574,12 @@ class GrassModuleStarter():
         parameterMap.append(self.inputParameter.grassModule)
 
         for i in self.inputMap:
-            if self.inputMap[i] != "":
-                parameterMap.append(i + "=" + self.inputMap[i])
-            else:
-                parameterMap.append(i)
+            # filter the resolution adjustment and the stdout output from the input parameter!
+            if i != "ns_resolution" and i != "ew_resolution":
+                if self.inputMap[i] != "":
+                    parameterMap.append(i + "=" + self.inputMap[i])
+                else:
+                    parameterMap.append(i)
 
         for i in self.outputMap:
             parameterMap.append(i + "=" + self.outputMap[i])
