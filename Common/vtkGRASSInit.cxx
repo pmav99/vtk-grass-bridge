@@ -83,3 +83,12 @@ void vtkGRASSInit::Init(const char *name)
     // Init GRASS
     G_gisinit(name);
 }
+
+
+//----------------------------------------------------------------------------
+
+void vtkGRASSInit::Parser(int argc, char **argv)
+{
+    // Init GRASS
+    G_parser(argc, argv);
+}
