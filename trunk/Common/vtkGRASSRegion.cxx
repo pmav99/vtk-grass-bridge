@@ -100,13 +100,9 @@ bool vtkGRASSRegion::ReadRegion(char *regionName) {
         this->InsertNextError(buff);
         return false;
     }
-    if (G__get_window(&this->head, "windows", this->Name, mapset) != NULL) {
-        G_snprintf(buff, 1024, "class: %s line: %i Unable to read region <%s> in <%s>",
-                    this->GetClassName(), __LINE__, this->Name,
-                mapset);
-        this->InsertNextError(buff);
-        return false;
-    }
+    TRY
+    G__get_window(&this->head, "windows", this->Name, mapset);
+    CATCH_BOOL
 
     this->CopyRegionFrom(&this->head);
     this->Modified();
@@ -118,7 +114,6 @@ bool vtkGRASSRegion::ReadRegion(char *regionName) {
 
 bool vtkGRASSRegion::SaveRegion(char *regionName) {
 
-    const char *message;
     char buff[1024];
 
     this->SetName(regionName);
@@ -139,14 +134,10 @@ bool vtkGRASSRegion::SaveRegion(char *regionName) {
         return false;
     }
 
-    message = G_adjust_Cell_head(&this->head, 1, 1);
-    if(message != NULL)
-    {
-        G_snprintf(buff, 1024, "class: %s line: %i %s",
-                    this->GetClassName(), __LINE__, message);
-        this->InsertNextError(buff);
-        return false;
-    }
+    TRY
+    G_adjust_Cell_head(&this->head, 1, 1);
+    CATCH_BOOL
+
 
     this->CopyRegionTo(&this->head);
     if(G__put_window(&this->head, "windows", this->Name) != 1)
@@ -163,20 +154,12 @@ bool vtkGRASSRegion::SaveRegion(char *regionName) {
 //----------------------------------------------------------------------------
 
 bool vtkGRASSRegion::SaveRegionAsDefault() {
-    const char *message;
     char buff[1024];
 
     this->CopyRegionTo(&this->head);
 
-    TRY message = G_adjust_Cell_head(&this->head, 1, 1);
+    TRY G_adjust_Cell_head(&this->head, 1, 1);
     CATCH_BOOL
-    if(message != NULL)
-    {
-        G_snprintf(buff, 1024, "class: %s line: %i %s",
-                    this->GetClassName(), __LINE__, message);
-        this->InsertNextError(buff);
-        return false;
-    }
 
     if(G_put_window(&this->head) != 1)
     {
@@ -192,20 +175,13 @@ bool vtkGRASSRegion::SaveRegionAsDefault() {
 //----------------------------------------------------------------------------
 
 bool vtkGRASSRegion::AdjustRegion() {
-    const char *message;
+
     char buff[1024];
 
     this->CopyRegionTo(&this->head);
 
-    TRY message = G_adjust_Cell_head(&this->head, 1, 1);
+    TRY G_adjust_Cell_head(&this->head, 1, 1);
     CATCH_BOOL
-    if(message != NULL)
-    {
-        G_snprintf(buff, 1024, "class: %s line: %i %s",
-                    this->GetClassName(), __LINE__, message);
-        this->InsertNextError(buff);
-        return false;
-    }
 
     this->CopyRegionFrom(&this->head);
 
