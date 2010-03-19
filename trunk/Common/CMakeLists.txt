@@ -14,6 +14,9 @@ vtkGRASSVectorMapLister.cxx
 vtkGRASSRegion.cxx
 vtkObjectGRASSErrorHandler.cxx
 vtkGRASSInit.cxx
+vtkGRASSModule.cxx
+vtkGRASSFlag.cxx
+vtkGRASSOption.cxx
 vtkGRASSMessagingInterface.cxx
 )
 
@@ -24,6 +27,9 @@ vtkGRASSRasterMapLister.h
 vtkGRASSVectorMapLister.h
 vtkGRASSRegion.h
 vtkGRASSInit.h
+vtkGRASSModule.h
+vtkGRASSFlag.h
+vtkGRASSOption.h
 vtkObjectGRASSErrorHandler.h
 vtkGRASSMessagingInterface.h
 vtkGRASSBridgeCommonWin32Header.h
