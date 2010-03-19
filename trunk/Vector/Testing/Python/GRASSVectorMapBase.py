@@ -12,7 +12,6 @@
 #  GNU General Public License for more details.
 
 import unittest
-import os
 from libvtkCommonPython import *
 from libvtkGRASSBridgeCommonPython import *
 from libvtkGRASSBridgeVectorPython import *
