@@ -16,11 +16,14 @@
 #include <vtkStringArray.h>
 #include <vtkObjectFactory.h>
 #include "vtkGRASSDefines.h"
+#include <vtkStdString.h>
+#include <sstream>
 
 extern "C"
 {
 #include <grass/gis.h>
 #include <setjmp.h>
+#include <c++/4.4/bits/basic_string.h>
 }
 
 vtkCxxRevisionMacro(vtkGRASSInit, "$Revision: 1.18 $");
@@ -84,11 +87,42 @@ void vtkGRASSInit::Init(const char *name)
     G_gisinit(name);
 }
 
+//----------------------------------------------------------------------------
+
+void vtkGRASSInit::Parser(const char *argv)
+{
+	char **buff = NULL;
+	int num = 0;
+	vtkStdString a(argv), value;
+	std::stringstream ss;
+
+	// Count the number of arguments
+	ss << a;
+	while (ss >> value)
+	{
+		num++;
+	}
+
+	buff = (char **)G_calloc(num, sizeof(char*));
+
+	// Put the arguments into the charachter array
+	num = 0;
+	ss << a;
+	while (ss >> value)
+	{
+		buff[num] = (char*)G_calloc(value.size() + 1, sizeof(char));
+		G_snprintf(buff[num], value.size(), "%s", value.c_str());
+		num++;
+	}
+
+    // Start the grass command line parser
+    G_parser(num, buff);
+}
 
 //----------------------------------------------------------------------------
 
 void vtkGRASSInit::Parser(int argc, char **argv)
 {
-    // Init GRASS
+    // Start the grass command line parser
     G_parser(argc, argv);
 }

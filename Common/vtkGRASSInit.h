@@ -49,9 +49,12 @@ public:
   void ExitOnErrorOff();
   //!\brief Init GRASS
   void Init(const char *name);
+  //!\brief Parse the command line arguments which are presented as a single string
+  void Parser(const char *argv);
+  //BTX
   //!\brief Prase the command line arguments
   void Parser(int argc, char **argv);
-
+  //ETX
 protected:
   vtkGRASSInit();
   ~vtkGRASSInit() {};
