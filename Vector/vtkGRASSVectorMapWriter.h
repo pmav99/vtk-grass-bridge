@@ -75,7 +75,7 @@ public:
       \return new feature id (level 2) or offset into file where the feature starts (level 1)
      */
 
-    virtual int WriteFeature(vtkGRASSVectorFeaturePoints *points, vtkGRASSVectorFeatureCats *cats){this->WriteFeature(
+    virtual int WriteFeature(vtkGRASSVectorFeaturePoints *points, vtkGRASSVectorFeatureCats *cats){return this->WriteFeature(
             points->GetFeatureType(), points, cats);}
 
     /*!
