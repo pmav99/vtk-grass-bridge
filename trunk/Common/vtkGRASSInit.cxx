@@ -23,7 +23,6 @@ extern "C"
 {
 #include <grass/gis.h>
 #include <setjmp.h>
-#include <c++/4.4/bits/basic_string.h>
 }
 
 vtkCxxRevisionMacro(vtkGRASSInit, "$Revision: 1.18 $");
@@ -89,34 +88,25 @@ void vtkGRASSInit::Init(const char *name)
 
 //----------------------------------------------------------------------------
 
-void vtkGRASSInit::Parser(const char *argv)
+void vtkGRASSInit::Parser(vtkStringArray *argv)
 {
 	char **buff = NULL;
-	int num = 0;
-	vtkStdString a(argv), value;
-	std::stringstream ss;
+    int i;
 
-	// Count the number of arguments
-	ss << a;
-	while (ss >> value)
-	{
-		num++;
-	}
 
-	buff = (char **)G_calloc(num, sizeof(char*));
+	buff = (char **)G_calloc(argv->GetNumberOfValues(), sizeof(char*));
 
 	// Put the arguments into the charachter array
-	num = 0;
-	ss << a;
-	while (ss >> value)
+
+	for(i = 0; i < argv->GetNumberOfValues(); i++)
 	{
-		buff[num] = (char*)G_calloc(value.size() + 1, sizeof(char));
-		G_snprintf(buff[num], value.size(), "%s", value.c_str());
-		num++;
+		buff[i] = (char*)G_calloc(argv->GetValue(i).size() + 1, sizeof(char));
+		G_snprintf(buff[i], argv->GetValue(i).size(), "%s", argv->GetValue(i).c_str());
+		i++;
 	}
 
     // Start the grass command line parser
-    G_parser(num, buff);
+    G_parser(argv->GetNumberOfValues(), buff);
 }
 
 //----------------------------------------------------------------------------
