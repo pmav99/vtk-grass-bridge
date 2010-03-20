@@ -16,6 +16,7 @@
 #include <vtkStringArray.h>
 #include <vtkObjectFactory.h>
 #include "vtkGRASSDefines.h"
+#include <vtkStringArray.h>
 
 vtkCxxRevisionMacro(vtkGRASSOption, "$Revision: 1.18 $");
 vtkStandardNewMacro(vtkGRASSOption);
@@ -27,6 +28,28 @@ vtkGRASSOption::vtkGRASSOption()
 {
 	this->option = NULL;
 }
+
+//----------------------------------------------------------------------------
+
+void vtkGRASSOption::GetAnswers(vtkStringArray *array)
+{
+    int count = 0;
+
+    array->Initialize();
+    array->SetNumberOfComponents(1);
+
+    if(this->option->answers != NULL)
+    {
+        while(this->option->answers[count] != NULL)
+        {
+            array->InsertNextValue(this->option->answers[count]);
+            count ++;
+        }
+    }
+
+    return;
+}
+
 
 
 

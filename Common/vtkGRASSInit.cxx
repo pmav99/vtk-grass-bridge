@@ -101,8 +101,7 @@ void vtkGRASSInit::Parser(vtkStringArray *argv)
 	for(i = 0; i < argv->GetNumberOfValues(); i++)
 	{
 		buff[i] = (char*)G_calloc(argv->GetValue(i).size() + 1, sizeof(char));
-		G_snprintf(buff[i], argv->GetValue(i).size(), "%s", argv->GetValue(i).c_str());
-		i++;
+		G_snprintf(buff[i], argv->GetValue(i).size() + 1, "%s", argv->GetValue(i).c_str());
 	}
 
     // Start the grass command line parser

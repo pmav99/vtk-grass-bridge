@@ -36,6 +36,7 @@ extern "C"
 #include <grass/gis.h>
 }
 
+class vtkStringArray;
 #define VGB_CHECK_OPTION if(this->option == NULL){ this->option = G_define_option();}
 
 class VTK_GRASS_BRIDGE_COMMON_EXPORT vtkGRASSOption : public vtkObjectGRASSErrorHandler
@@ -87,6 +88,8 @@ public:
   const char* GetGisprompt() {VGB_CHECK_OPTION return this->option->gisprompt;}
   //!\brief Return the answer string
   const char* GetAnswer() {VGB_CHECK_OPTION return this->option->answer;}
+  //!\brief Return the answer strings in a vtkStringArray
+  void GetAnswers(vtkStringArray *answers);
   //!\brief Return the options string
   const char* GetOptions() {VGB_CHECK_OPTION return this->option->options;}
   //!\brief Check if the option is multiple (true/false)
