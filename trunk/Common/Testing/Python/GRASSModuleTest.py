@@ -14,7 +14,6 @@
 
 
 import unittest
-import os
 from libvtkCommonPython import *
 from libvtkGRASSBridgeCommonPython import *
 
@@ -37,16 +36,46 @@ class GRASSModuleTest(unittest.TestCase):
 	flag.SetKey('f')
 	flag.SetGuiSection("Flags")
 
-	option = vtkGRASSOptions()
-	option.SetKey("option")
-	option.SetDescription("This is an option")
-	option.SetGuiSection("Options")
-	option.SetGisprompt("old,raster,cell")
-	option.RequiredOff()
-	option.MultipleOff()
-	option.SetTypeToInteger()
+	option1 = vtkGRASSOption()
+	option1.SetKey("option1")
+	option1.SetDescription("This is option one")
+	option1.SetGuiSection("Options")
+	option1.SetGisprompt("old,raster,cell")
+	option1.RequiredOff()
+	option1.MultipleOff()
+	option1.SetTypeToString()
 
-	init.Parser("test")
+	option2 = vtkGRASSOption()
+	option2.SetKey("option2")
+	option2.SetDescription("This is option two")
+	option2.SetGuiSection("Options")
+	option2.SetGisprompt("old,raster,cell")
+	option2.RequiredOn()
+	option2.MultipleOn()
+	option2.SetTypeToString()
+
+        option3 =  vtkGRASSOption()
+        option3.CreateOption_DB_Where()
+
+        argv = vtkStringArray()
+        argv.InsertNextValue("test")
+        argv.InsertNextValue("-f")
+        argv.InsertNextValue("option1=test")
+        argv.InsertNextValue("option2=aa,bb,cc,dd")
+        argv.InsertNextValue("where=income < 1000 and inhab >= 10000")
+
+	init.Parser(argv)
+
+        answers = vtkStringArray()
+        option2.GetAnswers(answers)
+
+        self.assertEqual(flag.GetAnswer(), True, "Flag is not functional")
+        self.assertEqual(option1.GetAnswer(), "test", "Options is not functional")
+        self.assertEqual(answers.GetValue(0), "aa", "Options is not functional")
+        self.assertEqual(answers.GetValue(1), "bb", "Options is not functional")
+        self.assertEqual(answers.GetValue(2), "cc", "Options is not functional")
+        self.assertEqual(answers.GetValue(3), "dd", "Options is not functional")
+        self.assertEqual(option3.GetAnswer(), "income < 1000 and inhab >= 10000", "Options is not functional")
 
 if __name__ == '__main__':
     suite = unittest.TestLoader().loadTestsFromTestCase(GRASSModuleTest)
