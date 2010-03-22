@@ -24,12 +24,15 @@
 
 import os
 import os.path
+from ProcessLogging import ProcessLogging
 
-class GrassEnvironment():
+class GrassEnvironment(ProcessLogging):
     """This class saves and sets grass environment variables"""
 
     ############################################################################
-    def __init__(self):
+    def __init__(self, logfile):
+
+        ProcessLogging.__init__(self, logfile)
         self.env = {"GISBASE":"", "GISRC":"", "LD_LIBRARY_PATH":"",\
         "GRASS_ADDON_PATH":"", "GRASS_VERSION":""}
 
@@ -39,6 +42,7 @@ class GrassEnvironment():
             try:
                 self.env[key] = os.getenv(key, self.env[key])
             except:
+                self.LogError("Error setting grass environmental variables")
                 raise
 
     ############################################################################
@@ -52,23 +56,26 @@ class GrassEnvironment():
                 os.putenv(key,value)
                 os.environ[key] = value
             except:
+                self.LogError("Error setting grass environmental variables")
                 raise
 
 ###############################################################################
 ###############################################################################
 ###############################################################################
 
-class GrassGisRC():
+class GrassGisRC(ProcessLogging):
     """This class takes care of the correct creation of the gisrc file"""
     ############################################################################
-    def __init__(self):
+    def __init__(self, logfile):
+
+        ProcessLogging.__init__(self, logfile)
         self.locationName = GRASS_LOCATION_NAME
         self.mapset = GRASS_MAPSET_NAME
         self.gisdbase = ""
         self.__gisrcFile = ""
 
     ############################################################################
-    def __init__(self, gisdbase, locationName, mapset):
+    def __init__(self, gisdbase, locationName, mapset, logfile):
         self.locationName = locationName
         self.mapset = mapset
         self.gisdbase = gisdbase
@@ -80,6 +87,7 @@ class GrassGisRC():
         if self.__gisrcFile != "":
             self.__writeFile()
         else:
+            self.LogError("Error re-writing the gisrc file")
             raise IOError
 
     ############################################################################
@@ -89,6 +97,7 @@ class GrassGisRC():
                self.__gisrcFile = os.path.join(tempdir, "gisrc")
                self.__writeFile()
             except:
+                self.LogError("Error writing the gisrc file")
                 raise
 
     ############################################################################
@@ -103,6 +112,7 @@ class GrassGisRC():
             gisrc.write("GRASS_GUI: text\n")
             gisrc.close()
         except:
+            self.LogError("Error writing the gisrc file")
             raise
 
     ############################################################################
@@ -113,11 +123,13 @@ class GrassGisRC():
 ###############################################################################
 ###############################################################################
 
-class GrassWindFile():
+class GrassWindFile(ProcessLogging):
     """This class takes care of thr correct creation of grass WIND and
     DEFAULT_WIND files using a dummy region"""
     ############################################################################
-    def __init__(self, gisdbase, location, mapset):
+    def __init__(self, gisdbase, location, mapset, logfile):
+
+        ProcessLogging.__init__(self, logfile)
         """ Create the WIND and if needed the DEFAULT_WIND file """
         self.__windFile = ""
         self.__windname = "WIND"
@@ -146,6 +158,7 @@ class GrassWindFile():
             wind.write("""n-s resol:  1\n""")
             wind.close()
         except:
+            self.LogError("Error writing the WIND file")
             raise
 
     ############################################################################
