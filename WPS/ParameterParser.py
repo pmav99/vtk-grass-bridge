@@ -24,6 +24,7 @@
 
 import os
 import os.path
+from ProcessLogging import *
 
 class ComplexData():
     """This class saves the complex in- and output data
@@ -48,19 +49,19 @@ class ComplexData():
             if len(splitstring) > 1:
                 if splitstring[0].upper().find("IDENTIFIER") != -1:
                     self.identifier = splitstring[1].rstrip()
-                    print self.identifier
+                    #print self.identifier
                 if splitstring[0].upper().find("PATHTOFILE") != -1:
                     self.pathToFile = splitstring[1].rstrip()
-                    print self.pathToFile
+                    #print self.pathToFile
                 if splitstring[0].upper().find("MIMETYPE") != -1:
                     self.mimeType = splitstring[1].rstrip()
-                    print self.mimeType
+                    #print self.mimeType
                 if splitstring[0].upper().find("ENCODING") != -1:
                     self.encoding = splitstring[1].rstrip()
-                    print self.encoding
+                    #print self.encoding
                 if splitstring[0].upper().find("SCHEMA") != -1:
                     self.schema = splitstring[1].rstrip()
-                    print self.schema
+                    #print self.schema
 
 ###############################################################################
 ###############################################################################
@@ -95,23 +96,26 @@ class LiteralData():
             if len(splitstring) > 1:
                 if splitstring[0].upper().find("IDENTIFIER") != -1:
                     self.identifier = splitstring[1].rstrip()
-                    print self.identifier
+                    #print self.identifier
                 if splitstring[0].upper().find("VALUE") != -1:
                     self.value = splitstring[1].rstrip()
-                    print self.value
+                    #print self.value
                 if splitstring[0].upper().find("TYPE") != -1:
                     self.type = splitstring[1].rstrip()
-                    print self.type
+                    #print self.type
 
 ###############################################################################
 ###############################################################################
 ###############################################################################
 
-class InputParameter():
+class InputParameter(ProcessLogging):
     """This class parses and stores the key-value input parameter of
     a wps execusion request"""
     ############################################################################
-    def __init__(self):
+    def __init__(self, logfile):
+
+        ProcessLogging.__init__(self, logfile)
+        
         self.workDir = ""
         self.grassGisBase = ""
         self.grassAddonPath = ""
@@ -133,6 +137,7 @@ class InputParameter():
         self.__filename = filename
 
         if os.path.isfile(filename) == False:
+            self.LogError("Unable to open input file " + str(filename))
             raise IOError
 
         self.__file = open(filename, 'r')

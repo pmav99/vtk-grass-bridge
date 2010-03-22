@@ -29,6 +29,7 @@ import os.path
 import tempfile
 from ParameterParser import *
 from GrassSettings import *
+from ProcessLogging import *
 
 GRASS_LOCATION_NAME = "startLocation"
 GRASS_WORK_LOCATION = "workLocation"
@@ -140,7 +141,7 @@ GRASS_MAPSET_NAME = "PERMANENT"
 ###############################################################################
 ###############################################################################
 
-class GrassModuleStarter():
+class GrassModuleStarter(ModuleLogging):
     """This class does the following:
 
      The goal is to process the input data within grass in its own coordinate system without import
@@ -181,7 +182,9 @@ class GrassModuleStarter():
     This python script is based on the latest grass7 svn version
     """
     ############################################################################
-    def __init__(self, inputfile):
+    def __init__(self, inputfile, logfile, module_output, module_error):
+
+        ModuleLogging.__init__(self, logfile, module_output, module_error)
 
         self.inputCounter = 0
         self.outputCounter = 0
@@ -193,11 +196,11 @@ class GrassModuleStarter():
         # the pid of the process which is currently executed, to be used for suspending
         self.runPID = -1
 
-        self.inputParameter = InputParameter()
+        self.inputParameter = InputParameter(self.logfile)
         try:
             self.inputParameter.parseFile(inputfile)
         except:
-            raise
+            self.LogError("Error parsing the input file")
 
         # Create the input parameter of literal data
         self.__createLiteralInputMap()
@@ -232,7 +235,7 @@ class GrassModuleStarter():
         
         # gisrc and wind file creation
         try:
-            self.gisrc = GrassGisRC(self.gisdbase, GRASS_LOCATION_NAME, GRASS_MAPSET_NAME)
+            self.gisrc = GrassGisRC(self.gisdbase, GRASS_LOCATION_NAME, GRASS_MAPSET_NAME, self.logfile)
             self.gisrc.writeFile(tempdir = self.gisdbase)
             self.gisrcfile = self.gisrc.getFileName()
             print self.gisrcfile
@@ -240,7 +243,7 @@ class GrassModuleStarter():
             raise
 
         try:
-            self.wind = GrassWindFile(self.gisdbase, GRASS_LOCATION_NAME, GRASS_MAPSET_NAME)
+            self.wind = GrassWindFile(self.gisdbase, GRASS_LOCATION_NAME, GRASS_MAPSET_NAME, self.logfile)
             self.windfile = self.wind.getFileName()
             print self.windfile
         except:
@@ -274,7 +277,7 @@ class GrassModuleStarter():
     ############################################################################
     def __setEnvironment(self):
         # set the grass environment
-        self.genv = GrassEnvironment()
+        self.genv = GrassEnvironment(self.logfile)
         self.genv.env["GIS_LOCK"] = str(os.getpid())
         self.genv.env["GISBASE"] = self.inputParameter.grassGisBase
         self.genv.env["GISRC"] = os.path.join(self.gisdbase, "gisrc")
@@ -362,7 +365,7 @@ class GrassModuleStarter():
         # TODO: implement correct and meaningful error handling and error messages
         
         if self.__isRaster(input) != "":
-            proc = Popen(["r.in.gdal", "input=" + input.pathToFile, "location=" + GRASS_WORK_LOCATION , "-ie", "output=undefined"])
+            proc = Popen(["r.in.gdal", "input=" + input.pathToFile, "location=" + GRASS_WORK_LOCATION , "-ce", "output=undefined"])
             self.runPID = proc.pid
             print self.runPID
             proc.communicate()
@@ -372,7 +375,7 @@ class GrassModuleStarter():
                 raise IOError
 
         elif self.__isVector(input) != "":
-            proc = Popen(["v.in.ogr", "dsn=" + input.pathToFile, "location=" + GRASS_WORK_LOCATION , "-ie", "output=undefined"])
+            proc = Popen(["v.in.ogr", "dsn=" + input.pathToFile, "location=" + GRASS_WORK_LOCATION , "-ce", "output=undefined"])
             self.runPID = proc.pid
             print self.runPID
             proc.communicate()
@@ -625,17 +628,31 @@ class GrassModuleStarter():
 def main():
     """The main function which will be called if the script is executed directly"""
 
-    usage = "usage: %prog --file inputfile.txt"
+    usage = "usage: %prog [-help,--help] --file inputfile.txt [--logfile log.txt] [--module_output mout.txt] [--module_error merror.txt]"
     description = "Use %prog to process geo-data with grass without the need to explicitely " +\
                   "generate a grass location and the import/export of the input and output geo-data. " +\
                   "This may helpful for WPS server or other web services providing grass geo-processing."
     parser = OptionParser(usage=usage, description=description)
     parser.add_option("-f", "--file", dest="filename",
                       help="The path to the input file", metavar="FILE")
+    parser.add_option("-l", "--logfile", dest="logfile", default="logfile.txt", \
+                      help="The name to the logfile. This file logs everything "\
+                      "which happens in this module (import, export, location creation ...).", metavar="FILE")
+    parser.add_option("-m", "--module_output", dest="module_output", default="logfile_module_output.txt",
+                      help="The name to the file logging the messages to stdout "\
+                      "of the called grass processing module (textual module output).", metavar="FILE")
+    parser.add_option("-e", "--module_error", dest="module_error", default="logfile_module_error.txt",\
+                      help="The name to the file logging the messages to stderr"\
+                      " of the called grass processing module (warnings and errors).", metavar="FILE")
 
     (options, args) = parser.parse_args()
 
-    starter = GrassModuleStarter(options.filename)
+
+    if options.filename == None:
+        parser.print_help()
+        parser.error("A file name must be provided")
+
+    starter = GrassModuleStarter(options.filename, options.logfile, options.module_output, options.module_error)
     exit(0)
 
 ###############################################################################
