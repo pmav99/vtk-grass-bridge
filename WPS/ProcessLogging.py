@@ -20,23 +20,48 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
+import os
+
 class ProcessLogging():
     """This class initiates the logging mechanism and is the base class for all
-    other classes, which ahve information to be logged.
+    other classes, which have information to be logged.
     """
 
     ############################################################################
     def __init__(self, logfile):
-        self.logfile = logfile
+        
+        # Check if the argument is a string or a file
+        # In case of a string open the file
+        
+        if isinstance(logfile, file):
+            self.logfile = logfile
+        elif isinstance(logfile, str):
+             self.logfile = open(logfile, 'w')
+        else:
+            print "Unable to access " + str(logfile)
+            raise IOError
 
-    def LogInfo(self, warning_message):
-        print "Not jet implemented"
+    def LogInfo(self, message):
+        """Write an info message into the logfile"""
+        self.logfile.write("\n<INFO>\n")
+        self.logfile.write(message)
+        self.logfile.write("\n</INFO>\n")
+        self.logfile.flush()
+        
 
-    def LogWarning(self, warning_message):
-        print "Not jet implemented"
+    def LogWarning(self, message):
+        """Write a warning message into the logfile"""
+        self.logfile.write("\n<WARNING>\n")
+        self.logfile.write(message)
+        self.logfile.write("\n</WARNING>\n")
+        self.logfile.flush()
 
-    def LogError(self, error_message):
-        print "Not jet implemented"
+    def LogError(self, message):
+        """Write an error message into the logfile"""
+        self.logfile.write("\n<ERROR>\n")
+        self.logfile.write(message)
+        self.logfile.write("\n</ERROR>\n")
+        self.logfile.flush()
 
 
 class ModuleLogging(ProcessLogging):
@@ -47,11 +72,28 @@ class ModuleLogging(ProcessLogging):
     def __init__(self, logfile, module_output, module_error):
         ProcessLogging.__init__(self, logfile)
 
-        self.module_output = module_output
-        self.module_error = module_error
+        if isinstance(module_output, file):
+            self.module_output = module_output
+        elif isinstance(module_output, str):
+             self.module_output = open(module_output, 'w')
+        else:
+            print "Unable to access " + str(module_output)
+            raise IOError
 
-    def LogModuleError(self, error_message):
-        print "Not jet implemented"
+        if isinstance(module_error, file):
+            self.module_error = module_error
+        elif isinstance(module_error, str):
+             self.module_error = open(module_error, 'w')
+        else:
+            print "Unable to access " + str(module_error)
+            raise IOError
 
-    def LogModuleOutput(self, output_message):
-        print "Not jet implemented"
+    def LogModuleStderr(self, message):
+        """Write the module message on stderr into the module error logfile"""
+        self.module_error.write(message)
+        self.module_error.flush()
+
+    def LogModuleStdout(self, message):
+        """Write the module message on stdout into the module output logfile"""
+        self.module_error.write(message)
+        self.module_error.flush()

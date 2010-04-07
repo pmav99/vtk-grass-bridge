@@ -14,6 +14,7 @@
 
 [ComplexData]
  Identifier=input
+ MaxOccurs=1
  PathToFile=roads.gml
  MimeType=text/xml
  Encoding=UTF-8
@@ -30,12 +31,12 @@
  Value=cat
 
 [LiteralData]
- Identifier=ns_resolution
+ Identifier=grass_resolution_ns
  DataType=double
  Value=10
 
 [LiteralData]
- Identifier=ew_resolution
+ Identifier=grass_resolution_ew
  DataType=double
  Value=10
 
