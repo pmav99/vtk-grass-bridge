@@ -33,6 +33,7 @@ class ComplexData():
     def __init__(self, file):
         self.__file = file
         self.identifer = ""
+        self.maxOccurs= ""
         self.pathToFile = ""
         self.mimeType = ""
         self.schema = ""
@@ -41,7 +42,7 @@ class ComplexData():
 
     ############################################################################
     def __parseFile(self):
-        for i in range(5):
+        for i in range(6):
             string = self.__file.readline()
             if string == "":
                 return
@@ -50,6 +51,9 @@ class ComplexData():
                 if splitstring[0].upper().find("IDENTIFIER") != -1:
                     self.identifier = splitstring[1].rstrip()
                     #print self.identifier
+                if splitstring[0].upper().find("MAXOCCURS") != -1:
+                    self.maxOccurs = splitstring[1].rstrip()
+                    #print self.maxOccurs
                 if splitstring[0].upper().find("PATHTOFILE") != -1:
                     self.pathToFile = splitstring[1].rstrip()
                     #print self.pathToFile
@@ -148,23 +152,23 @@ class InputParameter(ProcessLogging):
                 break
 
             if string.upper().find("[SYSTEM]") != -1:
-                print string.upper()
+                #print string.upper()
                 self.__parseSystem()
 
             if string.upper().find("[GRASS]") != -1:
-                print string.upper()
+                #print string.upper()
                 self.__parseGrass()
 
             if string.upper().find("[COMPLEXDATA]") != -1:
-                print string.upper()
+                #print string.upper()
                 self.complexDataList.append(ComplexData(self.__file))
 
             if string.upper().find("[COMPLEXOUTPUT]") != -1:
-                print string.upper()
+                #print string.upper()
                 self.complexOutputList.append(ComplexOutput(self.__file))
 
             if string.upper().find("[LITERALDATA]") != -1:
-                print string.upper()
+                #print string.upper()
                 self.literalDataList.append(LiteralData(self.__file))
 
     ############################################################################
@@ -178,10 +182,10 @@ class InputParameter(ProcessLogging):
             if len(splitstring) > 1:
                 if splitstring[0].upper().find("WORKDIR") != -1:
                     self.workDir = splitstring[1].rstrip()
-                    print self.workDir
+                    #print self.workDir
                 if splitstring[0].upper().find("OUTPUTDIR") != -1:
                     self.outputDir = splitstring[1].rstrip()
-                    print self.outputDir
+                    #print self.outputDir
 
 
     ############################################################################
@@ -195,25 +199,25 @@ class InputParameter(ProcessLogging):
             if len(splitstring) > 1:
                 if splitstring[0].upper().find("GISBASE") != -1:
                     self.grassGisBase = splitstring[1].rstrip()
-                    print self.grassGisBase
+                    #print self.grassGisBase
                 if splitstring[0].upper().find("GRASS_ADDON_PATH") != -1:
                     self.grassAddonPath = splitstring[1].rstrip()
-                    print self.grassAddonPath
+                    #print self.grassAddonPath
                 if splitstring[0].upper().find("GRASS_VERSION") != -1:
                     self.grassVersion = splitstring[1].rstrip()
-                    print self.grassVersion
+                    #print self.grassVersion
                 if splitstring[0].upper().find("MODULE") != -1:
                     self.grassModule = splitstring[1].rstrip()
-                    print self.grassModule
+                    #print self.grassModule
                 if splitstring[0].upper().find("LOCATION") != -1:
                     self.location = splitstring[1].rstrip()
-                    print self.location
+                    #print self.location
                 if splitstring[0].upper().find("LINKINPUT") != -1:
                     self.linkInput = splitstring[1].rstrip()
-                    print self.linkInput
+                    #print self.linkInput
                 if splitstring[0].upper().find("IGNOREPROJECTION") != -1:
                     self.ignoreProjection = splitstring[1].rstrip()
-                    print self.ignoreProjection
+                    #print self.ignoreProjection
                 if splitstring[0].upper().find("USRXYLOCATION") != -1:
                     self.useXYLocation = splitstring[1].rstrip()
-                    print self.useXYLocation
+                    #print self.useXYLocation

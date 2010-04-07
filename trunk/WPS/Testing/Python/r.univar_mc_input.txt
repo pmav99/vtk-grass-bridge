@@ -14,27 +14,8 @@
 
 [ComplexData]
  Identifier=map
- MaxOccurs=1
- PathToFile=elev_srtm_30m.tiff
- MimeType=image/tiff
- Encoding=
- Schema=
-
-[LiteralData]
- Identifier=grass_band_number
- DataType=integer
- Value=1
-
-[ComplexData]
- Identifier=map
- PathToFile=elev_srtm_30m.tiff
- MimeType=image/tiff
- Encoding=
- Schema=
-
-[ComplexData]
- Identifier=map
- PathToFile=elev_srtm_30m.tiff
+ MaxOccurs=1024
+ PathToFile=SoilsMultiChannel.tiff
  MimeType=image/tiff
  Encoding=
  Schema=

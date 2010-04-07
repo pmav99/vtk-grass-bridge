@@ -14,8 +14,8 @@
 
 [ComplexData]
  Identifier=map
- MaxOccurs=1
- PathToFile=elev_srtm_30m.tiff
+ MaxOccurs=1024
+ PathToFile=SoilsMultiChannel.tiff
  MimeType=image/tiff
  Encoding=
  Schema=
@@ -27,14 +27,16 @@
 
 [ComplexData]
  Identifier=map
- PathToFile=elev_srtm_30m.tiff
+ PathToFile=SoilsMultiChannel.tiff
+ MaxOccurs=1024
  MimeType=image/tiff
  Encoding=
  Schema=
 
 [ComplexData]
  Identifier=map
- PathToFile=elev_srtm_30m.tiff
+ PathToFile=SoilsMultiChannel.tiff
+ MaxOccurs=1024
  MimeType=image/tiff
  Encoding=
  Schema=

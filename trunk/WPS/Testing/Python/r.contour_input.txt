@@ -3,7 +3,7 @@
  OutputDir=/tmp
 
 [GRASS]
- GISBASE=/home/soeren/src/grass7.0/grass_trunk/dist.i686-pc-linux-gnu
+ GISBASE=/1/gebbert/src/grass_dev/grass_trunk/dist.i686-pc-linux-gnu
  GRASS_ADDON_PATH=
  GRASS_VERSION=7.0.svn
  Module=r.contour
@@ -14,10 +14,16 @@
 
 [ComplexData]
  Identifier=input
+ MaxOccurs=1
  PathToFile=elev_srtm_30m.tiff
  MimeType=image/tiff
  Encoding=
  Schema=
+
+[LiteralData]
+ Identifier=grass_band_number
+ DataType=integer
+ Value=1
 
 [LiteralData]
  Identifier=levels
