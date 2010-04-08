@@ -393,13 +393,17 @@ class GrassModuleStarter(ModuleLogging):
     def __runProcess(self, inputlist):
         """This function runs a process and logs the stdout and stderr"""
 
-        self.LogInfo("Run process: " + str(inputlist))
-        proc = subprocess.Popen(args=inputlist, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        self.runPID = proc.pid
-        self.LogInfo("Process pid: " + str(self.runPID))
-        stdout_buff, stderr_buff = proc.communicate()
-        self.LogInfo(stdout_buff)
-        self.LogInfo(stderr_buff)
+        try:
+            self.LogInfo("Run process: " + str(inputlist))
+            proc = subprocess.Popen(args=inputlist, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            self.runPID = proc.pid
+            self.LogInfo("Process pid: " + str(self.runPID))
+            stdout_buff, stderr_buff = proc.communicate()
+            self.LogInfo(stdout_buff)
+            self.LogInfo(stderr_buff)
+        except:
+            self.LogError("Unable to execute process: " + str(inputlist))
+            raise
 
         return proc.returncode, stdout_buff, stderr_buff
 
