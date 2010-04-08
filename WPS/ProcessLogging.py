@@ -20,8 +20,6 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
-import os
-
 class ProcessLogging():
     """This class initiates the logging mechanism and is the base class for all
     other classes, which have information to be logged.
@@ -38,31 +36,37 @@ class ProcessLogging():
         elif isinstance(logfile, str):
              self.logfile = open(logfile, 'w')
         else:
-            print "Unable to access " + str(logfile)
+            print "ERROR: Unable to access " + str(logfile)
             raise IOError
 
     def LogInfo(self, message):
         """Write an info message into the logfile"""
-        self.logfile.write("\n<INFO>\n")
-        self.logfile.write(message)
-        self.logfile.write("\n</INFO>\n")
-        self.logfile.flush()
+        if message != None and message != "":
+            self.logfile.write("\n<INFO>\n")
+            self.logfile.write(message)
+            self.logfile.write("\n</INFO>\n")
+            self.logfile.flush()
         
 
     def LogWarning(self, message):
         """Write a warning message into the logfile"""
-        self.logfile.write("\n<WARNING>\n")
-        self.logfile.write(message)
-        self.logfile.write("\n</WARNING>\n")
-        self.logfile.flush()
+        if message != None and message != "":
+            self.logfile.write("\n<WARNING>\n")
+            self.logfile.write(message)
+            self.logfile.write("\n</WARNING>\n")
+            self.logfile.flush()
 
     def LogError(self, message):
         """Write an error message into the logfile"""
-        self.logfile.write("\n<ERROR>\n")
-        self.logfile.write(message)
-        self.logfile.write("\n</ERROR>\n")
-        self.logfile.flush()
+        if message != None and message != "":
+            self.logfile.write("\n<ERROR>\n")
+            self.logfile.write(message)
+            self.logfile.write("\n</ERROR>\n")
+            self.logfile.flush()
 
+###############################################################################
+###############################################################################
+###############################################################################
 
 class ModuleLogging(ProcessLogging):
     """This class initiates the logging mechanism for the called grass module.
@@ -77,7 +81,7 @@ class ModuleLogging(ProcessLogging):
         elif isinstance(module_output, str):
              self.module_output = open(module_output, 'w')
         else:
-            print "Unable to access " + str(module_output)
+            print "ERROR: Unable to access " + str(module_output)
             raise IOError
 
         if isinstance(module_error, file):
@@ -85,15 +89,17 @@ class ModuleLogging(ProcessLogging):
         elif isinstance(module_error, str):
              self.module_error = open(module_error, 'w')
         else:
-            print "Unable to access " + str(module_error)
+            print "ERROR: Unable to access " + str(module_error)
             raise IOError
 
     def LogModuleStderr(self, message):
-        """Write the module message on stderr into the module error logfile"""
-        self.module_error.write(message)
-        self.module_error.flush()
+        if message != None and message != "":
+            """Write the module message on stderr into the module error logfile"""
+            self.module_error.write(message)
+            self.module_error.flush()
 
     def LogModuleStdout(self, message):
-        """Write the module message on stdout into the module output logfile"""
-        self.module_error.write(message)
-        self.module_error.flush()
+        if message != None and message != "":
+            """Write the module message on stdout into the module output logfile"""
+            self.module_error.write(message)
+            self.module_error.flush()
