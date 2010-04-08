@@ -23,6 +23,7 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
 import subprocess
+import shutil
 from optparse import OptionParser
 import os
 import os.path
@@ -30,11 +31,14 @@ import tempfile
 from ParameterParser import *
 from GrassSettings import *
 from ProcessLogging import *
+from ErrorHandler import *
 
 GRASS_LOCATION_NAME = "startLocation"
 GRASS_WORK_LOCATION = "workLocation"
 GRASS_MAPSET_NAME = "PERMANENT"
 GRASS_WPS_KEYWORD_LIST = ["grass_resolution_ns", "grass_resolution_ew", "grass_band_number"]
+
+GMS_DEBUG = True
 
 
 # This module needs an input file for processing. All input and output parameter
@@ -207,11 +211,13 @@ class GrassModuleStarter(ModuleLogging):
         # Initiate the logfiles
         ModuleLogging.__init__(self, logfile, module_output, module_error)
 
+        # Do all the work
         try:
             self.__run()
         except:
+            raise 
+        finally:
             self.__closeLogfiles()
-            raise
 
     def __run(self):
 
@@ -220,7 +226,8 @@ class GrassModuleStarter(ModuleLogging):
         try:
             self.inputParameter.parseFile(self.inputFile)
         except:
-            self.LogError("Error parsing the input file")
+            log = "Error parsing the input file"
+            self.LogError(log)
             raise
 
         # Create the input parameter of literal data
@@ -237,7 +244,8 @@ class GrassModuleStarter(ModuleLogging):
             try:
                 self.__checkModuleForMultipleRasterInputs()
             except:
-                self.LogError("Unable to check for multiple raster inputs")
+                log = "Unable to check for multiple raster inputs"
+                self.LogError(log)
                 raise
             
         # Create a temporal directory for the location and mapset creation
@@ -245,74 +253,112 @@ class GrassModuleStarter(ModuleLogging):
             try:
                 self.gisdbase = tempfile.mkdtemp(dir=self.inputParameter.workDir)
             except:
-                self.LogError("Unable create a temp-directory")
+                log = "Unable create a temp-directory"
+                self.LogError(log)
                 raise
         else:
             try:
                 self.gisdbase = tempfile.mkdtemp()
             except:
-                self.LogError("Unable create a temp-directory")
+                log = "Unable create a temp-directory"
+                self.LogError(log)
                 raise
 
+        # Add Error messages
         try:
-            os.mkdir(os.path.join(self.gisdbase, GRASS_LOCATION_NAME))
-            os.mkdir(os.path.join(self.gisdbase, GRASS_LOCATION_NAME, GRASS_MAPSET_NAME))
+            try:
+                os.mkdir(os.path.join(self.gisdbase, GRASS_LOCATION_NAME))
+                os.mkdir(os.path.join(self.gisdbase, GRASS_LOCATION_NAME, GRASS_MAPSET_NAME))
+            except:
+                raise
+
+            self.fullmapsetpath = os.path.join(self.gisdbase, GRASS_LOCATION_NAME, GRASS_MAPSET_NAME)
+
+            # set the evironment variables for grass (Unix system only)
+            try:
+                self.__setEnvironment()
+            except:
+                raise
+
+            # gisrc and wind file creation
+            try:
+                self.gisrc = GrassGisRC(self.gisdbase, GRASS_LOCATION_NAME, GRASS_MAPSET_NAME, self.logfile)
+                self.gisrc.writeFile(tempdir = self.gisdbase)
+                self.gisrcfile = self.gisrc.getFileName()
+                self.LogInfo("Created gisrc file " + str(self.gisrcfile))
+            except:
+                raise
+
+            try:
+                self.wind = GrassWindFile(self.gisdbase, GRASS_LOCATION_NAME, GRASS_MAPSET_NAME, self.logfile)
+                self.windfile = self.wind.getFileName()
+                self.LogInfo("Created WIND file " + str(self.windfile))
+            except:
+                raise
+
+            # Create the new location based on the first input and import all maps
+            try:
+                self.__importData()
+            except:
+                raise
+
+            # start the grass module one or multiple times, depending on the multiple import parameter
+            try:
+                self.__startGrassModule()
+            except:
+                raise
+
+            # now export the results
+            try:
+                self.__exportOutput()
+            except:
+                raise
         except:
             raise
-
-        self.fullmapsetpath = os.path.join(self.gisdbase, GRASS_LOCATION_NAME, GRASS_MAPSET_NAME)
-
-        # set the evironment variables for grass (Unix system only)
-        try:
-            self.__setEnvironment()
-        except:
-            raise
-        
-        # gisrc and wind file creation
-        try:
-            self.gisrc = GrassGisRC(self.gisdbase, GRASS_LOCATION_NAME, GRASS_MAPSET_NAME, self.logfile)
-            self.gisrc.writeFile(tempdir = self.gisdbase)
-            self.gisrcfile = self.gisrc.getFileName()
-            self.LogInfo("Created gisrc file " + str(self.gisrcfile))
-        except:
-            raise
-
-        try:
-            self.wind = GrassWindFile(self.gisdbase, GRASS_LOCATION_NAME, GRASS_MAPSET_NAME, self.logfile)
-            self.windfile = self.wind.getFileName()
-            self.LogInfo("Created WIND file " + str(self.windfile))
-        except:
-            raise
-
-        # Create the new location based on the first input and import all maps
-        try:
-            self.__importData()
-        except:
-            raise
-
-        # start the grass module one or multiple times, depending on the multiple import parameter
-        try:
-            self.__startGrassModule()
-        except:
-            raise
-
-        # now export the results
-        try:
-            self.__exportOutput()
-        except:
-            raise
-
-        # cleanup the temporary data
-        try:
+        finally:
             self.__removeTempData()
-        except:
-            raise
 
-        self.__closeLogfiles()
+    ############################################################################
+    def __checkModuleForMultipleRasterInputs(self):
+        """ Check if the grass module supports multiple inputs """
+        SingleInputCount = 0
+        MultipleInputCount = 0
+        self.LogInfo("Check for multiple import")
+        for input in self.inputParameter.complexDataList:
+            if self.__isRaster(input):
+                if(input.maxOccurs > 1):
+                    MultipleInputCount += 1
+                else:
+                    SingleInputCount += 1
+
+        if MultipleInputCount > 0 and SingleInputCount > 0:
+            self.multipleRasterProcessing = True
+        elif MultipleInputCount == 0 and SingleInputCount > 0:
+            self.multipleRasterProcessing = True
+        elif MultipleInputCount > 0 and SingleInputCount == 0:
+            self.multipleRasterProcessing = False
+        else:
+            self.multipleRasterProcessing = False
+            self.multipleRasterImport = False
+            self.bandNumber = 0
+
+
+    ############################################################################
+    def __checkBandNumber(self):
+        """ Check if a band number is provided as literal data, if not multiple
+        import is enabled even the input file contains only one band """
+        self.LogInfo("Check if a band number is present")
+        self.multipleRasterImport = True
+        self.bandNumber = 0
+        for i in self.inputMap:
+            if i == "grass_band_number" and self.inputMap[i] != "":
+                self.bandNumber = int(self.inputMap[i])
+                self.multipleRasterImport = False
+                self.LogInfo("Noticed grass_band_number: " + str(self.bandNumber))
 
     ############################################################################
     def __closeLogfiles(self):
-        # Close all logfiles
+        """ Close all logfiles """
         self.logfile.close()
         self.module_output.close()
         self.module_error.close()
@@ -320,11 +366,14 @@ class GrassModuleStarter(ModuleLogging):
     ############################################################################
     def __removeTempData(self):
         # remove the created directory
-        try:
-            self.LogInfo("Remove " + str(self.gisdbase))
-            os.rmdir(self.gisdbase)
-        except:
-            pass
+        if os.path.isdir(str(self.gisdbase)):
+            try:
+                self.LogInfo("Remove " + str(self.gisdbase))
+                shutil.rmtree(self.gisdbase)
+            except:
+                log = "Unable to remove temporary grass location " + str(self.gisdbase)
+                self.LogError(log)
+                raise
 
     ############################################################################
     def __setEnvironment(self):
@@ -341,16 +390,31 @@ class GrassModuleStarter(ModuleLogging):
         self.genv.getEnvVariables()
 
     ############################################################################
+    def __runProcess(self, inputlist):
+        """This function runs a process and logs the stdout and stderr"""
+
+        self.LogInfo("Run process: " + str(inputlist))
+        proc = subprocess.Popen(args=inputlist, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        self.runPID = proc.pid
+        self.LogInfo("Process pid: " + str(self.runPID))
+        stdout_buff, stderr_buff = proc.communicate()
+        self.LogInfo(stdout_buff)
+        self.LogInfo(stderr_buff)
+
+        return proc.returncode, stdout_buff, stderr_buff
+
+    ############################################################################
     def __importData(self):
+        """Import all ComplexData inputs which are raster or vector files. Take care of multiple inputs and group generation"""
         list = self.inputParameter.complexDataList
 
-        # The list may be empty
+        # The list may be empty in case no input is provided
         if len(list) == 0:
             return
 
-        #Debug
-        parameter = ["g.region", '-p']
-        errorid, stdout_buff, stderr_buff = self.__runProcess(parameter)
+        if GMS_DEBUG:
+            parameter = ["g.region", '-p']
+            errorid, stdout_buff, stderr_buff = self.__runProcess(parameter)
 
         # Create a new location based on the first input map
         self.__createInputLocation(list[0])
@@ -362,10 +426,11 @@ class GrassModuleStarter(ModuleLogging):
         # Set the region resolution in case resolution values are provided as literal data
         self.__setRegionResolution()
         
-        #Debug
-        parameter = ["g.region", '-p']
-        errorid, stdout_buff, stderr_buff = self.__runProcess(parameter)
+        if GMS_DEBUG:
+            parameter = ["g.region", '-p']
+            errorid, stdout_buff, stderr_buff = self.__runProcess(parameter)
 
+        # In case no band number was provided but the input has only one band, the data will be imported not linked
         if self.inputParameter.linkInput == "FALSE" or self.multipleRasterImport == True or self.multipleRasterProcessing == True:
             for i in list:
                 self.__importInput(i)
@@ -398,7 +463,7 @@ class GrassModuleStarter(ModuleLogging):
 
     ############################################################################
     def __isTextFile(self, input):
-        """Check for vector input"""
+        """Check for text file input"""
         if input.mimeType.upper() == "TEXT/PLAIN":
             self.LogInfo("Text file recognized")
             return "TXT"
@@ -408,66 +473,32 @@ class GrassModuleStarter(ModuleLogging):
     ############################################################################
     def __createInputLocation(self, input):
         """Creat a new work location based on an input dataset"""
-        # TODO: implement correct and meaningful error handling and error messages
         
         if self.__isRaster(input) != "":
             parameter = ["r.in.gdal", "input=" + input.pathToFile, "location=" + GRASS_WORK_LOCATION , "-ce", "output=undefined"]
             errorid, stdout_buff, stderr_buff = self.__runProcess(parameter)
 
             if errorid != 0:
-                self.LogError("Unable to create input location from input " + str(input.pathToFile))
-                raise IOError
+                log = "Unable to create input location from input " + str(input.pathToFile)
+                self.LogError(log)
+                raise GMSError(log)
 
         elif self.__isVector(input) != "":
             parameter = ["v.in.ogr", "dsn=" + input.pathToFile, "location=" + GRASS_WORK_LOCATION , "-ce", "output=undefined"]
             errorid, stdout_buff, stderr_buff = self.__runProcess(parameter)
 
             if errorid != 0:
-                self.LogError("Unable to create input location from input " + str(input.pathToFile))
-                raise IOError
+                log = "Unable to create input location from input " + str(input.pathToFile)
+                self.LogError(log)
+                raise GMSError(log)
             
         elif self.__isTextFile(input) != "":
             return
         else:
-            self.LogError("Unable to create input location from input " + str(input.pathToFile))
-            raise IOError
+            log = "Unable to create input location from input " + str(input.pathToFile)
+            self.LogError(log)
+            raise GMSError(log)
 
-    ############################################################################
-    def __checkModuleForMultipleRasterInputs(self):
-        # Check if the module supports multiple inputs
-        SingleInputCount = 0
-        MultipleInputCount = 0
-        self.LogInfo("Check for multiple import")
-        for input in self.inputParameter.complexDataList:
-            if self.__isRaster(input):
-                if(input.maxOccurs > 1):
-                    MultipleInputCount += 1
-                else:
-                    SingleInputCount += 1
-
-        if MultipleInputCount > 0 and SingleInputCount > 0:
-            self.multipleRasterProcessing = True
-        elif MultipleInputCount == 0 and SingleInputCount > 0:
-            self.multipleRasterProcessing = True
-        elif MultipleInputCount > 0 and SingleInputCount == 0:
-            self.multipleRasterProcessing = False
-        else:
-            self.multipleRasterProcessing = False
-            self.multipleRasterImport = False
-            self.bandNumber = 0
-
-                
-    ############################################################################
-    def __checkBandNumber(self):
-        # Check if a band number is provided as literal data
-        self.LogInfo("Check if a band number is present")
-        self.multipleRasterImport = True
-        self.bandNumber = 0
-        for i in self.inputMap:
-            if i == "grass_band_number" and self.inputMap[i] != "":
-                self.bandNumber = int(self.inputMap[i])
-                self.multipleRasterImport = False
-                self.LogInfo("Noticed grass_band_number: " + str(self.bandNumber))
 
     ############################################################################
     def __setRegionResolution(self):
@@ -487,14 +518,14 @@ class GrassModuleStarter(ModuleLogging):
                 proc = subprocess.Popen(["g.region", "ewres=" + str(ew), "nsres=" + str(ns)])
                 proc.communicate()
                 if proc.returncode != 0:
-                    self.LogError("Unable to set the region resolution")
-                    raise IOError
+                    log = "Unable to set the region resolution"
+                    self.LogError(log)
+                    raise GMSError(log)
 
     ############################################################################
     def __linkInput(self, input):
         """Link the input data into a grass work location"""
         self.LogInfo("Link input")
-        # TODO: implement correct and meaningful error handling and error messages
 
         inputName = "input_" + str(self.inputCounter)
 
@@ -509,69 +540,32 @@ class GrassModuleStarter(ModuleLogging):
 
             # If the linking fails, import the data with r.in.gdal
             if errorid != 0:
-                self.LogInfo("Unable to link the raster map, try to import.")
+                self.LogInfo("Unable to link the raster map" + input.pathToFile + " try to import.")
                 try:
                     self.__importInput(input)
                 except:
-                    self.LogError("Unable to link or import the raster map into the grass mapset")
-                    raise IOError
+                    log = "Unable to link or import the raster map " + input.pathToFile + " into the grass mapset"
+                    self.LogError(log)
+                    raise GMSError(log)
                 return
 
-            # Debugoutput
-            parameter = ["r.info", inputName ]
-            errorid, stdout_buff, stderr_buff = self.__runProcess(parameter)
+            if GMS_DEBUG:
+                parameter = ["r.info", inputName ]
+                errorid, stdout_buff, stderr_buff = self.__runProcess(parameter)
 
         elif self.__isVector(input) != "":
             # Linking does not work properly right now for GML -> no random access, so we import the vector data
             self.__importInput(input)
             return
-        
         elif self.__isTextFile(input) != "":
             self.__updateInputMap(input, input.pathToFile)
             return
         else:
-            raise IOError
+            log = "An unexpected error occured while input linking into the grass mapsets, input " + str(input.pathToFile)
+            self.LogError(log)
+            raise GMSError(log)
 
         self.__updateInputMap(input, inputName)
-
-    ############################################################################
-    def __runProcess(self, inputlist):
-        """This function runs a process and logs the stdout and stderr"""
-
-        self.LogInfo("Run process: " + str(inputlist))
-        proc = subprocess.Popen(args=inputlist, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        self.runPID = proc.pid
-        self.LogInfo("Process pid: " + str(self.runPID))
-        stdout_buff, stderr_buff = proc.communicate()
-        self.LogInfo(stdout_buff)
-        self.LogInfo(stderr_buff)
-
-        return proc.returncode, stdout_buff, stderr_buff
-
-    ############################################################################
-    def __checkForRasterGroup(self, inputName):
-        """This function checks if inputName is a grass group and returns the 
-        raster map names of the group as single string"""
-        name = ""
-        
-        parameter = ["i.group", "group=" + inputName, "-g"]
-
-        errorid, stdout_buff, stderr_buff = self.__runProcess(parameter)
-         
-        if errorid != 0:
-            # no group was found, maybe stderr_buff should be parsed for keywords?
-            return inputName
-        else:
-            count = 0
-            for i in stdout_buff.split():
-
-                if count > 0:
-                    names += "," + str(i)
-                else:
-                    names = i
-                count += 1
-
-        return names
 
     ############################################################################
     def __importInput(self, input):
@@ -593,16 +587,18 @@ class GrassModuleStarter(ModuleLogging):
             errorid, stdout_buff, stderr_buff = self.__runProcess(parameter)
 
             if errorid != 0:
-                self.LogError("Unable to import " + inputName)
-                raise IOError
+                log = "Unable to import " + inputName
+                self.LogError(log)
+                raise GMSError(log)
 
             # Check if r.in.gdal created a group and put these file names into inputName
-            inputName = self.__checkForRasterGroup(inputName)
+            if self.bandNumber == 0:
+                inputName = self.__checkForRasterGroup(inputName)
 
-            # For debugging
-            for i in inputName.split(','):
-                parameter = ["r.info", i ]
-                errorid, stdout_buff, stderr_buff = self.__runProcess(parameter)
+            if GMS_DEBUG:
+                for i in inputName.split(','):
+                    parameter = ["r.info", i ]
+                    errorid, stdout_buff, stderr_buff = self.__runProcess(parameter)
             
         # import the vector data via ogr
         elif self.__isVector(input) != "":
@@ -610,12 +606,13 @@ class GrassModuleStarter(ModuleLogging):
             errorid, stdout_buff, stderr_buff = self.__runProcess(parameter)
 
             if errorid != 0:
-                self.LogError("Unable to import " + inputName)
-                raise IOError
+                log = "Unable to import " + inputName
+                self.LogError(log)
+                raise GMSError(log)
 
-            # Debug
-            parameter = ["v.info", inputName ]
-            errorid, stdout_buff, stderr_buff = self.__runProcess(parameter)
+            if GMS_DEBUG:
+                parameter = ["v.info", inputName ]
+                errorid, stdout_buff, stderr_buff = self.__runProcess(parameter)
 
 
         # Text input file, no need to create a new name or for import, use the path as input
@@ -623,14 +620,41 @@ class GrassModuleStarter(ModuleLogging):
             self.__updateInputMap(input, input.pathToFile)
             return
         else:
-            self.LogError("Unable to register textfile " + str(input.pathToFile))
-            raise IOError
+            log = "Unable to register textfile " + str(input.pathToFile)
+            self.LogError(log)
+            raise GMSError(log)
 
         self.__updateInputMap(input, inputName)
 
     ############################################################################
+    def __checkForRasterGroup(self, inputName):
+        """This function checks if inputName is a grass group and returns the
+        raster map names of the group as single string connected via ,"""
+        name = ""
+
+        parameter = ["i.group", "group=" + inputName, "-g"]
+
+        errorid, stdout_buff, stderr_buff = self.__runProcess(parameter)
+
+        if errorid != 0:
+            # no group was found, maybe stderr_buff should be parsed for keywords?
+            # We return the group name, which is the raster map name
+            return inputName
+        else:
+            count = 0
+            for i in stdout_buff.split():
+
+                if count > 0:
+                    names += "," + str(i)
+                else:
+                    names = i
+                count += 1
+
+        return names
+
+    ############################################################################
     def __updateInputMap(self, input, inputName):
-        # Connect the values if multiple defined
+        """ Update the input map and connect the inputs if multiple defined """
         if self.inputMap.has_key(input.identifier):
             self.inputMap[input.identifier] += "," + inputName
         else:
@@ -689,8 +713,9 @@ class GrassModuleStarter(ModuleLogging):
                 errorid, stdout_buff, stderr_buff = self.__runProcess(parameter)
 
                 if errorid != 0:
-                    self.LogError("Unable to export " + inputName)
-                    raise IOError
+                    log = "Unable to export " + inputName
+                    self.LogError(log)
+                    raise GMSError(log)
 
             # export the data via ogr
             elif self.__isVector(output) != "":
@@ -698,11 +723,13 @@ class GrassModuleStarter(ModuleLogging):
                 errorid, stdout_buff, stderr_buff = self.__runProcess(parameter)
 
                 if errorid != 0:
-                    self.LogError("Unable to export " + inputName)
-                    raise IOError
+                    log = "Unable to export " + inputName
+                    self.LogError(log)
+                    raise GMSError(log)
             else:
-                self.LogError("Unable to export " + inputName)
-                raise IOError
+                log = "Unable to export " + inputName
+                self.LogError(log)
+                raise GMSError(log)
 
     ############################################################################
     def __startGrassModule(self):
@@ -729,8 +756,9 @@ class GrassModuleStarter(ModuleLogging):
         self.LogModuleStderr(stderr_buff)
 
         if errorid != 0:
-            self.LogError("Error while executing the grass module")
-            raise IOError
+            log = "Error while executing the grass module"
+            self.LogError(log)
+            raise GMSError(log)
 
 ###############################################################################
 ###############################################################################

@@ -21,11 +21,6 @@
  Schema=
 
 [LiteralData]
- Identifier=grass_band_number
- DataType=integer
- Value=1
-
-[LiteralData]
  Identifier=-s
  DataType=boolean
  Value=true
@@ -36,21 +31,21 @@
  Value=500
 
 [ComplexOutput]
- Identifier=accumulation
+ Identifier=accumulation_output
  PathToFile=/tmp/elev_srtm_30m_acc.tiff
  MimeType=image/tiff
  Encoding=
  Schema=
 
 [ComplexOutput]
- Identifier=basin
+ Identifier=basin_output
  PathToFile=/tmp/elev_srtm_30m_basin.tiff
  MimeType=image/tiff
  Encoding=
  Schema=
 
 [ComplexOutput]
- Identifier=stream
+ Identifier=stream_output
  PathToFile=/tmp/elev_srtm_30m_stream.tiff
  MimeType=image/tiff
  Encoding=
