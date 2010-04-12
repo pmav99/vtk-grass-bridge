@@ -781,7 +781,7 @@ def main():
     parser.add_option("-l", "--logfile", dest="logfile", default="logfile.txt", \
                       help="The name to the logfile. This file logs everything "\
                       "which happens in this module (import, export, location creation ...).", metavar="FILE")
-    parser.add_option("-m", "--module_output", dest="module_output", default="logfile_module_stdout.txt",
+    parser.add_option("-o", "--module_output", dest="module_output", default="logfile_module_stdout.txt",
                       help="The name to the file logging the messages to stdout "\
                       "of the called grass processing module (textual module output).", metavar="FILE")
     parser.add_option("-e", "--module_error", dest="module_error", default="logfile_module_stderr.txt",\

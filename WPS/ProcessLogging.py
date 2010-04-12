@@ -101,5 +101,5 @@ class ModuleLogging(ProcessLogging):
     def LogModuleStdout(self, message):
         if message != None and message != "":
             """Write the module message on stdout into the module output logfile"""
-            self.module_error.write(message)
-            self.module_error.flush()
+            self.module_output.write(message)
+            self.module_output.flush()
