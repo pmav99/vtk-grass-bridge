@@ -38,7 +38,7 @@ class ProcessLogging():
         else:
             print "ERROR: Unable to access " + str(logfile)
             raise IOError
-
+        
     def LogInfo(self, message):
         """Write an info message into the logfile"""
         if message != None and message != "":
