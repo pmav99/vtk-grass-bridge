@@ -80,7 +80,7 @@ GRASS_MAPSET_NAME = "PERMANENT"
 # This keyword list contains all grass related WPS keywords
 GRASS_WPS_KEYWORD_LIST = ["grass_resolution_ns", "grass_resolution_ew", "grass_band_number"]
 
-GMS_DEBUG = True
+GMS_DEBUG = False
 
 ###############################################################################
 ###############################################################################
@@ -184,7 +184,7 @@ class GrassModuleStarter(ModuleLogging):
                 log = "Unable to check for multiple raster inputs"
                 self.LogError(log)
                 raise
-            
+
         # Create a temporal directory for the location and mapset creation
         if self.inputParameter.workDir != "":
             try:
@@ -263,21 +263,25 @@ class GrassModuleStarter(ModuleLogging):
         self.LogInfo("Check for multiple import")
         for input in self.inputParameter.complexDataList:
             if self.__isRaster(input):
-                if(input.maxOccurs > 1):
+                if(int(input.maxOccurs) > 1):
                     MultipleInputCount += 1
                 else:
                     SingleInputCount += 1
 
         if MultipleInputCount > 0 and SingleInputCount > 0:
             self.multipleRasterProcessing = True
+            self.LogInfo("Multiple and single inputs: Enable multiple processing")
         elif MultipleInputCount == 0 and SingleInputCount > 0:
             self.multipleRasterProcessing = True
+            self.LogInfo("Only single inputs: Enable multiple processing")
         elif MultipleInputCount > 0 and SingleInputCount == 0:
             self.multipleRasterProcessing = False
+            self.LogInfo("Only multiple inputs: Disable multiple processing")
         else:
             self.multipleRasterProcessing = False
             self.multipleRasterImport = False
             self.bandNumber = 0
+            self.LogInfo("No inputs: Disable multiple processing")
 
 
     ############################################################################
@@ -610,6 +614,12 @@ class GrassModuleStarter(ModuleLogging):
 
         self.LogInfo("Found maps " + names)
 
+        # Currently multi - band input for single inputs is not supported
+        if self.multipleRasterProcessing == True and count > 1:
+            log = "The process does not support multi - band inputs. Please provide a band number."
+            self.LogError(log)
+            raise GMSError(log)
+
         return names
 
     ############################################################################
@@ -691,7 +701,8 @@ class GrassModuleStarter(ModuleLogging):
 
     ############################################################################
     def __startGrassModule(self):
-        """Create the parameter list and start the grass module"""
+        """Create the parameter list and start the grass module. Search for grass
+        modules in different grass specific directories"""
         self.LogInfo("Start GRASS module " + str(self.inputParameter.grassModule))
         parameter = []
 

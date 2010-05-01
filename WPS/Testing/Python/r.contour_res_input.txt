@@ -35,8 +35,6 @@
  DataType=double
  Value=25
 
-
-
 [LiteralData]
  Identifier=levels
  DataType=double
