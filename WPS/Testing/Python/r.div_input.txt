@@ -1,48 +1,50 @@
-# This script tests multiple - multichannel inputs with a single band number
 [System]
  WorkDir=/tmp
  OutputDir=/tmp
 
 [GRASS]
  GISBASE=/home/soeren/src/grass7.0/grass_trunk/dist.i686-pc-linux-gnu
- GRASS_ADDON_PATH=
+ GRASS_ADDON_PATH=/home/soeren/src/vtkGRASSBridge/vtk-grass-bridge/WPS/Testing/Python/GrassAddons
  GRASS_VERSION=7.0.svn
- Module=r.univar
+ Module=r.add
  LOCATION=
  LinkInput=TRUE
  IgnoreProjection=FALSE
  UseXYLocation=FALSE
 
 [ComplexData]
- Identifier=map
+ Identifier=inputs
  MaxOccurs=1024
  PathToFile=SoilsMultiChannel.tiff
  MimeType=image/tiff
  Encoding=
  Schema=
+
+[ComplexData]
+ Identifier=inputs
+ MaxOccurs=1024
+ PathToFile=SoilsMultiChannel.tiff
+ MimeType=image/tiff
+ Encoding=
+ Schema=
+
+[ComplexData]
+ Identifier=inputs
+ MaxOccurs=1024
+ PathToFile=SoilsMultiChannel.tiff
+ MimeType=image/tiff
+ Encoding=
+ Schema=
+
 
 [LiteralData]
  Identifier=grass_band_number
  DataType=integer
- Value=1
+ Value=3
 
-[ComplexData]
- Identifier=map
- PathToFile=SoilsMultiChannel.tiff
- MaxOccurs=1024
+[ComplexOutput]
+ Identifier=output
+ PathToFile=/tmp/elev_srtm_30m_add.tiff
  MimeType=image/tiff
  Encoding=
  Schema=
-
-[ComplexData]
- Identifier=map
- PathToFile=SoilsMultiChannel.tiff
- MaxOccurs=1024
- MimeType=image/tiff
- Encoding=
- Schema=
-
-[LiteralData]
- Identifier=-g
- DataType=boolean
- Value=true

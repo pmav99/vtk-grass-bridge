@@ -327,8 +327,10 @@ class GrassModuleStarter(ModuleLogging):
         self.genv.env["GRASS_ADDON_PATH"] = self.inputParameter.grassAddonPath
         if os.name != 'posix':
             self.genv.env["PATH"] = str(os.path.join(self.genv.env["GISBASE"], "bin") + ";" + os.path.join(self.genv.env["GISBASE"], "scripts"))
+            self.genv.env["PYTHONPATH"] = str(self.genv.env["PYTHONPATH"] + ";" + os.path.join(self.genv.env["GISBASE"], "etc", "python"))
         else:
             self.genv.env["PATH"] = str(os.path.join(self.genv.env["GISBASE"], "bin") + ":" + os.path.join(self.genv.env["GISBASE"], "scripts"))
+            self.genv.env["PYTHONPATH"] = str(self.genv.env["PYTHONPATH"] + ":" + os.path.join(self.genv.env["GISBASE"], "etc", "python"))
         self.genv.setEnvVariables()
         self.genv.getEnvVariables()
 
@@ -380,12 +382,11 @@ class GrassModuleStarter(ModuleLogging):
             errorid, stdout_buff, stderr_buff = self.__runProcess(parameter)
 
         # In case no band number was provided but the input has only one band, the data will be imported not linked
-        if self.inputParameter.linkInput == "FALSE" or self.multipleRasterImport == True or self.multipleRasterProcessing == True:
+        if self.inputParameter.linkInput == "FALSE":
             for i in list:
                 self.__importInput(i)
         else:
             # Link the inputs into the location
-            # Linking is only available if a band number was provided
             for i in list:
                 self.__linkInput(i)
 
@@ -500,9 +501,14 @@ class GrassModuleStarter(ModuleLogging):
                     raise GMSError(log)
                 return
 
+            # Check if r.external created a group and put these file names into inputName
+            if self.bandNumber == 0:
+                inputName = self.__checkForRasterGroup(inputName)
+                
             if GMS_DEBUG:
-                parameter = [os.path.join(self.inputParameter.grassGisBase, "bin", "r.info"), inputName ]
-                errorid, stdout_buff, stderr_buff = self.__runProcess(parameter)
+                for i in inputName.split(','):
+                    parameter = [os.path.join(self.inputParameter.grassGisBase, "bin", "r.info"), i ]
+                    errorid, stdout_buff, stderr_buff = self.__runProcess(parameter)
 
         elif self.__isVector(input) != "":
             # Linking does not work properly right now for GML -> no random access, so we import the vector data
@@ -580,7 +586,7 @@ class GrassModuleStarter(ModuleLogging):
     def __checkForRasterGroup(self, inputName):
         """This function checks if inputName is a grass group and returns the
         raster map names of the group as single string connected via ,"""
-        name = ""
+        names = ""
         parameter = [os.path.join(self.inputParameter.grassGisBase, "bin", "i.group"), "-g", "group=" + inputName]
         (errorid, stdout_buff, stderr_buff) = self.__runProcess(parameter)
 
@@ -693,13 +699,20 @@ class GrassModuleStarter(ModuleLogging):
         grassModulePath = os.path.join(self.inputParameter.grassGisBase, "bin", self.inputParameter.grassModule)
         
         if os.path.isfile(grassModulePath) == False:
-            self.LogWarning("GRASS module " + self.inputParameter.grassModule + " not found in " + grassModulePath)
+            log = "GRASS module " + self.inputParameter.grassModule + " not found in " + grassModulePath
+            self.LogWarning(log)
             grassModulePath = os.path.join(self.inputParameter.grassGisBase, "scripts", self.inputParameter.grassModule)
             # if the module was not found in the bin dir, test the script directory
             if os.path.isfile(grassModulePath) == False:
                 log = "GRASS module "+ self.inputParameter.grassModule + " not found in "  + grassModulePath
-                self.LogError(log)
-                raise GMSError(log)
+                self.LogWarning(log)
+                grassModulePath = os.path.join(self.inputParameter.grassAddonPath, self.inputParameter.grassModule)
+                # if the module was not found in the script dir, test the addon path
+                if os.path.isfile(grassModulePath) == False:
+                    log = "GRASS module "+ self.inputParameter.grassModule + " not found in "  + grassModulePath
+                    self.LogError(log)
+                    raise GMSError(log)
+
 
         parameter.append(grassModulePath)
 
