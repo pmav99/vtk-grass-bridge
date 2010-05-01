@@ -34,7 +34,7 @@ class GrassEnvironment(ProcessLogging):
 
         ProcessLogging.__init__(self, logfile)
         self.env = {"GISBASE":"", "GISRC":"", "LD_LIBRARY_PATH":"",\
-        "GRASS_ADDON_PATH":"", "GRASS_VERSION":""}
+        "GRASS_ADDON_PATH":"", "GRASS_VERSION":"", "PYTHONPATH":""}
 
     ############################################################################
     def getEnvVariables(self):
