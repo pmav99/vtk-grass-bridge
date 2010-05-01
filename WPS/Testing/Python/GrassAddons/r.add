@@ -34,8 +34,6 @@
 
 import sys
 import os
-
-print os.getenv("PYTHONPATH")
 import grass.script as grass
 
 def main():
