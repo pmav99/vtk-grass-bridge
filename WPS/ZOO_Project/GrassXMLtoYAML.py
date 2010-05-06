@@ -27,7 +27,7 @@ import os.path
 import WPS_1_0_0.OGC_WPS_1_0_0 as wps
 import yaml
 
-class GrassXMLtoZcfg():
+class GrassXMLtoYAML():
     """ Convert a Grass WPS XML file into a ZOO-WPS yaml config file"""
     def __init__(self):
         pass
@@ -61,17 +61,46 @@ class GrassXMLtoZcfg():
                 raise IOError("Only one Process is supported")
             
             for i in doc.ProcessDescription:
-	        proc = {}	    
+	        proc = {}
+
 	        proc['processVersion'] = str(i.processVersion)
 	        proc['storeSupported'] = bool(i.storeSupported)
 	        proc['statusSupported'] = bool(i.statusSupported)
 		proc["Identifier"] = str(i.Identifier.value())
+
+
+                if i.Metadata != None:
+                    metaData = []
+                    for meta in i.Metadata:
+                        content = {}
+                        if meta.title != None:
+                            content["title"] = str(meta.title)
+                        if meta.about != None:
+                            content["about"] = str(meta.about)
+                        if meta.arcrole != None:
+                            content["arcrole"] = str(meta.arcrole)
+                        if meta.actuate != None:
+                            content["actuate"] = str(meta.actuate)
+                        if meta.href != None:
+                            content["href"] = str(meta.href)
+                        if meta.role != None:
+                            content["role"] = str(meta.role)
+                        if meta.type != None:
+                            content["type"] = str(meta.type)
+                        if meta.show != None:
+                            content["show"] = str(meta.show)
+                        metaData.append(content)
+                    proc["Metadata"] = metaData
+
+
 	        ita = self.__getTitleAbstract(i)
 	        for key in ita.keys():
 		    proc[key] = ita[key] 
 	        proc["DataInputs"] = self.__getDataInputs(i)
 	        proc["ProcessOutputs"] = self.__getProcessOutputs(i)
 	        self.__yam["ProcessDescription"] = proc
+
+
 	        
 	    yaml.dump(self.__yam, self.__output, default_flow_style=False)
         except:
@@ -221,7 +250,7 @@ def main():
         parser.print_help()
         parser.error("Booth file names must be provided")
 
-    converter = GrassXMLtoZcfg()
+    converter = GrassXMLtoYAML()
     converter.setGrassXMLFileName(options.xmlfile)
     converter.setZcfgFileName(options.zcfgfile)
     converter.convert()
