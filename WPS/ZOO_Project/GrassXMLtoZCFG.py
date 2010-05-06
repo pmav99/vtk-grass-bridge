@@ -25,7 +25,7 @@ import shutil
 from optparse import OptionParser
 import os
 import os.path
-import WPS_1_0_0.OGC_WPS_1_0_0
+import WPS_1_0_0.OGC_WPS_1_0_0 as wps
 
 class GrassXMLtoZcfg():
     """ Convert a Grass WPS XML file into a ZOO-WPS config file (zcfg)"""
@@ -47,7 +47,7 @@ class GrassXMLtoZcfg():
     def convert(self):
         """Start the conversion from WPS XML to ZOO-WPS config file zcfg"""
         try:
-            doc = WPS_1_0_0.OGC_WPS_1_0_0.CreateFromDocument(file(self.__grassXMLFileName).read())
+            doc = wps.CreateFromDocument(file(self.__grassXMLFileName).read())
             
             if len(doc.ProcessDescription) > 1:
                 raise IOError("Only one Process is supported")
@@ -93,13 +93,13 @@ class GrassXMLtoZcfg():
     def __writeIdentTitleAbstract(self,  element,  indent=""):
         """Write identifier, title,and abstract """
         if element.Identifier != None:
-            self.__output.write(indent + "[" + str(element.Identifier.value()) + "]\n")
+            self.__output.write(indent + "[" + str(element.Identifier.value()).replace(".", "_") + "]\n")
         if element.Title.value() != None:
-            self.__output.write(indent + "Title = " + str(element.Title.value()) + "\n")
+            self.__output.write(indent + "Title = " + str(element.Title.value()).replace("\n"," ").replace("\t",  " ").replace("=",  "::") + "\n")
         else:
             self.__output.write(indent + "Title =\n")
         if element.Abstract != None:
-            self.__output.write(indent + "Abstract = " + str(element.Abstract.value()) + "\n")
+            self.__output.write(indent + "Abstract = " + str(element.Abstract.value()).replace("\n"," ").replace("\t",  " ").replace("=",  "::")  + "\n")
         else:
             self.__output.write(indent + "Abstract =\n")
     
@@ -130,9 +130,11 @@ class GrassXMLtoZcfg():
         self.__output.write("  <LiteralData>\n")
         if element.DataType != None:
             self.__output.write("    DataType   = " + str(element.DataType.value()) + "\n")
-        if element.AllowedValues != None:
-            for i in element.AllowedValues.Value:
-                self.__output.write("    AllowedValue   = " + str(i.value()) + "\n")
+        # Allowed values are not supported for now
+        #if element.AllowedValues != None:
+        #    for i in element.AllowedValues.Value:
+        #        self.__output.write("str(i.value()),")
+        #    self.__output.write("\n")
         self.__output.write("    <Default>\n")
         if element.DefaultValue != None:
             self.__output.write("      value = " + str(element.DefaultValue) + "\n")

@@ -16,7 +16,7 @@
 #############################################################################
 
 #%Module
-#% description: Convert a hight raster map into a vector map with the vtkGreedyTerrainDecimation filter class
+#% description: Convert a DEM raster map into a vector map with the vtkGreedyTerrainDecimation filter class
 #% keywords: raster
 #% keywords: vector
 #% keywords: tin

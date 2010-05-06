@@ -12,7 +12,7 @@
 
 
 #% Module
-#%  description: Adds a raster map with one or more raster maps
+#%  description: Adds two or more raster maps
 #%  keywords: raster
 #%  keywords: math
 #% End
