@@ -112,9 +112,9 @@ class GrassXMLtoYAML():
         """Create the title and abstract for yaml zcfg file"""
         ita = {}
         if element.Title.value() != None:
-            ita["Title"] = str(element.Title.value())
+            ita["Title"] = str(element.Title.value()).replace('\'', '')
         if element.Abstract != None:
-            ita["Abstract"] = str(element.Abstract.value())
+            ita["Abstract"] = str(element.Abstract.value()).replace('\'', '')
             
         return ita
         
@@ -196,8 +196,11 @@ class GrassXMLtoYAML():
             for i in element.AllowedValues.Value:
                 try:
                     if literalData["DataType"] == "boolean":
-                        allowedValues.append(bool(i.value()))
-                    elif literalData["DataType"] == "inreger":
+                        if str(i.value()) == "true":
+                            allowedValues.append(True)
+                        if str(i.value()) == "false":
+                            allowedValues.append(False)
+                    elif literalData["DataType"] == "integer":
                         allowedValues.append(int(i.value()))
                     elif literalData["DataType"] == "float":
                         allowedValues.append(float(i.value()))
@@ -209,8 +212,11 @@ class GrassXMLtoYAML():
         if element.DefaultValue != None:
             try:
                 if literalData["DataType"] == "boolean":
-                    literalData["DefaultValue"] = bool(element.DefaultValue)
-                elif literalData["DataType"] == "inreger":
+                    if element.DefaultValue == "true":
+                        literalData["DefaultValue"] = True
+                    if element.DefaultValue == "false":
+                        literalData["DefaultValue"] = False
+                elif literalData["DataType"] == "integer":
                     literalData["DefaultValue"] = int(element.DefaultValue)
                 elif literalData["DataType"] == "float":
                     literalData["DefaultValue"] = float(element.DefaultValue)

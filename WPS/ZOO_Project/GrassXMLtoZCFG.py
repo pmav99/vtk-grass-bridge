@@ -91,13 +91,13 @@ class GrassXMLtoZcfg():
     def __writeIdentTitleAbstract(self,  element,  indent=""):
         """Write identifier, title,and abstract """
         if element.Identifier != None:
-            self.__output.write(indent + "[" + str(element.Identifier.value()).replace(".", "_") + "]\n")
+            self.__output.write(indent + "[" + str(element.Identifier.value()).replace(".", "_").replace('\'', '') + "]\n")
         if element.Title.value() != None:
-            self.__output.write(indent + "Title = " + str(element.Title.value()).replace("\n"," ").replace("\t",  " ").replace("=",  "::") + "\n")
+            self.__output.write(indent + "Title = " + str(element.Title.value()).replace("\n"," ").replace("\t",  " ").replace("=",  "::").replace('\'', '') + "\n")
         else:
             self.__output.write(indent + "Title =\n")
         if element.Abstract != None:
-            self.__output.write(indent + "Abstract = " + str(element.Abstract.value()).replace("\n"," ").replace("\t",  " ").replace("=",  "::")  + "\n")
+            self.__output.write(indent + "Abstract = " + str(element.Abstract.value()).replace("\n"," ").replace("\t",  " ").replace("=",  "::").replace('\'', '')  + "\n")
         else:
             self.__output.write(indent + "Abstract =\n")
     
