@@ -9,15 +9,12 @@ xsi:schemaLocation="http://www.opengis.net/wps/1.0.0
 	<ProcessDescription wps:processVersion="1" storeSupported="true" statusSupported="true">
 		<ows:Identifier>r.neighbors</ows:Identifier>
 		<ows:Title>Makes each cell category value a function of the category values assigned to the cells around it, and stores new cell values in an output raster map layer.</ows:Title>
-		<ows:Abstract>
-			The manual page of this module is available here:
-			http://grass.osgeo.org/grass70/manuals/html70_user/r.neighbors.html
-		</ows:Abstract>
+		<ows:Abstract>The manual page of this module is available here: http://grass.osgeo.org/grass70/manuals/html70_user/r.neighbors.html</ows:Abstract>
 		<ows:Metadata xlink:title="raster" />
 		<DataInputs>
 			<Input minOccurs="0" maxOccurs="1">
 				<ows:Identifier>grass_resolution_ns</ows:Identifier>
-				<ows:Title>Resolution of the mapset in north-south direction in [m] or [degrees]</ows:Title>
+				<ows:Title>Resolution of the mapset in north-south direction in meters or degrees</ows:Title>
 				<ows:Abstract>This parameter defines the north-south resolution of the mapset in meter or degrees, which should be used to process the input and output raster data. To enable this setting, you need to specify north-south and east-west resolution.</ows:Abstract>
 				<LiteralData>
 					<ows:DataType ows:reference="xs:float">float</ows:DataType>
@@ -27,7 +24,7 @@ xsi:schemaLocation="http://www.opengis.net/wps/1.0.0
 			</Input>
 			<Input minOccurs="0" maxOccurs="1">
 				<ows:Identifier>grass_resolution_ew</ows:Identifier>
-				<ows:Title>Resolution of the mapset in east-west direction in [m] or [degrees]</ows:Title>
+				<ows:Title>Resolution of the mapset in east-west direction in meters or degrees</ows:Title>
 				<ows:Abstract>This parameter defines the east-west resolution of the mapset in meters or degrees, which should be used to process the input and output raster data.  To enable this setting, you need to specify north-south and east-west resolution.</ows:Abstract>
 				<LiteralData>
 					<ows:DataType ows:reference="xs:float">float</ows:DataType>

@@ -21,16 +21,14 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
-import subprocess
-import shutil
 from optparse import OptionParser
 import os
 import os.path
-import WPS_1_0_0.OGC_WPS_1_0_0
+import WPS_1_0_0.OGC_WPS_1_0_0 as wps
 import yaml
 
 class GrassXMLtoZcfg():
-    """ Convert a Grass WPS XML file into a ZOO-WPS config file (zcfg)"""
+    """ Convert a Grass WPS XML file into a ZOO-WPS yaml config file"""
     def __init__(self):
         pass
         
@@ -49,9 +47,9 @@ class GrassXMLtoZcfg():
     def convert(self):
     
         self.__yam = {}
-        """Start the conversion from WPS XML to ZOO-WPS config file zcfg"""
+        """Start the conversion from WPS XML to ZOO-WPS yaml config file"""
         try:
-            doc = WPS_1_0_0.OGC_WPS_1_0_0.CreateFromDocument(file(self.__grassXMLFileName).read())
+            doc = wps.CreateFromDocument(file(self.__grassXMLFileName).read())
             
             zcfg = {}
 
@@ -82,6 +80,7 @@ class GrassXMLtoZcfg():
             self.__closeOutput()
             
     def __getTitleAbstract(self, element):
+        """Create the title and abstract for yaml zcfg file"""
         ita = {}
         if element.Title.value() != None:
             ita["Title"] = str(element.Title.value())
@@ -91,7 +90,7 @@ class GrassXMLtoZcfg():
         return ita
         
     def __getDataInputs(self,  process):
-        """Write all data inputs into the zcfg file"""
+        """Create data inputs for yaml zcfg file"""
 	dataInputs = {}
         for i in process.DataInputs.Input:
             input = {}
@@ -114,7 +113,7 @@ class GrassXMLtoZcfg():
         return dataInputs
   
     def __getProcessOutputs(self,  process):
-        """Write all process outputs into the zcfg file"""
+        """Create process outputs for yaml zcfg file"""
         processOutputs = {}
         for i in process.ProcessOutputs.Output:
             output = {}
@@ -134,7 +133,7 @@ class GrassXMLtoZcfg():
         return processOutputs
         
     def __getComplexData(self,  element):
-        """Write the complex data into the zcfg file"""
+        """Create complex data for yaml zcfg file"""
         complexData = {}
         default = {}
         supported = {}
@@ -159,50 +158,53 @@ class GrassXMLtoZcfg():
         return complexData
         
     def __getLiteralData(self,  element):
-        """Write the literal data into the zcfg file"""
+        """Write the literal data into the yaml zcfg file"""
         literalData = {}
         allowedValues = []
         if element.DataType != None:
             literalData["DataType"] = str(element.DataType.value())
         if element.AllowedValues != None:
             for i in element.AllowedValues.Value:
-                if literalData["DataType"] == "boolean":
-		    allowedValues.append(bool(i.value()))
-                elif literalData["DataType"] == "inreger":
-		    allowedValues.append(int(i.value()))
-                elif literalData["DataType"] == "float":
-		    allowedValues.append(float(i.value()))
-		else:
-		    allowedValues.append(str(i.value()))
+                try:
+                    if literalData["DataType"] == "boolean":
+                        allowedValues.append(bool(i.value()))
+                    elif literalData["DataType"] == "inreger":
+                        allowedValues.append(int(i.value()))
+                    elif literalData["DataType"] == "float":
+                        allowedValues.append(float(i.value()))
+                    else:
+                        allowedValues.append(str(i.value()))
+                except:
+                    allowedValues.append(str(i.value()))
             literalData["AllowdValues"] = allowedValues
         if element.DefaultValue != None:
-	    if literalData["DataType"] == "boolean":
-		literalData["DefaultValue"] = bool(element.DefaultValue)
-	    elif literalData["DataType"] == "inreger":
-		literalData["DefaultValue"] = int(element.DefaultValue)
-	    elif literalData["DataType"] == "float":
-		literalData["DefaultValue"] = float(element.DefaultValue)
-	    else:
-		literalData["DefaultValue"] = str(element.DefaultValue)
+            try:
+                if literalData["DataType"] == "boolean":
+                    literalData["DefaultValue"] = bool(element.DefaultValue)
+                elif literalData["DataType"] == "inreger":
+                    literalData["DefaultValue"] = int(element.DefaultValue)
+                elif literalData["DataType"] == "float":
+                    literalData["DefaultValue"] = float(element.DefaultValue)
+                else:
+                    literalData["DefaultValue"] = str(element.DefaultValue)
+            except:
+                literalData["DefaultValue"] = str(element.DefaultValue)
         else:
             literalData["AnyValue"] = True
+
+        if element.UOMs != None:
+            UOMs = {}
+            supported = []
+            if element.UOMs.Default != None:
+                UOMs["Supported"] = supported
+                UOMs["Default"] = str(element.UOMs.Default.UOM.value())
+            if element.UOMs.Supported != None:
+                for i in element.UOMs.Supported.UOM:
+                    supported.append(str(i.value()))
+                literalData["UOMs"] = UOMs
             
         return literalData
         # Units are missing
-
-    def __writeLiteralData(self,  element):
-        """Write the literal data into the zcfg file"""
-        self.__output.write("  <LiteralData>\n")
-        if element.DataType != None:
-            self.__output.write("    DataType   = " + str(element.DataType.value()) + "\n")
-        if element.AllowedValues != None:
-            for i in element.AllowedValues.Value:
-                self.__output.write("    AllowedValue   = " + str(i.value()) + "\n")
-        self.__output.write("    <Default>\n")
-        if element.DefaultValue != None:
-            self.__output.write("      value = " + str(element.DefaultValue) + "\n")
-        self.__output.write("    </Default>\n")
-        self.__output.write("  </LiteralData>\n")
 
 def main():
     """The main function which will be called if the script is executed directly"""
@@ -211,7 +213,7 @@ def main():
     description = "Use %prog to convert Grass 7.0 WPS XML process description files into ZOO-WPS server YAML config files."
     parser = OptionParser(usage=usage, description=description)
     parser.add_option("-x", "--xmlfile", dest="xmlfile", help="The path to the grass WPS input xml file", metavar="FILE")
-    parser.add_option("-z", "--zcfgfile", dest="zcfgfile", help="Path to the new created zcfg file", metavar="FILE")
+    parser.add_option("-z", "--zcfgfile", dest="zcfgfile", help="Path to the new created yaml file", metavar="FILE")
 
     (options, args) = parser.parse_args()
 
