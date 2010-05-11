@@ -47,11 +47,12 @@ class GrassXMLtoYAML():
     def convert(self):
     
         self.__yam = {}
-        """Start the conversion from WPS XML to ZOO-WPS yaml config file"""
+        """Start the conversion from WPS XML to ZOO-WPS yaml config file.
+           Use nested dictionaries and arrays as data structure. """
         try:
             doc = wps.CreateFromDocument(file(self.__grassXMLFileName).read())
             
-            zcfg = {}
+            zcfg = {} # dict for yaml output generation
 
 	    zcfg['serviceProvider'] = "test_service"
 	    zcfg['serviceType'] = "Python"
@@ -60,18 +61,17 @@ class GrassXMLtoYAML():
             if len(doc.ProcessDescription) > 1:
                 raise IOError("Only one Process is supported")
             
-            for i in doc.ProcessDescription:
-	        proc = {}
+            for process in doc.ProcessDescription:
+	        proc = {} # dict for yaml output generation
 
-	        proc['processVersion'] = str(i.processVersion)
-	        proc['storeSupported'] = bool(i.storeSupported)
-	        proc['statusSupported'] = bool(i.statusSupported)
-		proc["Identifier"] = str(i.Identifier.value())
+	        proc['processVersion'] = str(process.processVersion)
+	        proc['storeSupported'] = bool(process.storeSupported)
+	        proc['statusSupported'] = bool(process.statusSupported)
+		proc["Identifier"] = str(process.Identifier.value())
 
-
-                if i.Metadata != None:
+                if process.Metadata != None:
                     metaData = []
-                    for meta in i.Metadata:
+                    for meta in process.Metadata:
                         content = {}
                         if meta.title != None:
                             content["title"] = str(meta.title)
@@ -93,11 +93,11 @@ class GrassXMLtoYAML():
                     proc["Metadata"] = metaData
 
 
-	        ita = self.__getTitleAbstract(i)
+	        ita = self.__getTitleAbstract(process)
 	        for key in ita.keys():
 		    proc[key] = ita[key] 
-	        proc["DataInputs"] = self.__getDataInputs(i)
-	        proc["ProcessOutputs"] = self.__getProcessOutputs(i)
+	        proc["DataInputs"] = self.__getDataInputs(process)
+	        proc["ProcessOutputs"] = self.__getProcessOutputs(process)
 	        self.__yam["ProcessDescription"] = proc
 
 
@@ -110,7 +110,7 @@ class GrassXMLtoYAML():
             
     def __getTitleAbstract(self, element):
         """Create the title and abstract for yaml zcfg file"""
-        ita = {}
+        ita = {} # dict for yaml output generation
         if element.Title.value() != None:
             ita["Title"] = str(element.Title.value()).replace('\'', '')
         if element.Abstract != None:
@@ -120,52 +120,48 @@ class GrassXMLtoYAML():
         
     def __getDataInputs(self,  process):
         """Create data inputs for yaml zcfg file"""
-	dataInputs = {}
-        for i in process.DataInputs.Input:
-            input = {}
-            ita = self.__getTitleAbstract(i)        
+	dataInputs = {} # dict for yaml output generation
+        for data in process.DataInputs.Input:
+            input = {} # dict for yaml output generation
+            ita = self.__getTitleAbstract(data)
             for key in ita.keys():
                 input[key] = ita[key] 
                 
-            input["minOccurs"] = int(i.minOccurs)
-            input["maxOccurs"] = int(i.maxOccurs)
+            input["minOccurs"] = int(data.minOccurs)
+            input["maxOccurs"] = int(data.maxOccurs)
             
-            if i.ComplexData != None:
-                input["ComplexData"] = self.__getComplexData(i.ComplexData)
-                #self.__writeComplexData(i.ComplexData)
-            if i.LiteralData != None:
-                input["LiteralData"] = self.__getLiteralData(i.LiteralData)
-                #self.__writeLiteralData(i.LiteralData)
+            if data.ComplexData != None:
+                input["ComplexData"] = self.__getComplexData(data.ComplexData)
+            if data.LiteralData != None:
+                input["LiteralData"] = self.__getLiteralData(data.LiteralData)
                 
-            dataInputs[str(i.Identifier.value())] = input
+            dataInputs[str(data.Identifier.value())] = input
             
         return dataInputs
   
     def __getProcessOutputs(self,  process):
         """Create process outputs for yaml zcfg file"""
-        processOutputs = {}
-        for i in process.ProcessOutputs.Output:
-            output = {}
-            ita = self.__getTitleAbstract(i)        
+        processOutputs = {} # dict for yaml output generation
+        for data in process.ProcessOutputs.Output:
+            output = {} # dict for yaml output generation
+            ita = self.__getTitleAbstract(data)
             for key in ita.keys():
                 output[key] = ita[key] 
                 
-            if i.ComplexOutput != None:
-                output["ComplexOutput"] = self.__getComplexData(i.ComplexOutput)
-                #self.__writeComplexData(i.ComplexOutput)
-            if i.LiteralOutput != None:
-                output["ComplexOutput"] = self.__getLiteralData(i.LiteralOutput)
-                #self.__writeLiteralData(i.LiteralOutput)
-                
-            processOutputs[str(i.Identifier.value())] = output
+            if data.ComplexOutput != None:
+                output["ComplexOutput"] = self.__getComplexData(data.ComplexOutput)
+            if data.LiteralOutput != None:
+                output["ComplexOutput"] = self.__getLiteralData(data.LiteralOutput)
+                                
+            processOutputs[str(data.Identifier.value())] = output
             
         return processOutputs
         
     def __getComplexData(self,  element):
         """Create complex data for yaml zcfg file"""
-        complexData = {}
-        default = {}
-        supported = {}
+        complexData = {} # dict for yaml output generation
+        default = {} # dict for yaml output generation
+        supported = {} # dict for yaml output generation
 
         if element.Default.Format.MimeType != None:
             default["MimeType"] = str(element.Default.Format.MimeType)
@@ -175,39 +171,39 @@ class GrassXMLtoYAML():
             default["Schema"] = str(element.Default.Format.Schema)
         complexData["Default"] = default
         
-        for i in element.Supported.Format:
-	  if element.Default.Format.MimeType != None:
-	      supported["MimeType"] = str(element.Default.Format.MimeType)
+        for format in element.Supported.Format:
+	  if format.MimeType != None:
+	      supported["MimeType"] = str(format.MimeType)
 	  if element.Default.Format.Encoding != None:
-	      supported["Encoding"] = str(element.Default.Format.Encoding)
+	      supported["Encoding"] = str(format.Encoding)
 	  if element.Default.Format.Schema != None:
-	      supported["Schema"] = str(element.Default.Format.Schema)
+	      supported["Schema"] = str(format.Schema)
         complexData["Supported"] = supported
         
         return complexData
         
     def __getLiteralData(self,  element):
         """Write the literal data into the yaml zcfg file"""
-        literalData = {}
-        allowedValues = []
+        literalData = {} # dict for yaml output generation
+        allowedValues = [] # array for yaml output generation
         if element.DataType != None:
             literalData["DataType"] = str(element.DataType.value())
         if element.AllowedValues != None:
-            for i in element.AllowedValues.Value:
+            for value in element.AllowedValues.Value:
                 try:
                     if literalData["DataType"] == "boolean":
-                        if str(i.value()) == "true":
+                        if str(value.value()) == "true":
                             allowedValues.append(True)
-                        if str(i.value()) == "false":
+                        if str(value.value()) == "false":
                             allowedValues.append(False)
                     elif literalData["DataType"] == "integer":
-                        allowedValues.append(int(i.value()))
+                        allowedValues.append(int(value.value()))
                     elif literalData["DataType"] == "float":
-                        allowedValues.append(float(i.value()))
+                        allowedValues.append(float(value.value()))
                     else:
-                        allowedValues.append(str(i.value()))
+                        allowedValues.append(str(value.value()))
                 except:
-                    allowedValues.append(str(i.value()))
+                    allowedValues.append(str(value.value()))
             literalData["AllowdValues"] = allowedValues
         if element.DefaultValue != None:
             try:
@@ -228,8 +224,8 @@ class GrassXMLtoYAML():
             literalData["AnyValue"] = True
 
         if element.UOMs != None:
-            UOMs = {}
-            supported = []
+            UOMs = {} # dict for yaml output generation
+            supported = [] # array for yaml output generation
             if element.UOMs.Default != None:
                 UOMs["Supported"] = supported
                 UOMs["Default"] = str(element.UOMs.Default.UOM.value())
