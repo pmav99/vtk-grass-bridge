@@ -22,6 +22,7 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
 from optparse import OptionParser
+import sys
 import os
 import os.path
 sys.path.append("..")

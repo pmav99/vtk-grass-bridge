@@ -21,6 +21,7 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
 from optparse import OptionParser
+import sys
 import os
 import os.path
 sys.path.append("..")
@@ -46,11 +47,11 @@ class GrassXMLtoZcfg():
 
     def __writePythonFile(self, modulename, funcname):
         """Write the service python file for the ZOO Kernel"""
-        self.__pythonFile.write("import ZOO_Project.ZOOGrassModuleStarter as zoo")
-        self.__pythonFile.write("def " + str(funcname) + "(m, inputs, outputs):")
-        self.__pythonFile.write("    service = zoo.ZOOGrassModuleStarter()")
-        self.__pythonFile.write("    service.fromMaps(" + str(modulename)+ ", inputs, outputs)")
-        self.__pythonFile.write("    return 1")
+        self.__pythonFile.write("import ZOO_Project.ZOOGrassModuleStarter as zoo\n")
+        self.__pythonFile.write("def " + str(funcname) + "(m, inputs, outputs):\n")
+        self.__pythonFile.write("    service = zoo.ZOOGrassModuleStarter()\n")
+        self.__pythonFile.write("    service.fromMaps(\"" + str(modulename)+ "\", inputs, outputs)\n")
+        self.__pythonFile.write("    return 1\n")
         self.__pythonFile.close()
 
     def __closeOutput(self):
@@ -74,7 +75,7 @@ class GrassXMLtoZcfg():
                 self.__writeDataInputs(i)
                 self.__writeProcessOutputs(i)
 
-                self.__writePythonFiles(str(i.Identifier.value()), str(i.Identifier.value()).replace(".", "_"))
+                self.__writePythonFile(str(i.Identifier.value()), str(i.Identifier.value()).replace(".", "_"))
         except:
             raise
         finally:
@@ -174,7 +175,7 @@ def main():
     converter = GrassXMLtoZcfg()
     converter.setGrassXMLFileName(options.xmlfile)
     converter.setZcfgFileName(options.zcfgfile)
-    converter.setZcfgFileName(options.pythonfile)
+    converter.setPythonFileName(options.pythonfile)
     converter.convert()
     
     exit(0)
