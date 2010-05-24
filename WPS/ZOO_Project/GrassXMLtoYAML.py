@@ -24,6 +24,7 @@
 from optparse import OptionParser
 import os
 import os.path
+sys.path.append("..")
 import WPS_1_0_0.OGC_WPS_1_0_0 as wps
 import yaml
 
@@ -227,15 +228,15 @@ class GrassXMLtoYAML():
             UOMs = {} # dict for yaml output generation
             supported = [] # array for yaml output generation
             if element.UOMs.Default != None:
-                UOMs["Supported"] = supported
                 UOMs["Default"] = str(element.UOMs.Default.UOM.value())
             if element.UOMs.Supported != None:
                 for i in element.UOMs.Supported.UOM:
                     supported.append(str(i.value()))
+                UOMs["Supported"] = supported
                 literalData["UOMs"] = UOMs
             
         return literalData
-        # Units are missing
+        # Literal output and BBox are not implemented yet
 
 def main():
     """The main function which will be called if the script is executed directly"""

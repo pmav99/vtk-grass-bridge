@@ -30,15 +30,16 @@ class ComplexData():
     """This class saves the complex in- and output data
     of a wps execution request"""
     ############################################################################
-    def __init__(self, file):
-        self.__file = file
-        self.identifer = ""
+    def __init__(self, fileobj=None):
+        self.identifier = ""
         self.maxOccurs= ""
         self.pathToFile = ""
         self.mimeType = ""
         self.schema = ""
         self.encoding = ""
-        self.__parseFile()
+        if isinstance(fileobj, file):
+            self.__file = fileobj
+            self.__parseFile()
 
     ############################################################################
     def __parseFile(self):
@@ -83,12 +84,13 @@ class LiteralData():
     """This class saves the literal in- and output data
     of a wps execution request"""
     ############################################################################
-    def __init__(self, file):
-        self.__file = file
+    def __init__(self, fileobj=None):
         self.identifier = ""
         self.value = ""
-        self.type = "" #double, integer, string
-        self.__parseFile()
+        self.type = "" #double, integer, boolean, string
+        if isinstance(fileobj, file):
+            self.__file = fileobj
+            self.__parseFile()
 
     ############################################################################
     def __parseFile(self):
@@ -120,7 +122,7 @@ class InputParameter(ProcessLogging):
 
         ProcessLogging.__init__(self, logfile)
         
-        self.workDir = ""
+        self.workDir = None
         self.grassGisBase = ""
         self.grassAddonPath = ""
         self.grassVersion = ""

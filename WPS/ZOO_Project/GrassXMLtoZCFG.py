@@ -23,6 +23,7 @@
 from optparse import OptionParser
 import os
 import os.path
+sys.path.append("..")
 import WPS_1_0_0.OGC_WPS_1_0_0 as wps
 
 class GrassXMLtoZcfg():
@@ -38,7 +39,20 @@ class GrassXMLtoZcfg():
     def setZcfgFileName(self,  filename):
         self.__zcfgFileName = filename
         self.__output = open(self.__zcfgFileName,  'w')
-    
+
+    def setPythonFileName(self,  filename):
+        self.__pythonFileName = filename
+        self.__pythonFile = open(self.__pythonFileName,  'w')
+
+    def __writePythonFile(self, modulename, funcname):
+        """Write the service python file for the ZOO Kernel"""
+        self.__pythonFile.write("import ZOO_Project.ZOOGrassModuleStarter as zoo")
+        self.__pythonFile.write("def " + str(funcname) + "(m, inputs, outputs):")
+        self.__pythonFile.write("    service = zoo.ZOOGrassModuleStarter()")
+        self.__pythonFile.write("    service.fromMaps(" + str(modulename)+ ", inputs, outputs)")
+        self.__pythonFile.write("    return 1")
+        self.__pythonFile.close()
+
     def __closeOutput(self):
         self.__output.close()
         
@@ -55,10 +69,12 @@ class GrassXMLtoZcfg():
                 self.__output.write("processVersion = 2\n")
                 self.__output.write("storeSupported = true \n")
                 self.__output.write("statusSupported = true\n")
-                self.__output.write("serviceProvider = test_service\n")
+                self.__output.write("serviceProvider = " + str(i.Identifier.value()).replace(".", "_") + "\n")
                 self.__output.write("serviceType = Python\n")
                 self.__writeDataInputs(i)
                 self.__writeProcessOutputs(i)
+
+                self.__writePythonFiles(str(i.Identifier.value()), str(i.Identifier.value()).replace(".", "_"))
         except:
             raise
         finally:
@@ -93,11 +109,11 @@ class GrassXMLtoZcfg():
         if element.Identifier != None:
             self.__output.write(indent + "[" + str(element.Identifier.value()).replace(".", "_").replace('\'', '') + "]\n")
         if element.Title.value() != None:
-            self.__output.write(indent + "Title = " + str(element.Title.value()).replace("\n"," ").replace("\t",  " ").replace("=",  "::").replace('\'', '') + "\n")
+            self.__output.write(indent + "Title = " + str(element.Title.value()).replace("\n"," ").replace("\t",  " ").replace("=",  "::").replace('\'', '').replace('(', '').replace(')', '').replace('<', '').replace('>', '') + "\n")
         else:
             self.__output.write(indent + "Title =\n")
         if element.Abstract != None:
-            self.__output.write(indent + "Abstract = " + str(element.Abstract.value()).replace("\n"," ").replace("\t",  " ").replace("=",  "::").replace('\'', '')  + "\n")
+            self.__output.write(indent + "Abstract = " + str(element.Abstract.value()).replace("\n"," ").replace("\t",  " ").replace("=",  "::").replace('\'', '').replace('(', '').replace(')', '').replace('<', '').replace('>', '')  + "\n")
         else:
             self.__output.write(indent + "Abstract =\n")
     
@@ -147,16 +163,18 @@ def main():
     parser = OptionParser(usage=usage, description=description)
     parser.add_option("-x", "--xmlfile", dest="xmlfile", help="The path to the grass WPS input xml file", metavar="FILE")
     parser.add_option("-z", "--zcfgfile", dest="zcfgfile", help="Path to the new created zcfg file", metavar="FILE")
+    parser.add_option("-p", "--pythonfile", dest="pythonfile", help="Path to the new created python file", metavar="FILE")
 
     (options, args) = parser.parse_args()
 
-    if options.xmlfile == None or options.zcfgfile == None:
+    if options.xmlfile == None or options.zcfgfile == None or options.pythonfile == None:
         parser.print_help()
-        parser.error("Booth file names must be provided")
+        parser.error("All file names must be provided")
 
     converter = GrassXMLtoZcfg()
     converter.setGrassXMLFileName(options.xmlfile)
     converter.setZcfgFileName(options.zcfgfile)
+    converter.setZcfgFileName(options.pythonfile)
     converter.convert()
     
     exit(0)
