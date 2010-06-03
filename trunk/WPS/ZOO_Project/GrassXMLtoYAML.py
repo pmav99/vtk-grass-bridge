@@ -122,9 +122,10 @@ class GrassXMLtoYAML():
         
     def __getDataInputs(self,  process):
         """Create data inputs for yaml zcfg file"""
-	dataInputs = {} # dict for yaml output generation
+	dataInputs = [] # array for yaml output generation
         for data in process.DataInputs.Input:
             input = {} # dict for yaml output generation
+            input["Identifier"] = str(data.Identifier.value())
             ita = self.__getTitleAbstract(data)
             for key in ita.keys():
                 input[key] = ita[key] 
@@ -137,15 +138,16 @@ class GrassXMLtoYAML():
             if data.LiteralData != None:
                 input["LiteralData"] = self.__getLiteralData(data.LiteralData)
                 
-            dataInputs[str(data.Identifier.value())] = input
+            dataInputs.append(input)
             
         return dataInputs
   
     def __getProcessOutputs(self,  process):
         """Create process outputs for yaml zcfg file"""
-        processOutputs = {} # dict for yaml output generation
+        processOutputs = [] # dict for yaml output generation
         for data in process.ProcessOutputs.Output:
             output = {} # dict for yaml output generation
+            output["Identifier"] = str(data.Identifier.value())    
             ita = self.__getTitleAbstract(data)
             for key in ita.keys():
                 output[key] = ita[key] 
@@ -153,9 +155,9 @@ class GrassXMLtoYAML():
             if data.ComplexOutput != None:
                 output["ComplexOutput"] = self.__getComplexData(data.ComplexOutput)
             if data.LiteralOutput != None:
-                output["ComplexOutput"] = self.__getLiteralData(data.LiteralOutput)
-                                
-            processOutputs[str(data.Identifier.value())] = output
+                output["LiteralOutput"] = self.__getLiteralData(data.LiteralOutput)
+                            
+            processOutputs.append(output)
             
         return processOutputs
         
