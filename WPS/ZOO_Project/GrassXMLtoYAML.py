@@ -144,7 +144,7 @@ class GrassXMLtoYAML():
   
     def __getProcessOutputs(self,  process):
         """Create process outputs for yaml zcfg file"""
-        processOutputs = [] # dict for yaml output generation
+        processOutputs = [] # array for yaml output generation
         for data in process.ProcessOutputs.Output:
             output = {} # dict for yaml output generation
             output["Identifier"] = str(data.Identifier.value())    
