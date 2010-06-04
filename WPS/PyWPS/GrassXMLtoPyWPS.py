@@ -29,7 +29,7 @@ sys.path.append("..")
 import WPS_1_0_0.OGC_WPS_1_0_0 as wps
 import yaml
 
-class GrassXMLtoYAML():
+class GrassXMLtoPyWPS():
     """ Convert a Grass WPS XML file into a ZOO-WPS yaml config file"""
     def __init__(self):
         pass
@@ -39,26 +39,20 @@ class GrassXMLtoYAML():
         if not os.path.isfile(self.__grassXMLFileName):
             raise IOError("Unable to open xml file")
             
-    def setZcfgFileName(self,  filename):
-        self.__zcfgFileName = filename
-        self.__output = open(self.__zcfgFileName,  'w')
+    def setPyWPSFileName(self,  filename):
+        self.__pyWPSFileName = filename
+        self.__output = open(self.__pyWPSFileName,  'w')
     
     def __closeOutput(self):
         self.__output.close()
         
     def convert(self):
     
-        self.__yam = {}
+        self.__content = {}
         """Start the conversion from WPS XML to ZOO-WPS yaml config file.
            Use nested dictionaries and arrays as data structure. """
         try:
             doc = wps.CreateFromDocument(file(self.__grassXMLFileName).read())
-            
-            zcfg = {} # dict for yaml output generation
-
-	    zcfg['serviceProvider'] = "test_service"
-	    zcfg['serviceType'] = "Python"
-	    self.__yam["zcfg"] = zcfg
 	    
             if len(doc.ProcessDescription) > 1:
                 raise IOError("Only one Process is supported")
@@ -100,16 +94,75 @@ class GrassXMLtoYAML():
 		    proc[key] = ita[key] 
 	        proc["DataInputs"] = self.__getDataInputs(process)
 	        proc["ProcessOutputs"] = self.__getProcessOutputs(process)
-	        self.__yam["ProcessDescription"] = proc
-
-
+	        self.__content["ProcessDescription"] = proc
 	        
-	    yaml.dump(self.__yam, self.__output, default_flow_style=False)
+	    self.__writePyWPSFile()
         except:
             raise
         finally:
             self.__closeOutput()
             
+    def __writePyWPSFile(self):
+        """Write the PyWPS python process file"""
+        self.__output.write("from pywps.Process import WPSProcess\n")
+        self.__output.write("class " + str(self.__content["ProcessDescription"]["Identifier"]).replace(".", "_") + "(WPSProcess):\n")
+        self.__output.write("  def __init__(self):\n")
+        self.__output.write("    WPSProcess.__init__(self, identifier = \'" + str(self.__content["ProcessDescription"]["Identifier"]) + "\', ")
+        self.__output.write("title = \'" + str(self.__content["ProcessDescription"]["Title"]) + "\', ")
+        self.__output.write("abstract = \'" + str(self.__content["ProcessDescription"]["Abstract"]) + "\')\n")
+        
+        self.__output.write("\n    #Input and output arrays, passed to the GrassModuelStarter\n")
+        
+        for input in self.__content["ProcessDescription"]["DataInputs"]:
+            #self.__output.write(str(input) + "\n\n\n\n\n")
+            self.__output.write("\n    ############################################################\n")
+            if input.has_key("ComplexData"):
+	        self.__output.write("    self.addComplexInput(")
+	    elif input.has_key("LiteralData"):
+	        self.__output.write("    self.addLiteralInput(")
+	        
+	    self.__output.write("identifier = \'" + input["Identifier"] + "\', ")
+	    self.__output.write("title = \'" + input["Title"] + "\', ")
+	    if input.has_key("Abstract"):
+                self.__output.write("abstract = \'" + input["Abstract"] + "\', ")
+            self.__output.write("minOccurs = " + str(input["minOccurs"]) + ", ")
+            self.__output.write("maxOccurs = " + str(input["maxOccurs"]) + "") 
+            
+            if input.has_key("LiteralData"):
+                if input["LiteralData"]["DataType"] == "float":
+	            self.__output.write(", type = type(float)")
+                if input["LiteralData"]["DataType"] == "integer":
+	            self.__output.write(", type = type(int)")
+                if input["LiteralData"]["DataType"] == "boolean":
+	            self.__output.write(", type = type(bool)")
+                if input["LiteralData"]["DataType"] == "string":
+	            self.__output.write(", type = type(str)")
+	        if input["LiteralData"].has_key("DefaultValue"):
+	            self.__output.write(", default = " + str(input["LiteralData"]["DefaultValue"]))	    
+	        if input["LiteralData"].has_key("AllowedValues"):
+	            self.__output.write(", allowedValues = \'" + str(input["LiteralData"]["AllowedValues"]) + "\'")
+	        elif input["LiteralData"].has_key("AnyValue"):
+	            self.__output.write(", allowedValues = \'*\'")
+            if input.has_key("ComplexData"):
+                self.__output.write(", formats = " + str(input["ComplexData"]["Supported"])) 
+            self.__output.write(")\n")
+            
+        # For now only complex outputs are supported
+        for output in self.__content["ProcessDescription"]["ProcessOutputs"]:
+            self.__output.write("\n    ############################################################\n")
+            if output.has_key("ComplexOutput"):
+	        self.__output.write("    self.addComplexOutput(")
+	    self.__output.write("identifier = \'" + output["Identifier"] + "\', ")
+	    self.__output.write("title = \'" + output["Title"] + "\'")
+	    if output.has_key("Abstract"):
+                self.__output.write(", abstract = \'" + output["Abstract"] + "\'")
+            self.__output.write(", formats = " + str(output["ComplexOutput"]["Supported"]))
+            self.__output.write(")\n")
+
+        self.__output.write("\n\n  def execute(self):\n")
+        self.__output.write("    pass\n")
+            
+            	
     def __getTitleAbstract(self, element):
         """Create the title and abstract for yaml zcfg file"""
         ita = {} # dict for yaml output generation
@@ -165,10 +218,11 @@ class GrassXMLtoYAML():
         """Create complex data for yaml zcfg file"""
         complexData = {} # dict for yaml output generation
         default = {} # dict for yaml output generation
-        supported = [] # dict for yaml output generation
+        supported = [] # array for yaml output generation
+        
 
         if element.Default.Format.MimeType != None:
-            default["MimeType"] = str(element.Default.Format.MimeType)
+            default["mimeType"] = str(element.Default.Format.MimeType)
         if element.Default.Format.Encoding != None:
             default["Encoding"] = str(element.Default.Format.Encoding)
         if element.Default.Format.Schema != None:
@@ -178,7 +232,7 @@ class GrassXMLtoYAML():
         for format in element.Supported.Format:
           supformat = {}
 	  if format.MimeType != None:
-	      supformat["MimeType"] = str(format.MimeType)
+	      supformat["mimeType"] = str(format.MimeType)
 	  if element.Default.Format.Encoding != None:
 	      supformat["Encoding"] = str(format.Encoding)
 	  if element.Default.Format.Schema != None:
@@ -248,20 +302,20 @@ def main():
     """The main function which will be called if the script is executed directly"""
 
     usage = "usage: %prog [-help,--help] --xmlfile inputfile.xml --zcfgfile output.txt]"
-    description = "Use %prog to convert Grass 7.0 WPS XML process description files into ZOO-WPS server YAML config files."
+    description = "Use %prog to convert Grass 7.0 WPS XML process description files into Py-WPS server python process files."
     parser = OptionParser(usage=usage, description=description)
     parser.add_option("-x", "--xmlfile", dest="xmlfile", help="The path to the grass WPS input xml file", metavar="FILE")
-    parser.add_option("-z", "--zcfgfile", dest="zcfgfile", help="Path to the new created yaml file", metavar="FILE")
+    parser.add_option("-p", "--pythonfile", dest="pythonfile", help="Path to the new created PyWPS python process file", metavar="FILE")
 
     (options, args) = parser.parse_args()
 
-    if options.xmlfile == None or options.zcfgfile == None:
+    if options.xmlfile == None or options.pythonfile == None:
         parser.print_help()
         parser.error("Booth file names must be provided")
 
-    converter = GrassXMLtoYAML()
+    converter = GrassXMLtoPyWPS()
     converter.setGrassXMLFileName(options.xmlfile)
-    converter.setZcfgFileName(options.zcfgfile)
+    converter.setPyWPSFileName(options.pythonfile)
     converter.convert()
     
     exit(0)
