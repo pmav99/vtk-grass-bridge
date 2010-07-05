@@ -15,36 +15,26 @@
 [ComplexData]
  Identifier=inputs
  MaxOccurs=1024
- PathToFile=elev_srtm_30m.tiff
- MimeType=image/tiff
+ PathToFile=TestData/basin_50K_nc.gif
+ MimeType=image/gif
  Encoding=
  Schema=
 
 [ComplexData]
  Identifier=inputs
  MaxOccurs=1024
- PathToFile=elev_srtm_30m.tiff
- MimeType=image/tiff
+ PathToFile=TestData/basin_50K_nc.jpg
+ MimeType=image/jpeg
  Encoding=
  Schema=
 
 [ComplexData]
  Identifier=inputs
  MaxOccurs=1024
- PathToFile=elev_srtm_30m.tiff
- MimeType=image/tiff
+ PathToFile=TestData/basin_50K_nc.png
+ MimeType=image/png
  Encoding=
  Schema=
-
-
-[ComplexData]
- Identifier=inputs
- MaxOccurs=1024
- PathToFile=elev_srtm_30m.tiff
- MimeType=image/tiff
- Encoding=
- Schema=
-
 
 [LiteralData]
  Identifier=grass_band_number
@@ -53,7 +43,7 @@
 
 [ComplexOutput]
  Identifier=output
- PathToFile=/tmp/elev_srtm_30m_add.tiff
- MimeType=image/tiff
+ PathToFile=/tmp/r_add_output.png
+ MimeType=image/png
  Encoding=
  Schema=
