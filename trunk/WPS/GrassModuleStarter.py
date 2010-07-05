@@ -24,7 +24,8 @@
 
 # This module needs an input file for processing. All input and output parameter
 # are defined within this file. The file parser expects an input file exactly as
-# defined below. All key names must be specified. New-lines between the key names are forbidden.
+# defined below. All key names must be specified.
+# New-lines between the key names are forbidden.
 #
 # The format of the input file is defined as:
 #
@@ -37,7 +38,7 @@
 #  GRASS_ADDON_PATH= path to addon modules
 #  GRASS_VERSION= the version of grass
 #  Module= the name of the module which should be executed
-#  LOCATION=Name of an existing location with an existing mapset PERMANENT, which should be used for processing, the mapsets are generated temporaly
+#  LOCATION=(optional, currently not used!)Name of an existing location with an existing mapset PERMANENT, which should be used for processing, the mapsets are generated temporaly
 #  LinkInput=TRUE/FALSE Try to link the input into the generated/existing location, default is TRUE
 #  IgnoreProjection=TRUE/FALSE Ignore the projection settings when trying to import the input data (ignored if LinkInput is true), default is FALSE
 #  UseXYLocation=TRUE/FALSE create only a XY location/mapset and import all data ignoring the projection information. The resolution will be set based on LiteralData or based on the first input raster resolution, default is FALSE  (not implemented)
@@ -79,8 +80,24 @@ GRASS_WORK_LOCATION = "workLocation"
 GRASS_MAPSET_NAME = "PERMANENT"
 # This keyword list contains all grass related WPS keywords
 GRASS_WPS_KEYWORD_LIST = ["grass_resolution_ns", "grass_resolution_ew", "grass_band_number"]
+# All supported import raster formats
+RASTER_MIMETYPES = [{"MIMETYPE":"IMAGE/TIFF", "GDALID":"GTiff"},
+                           {"MIMETYPE":"IMAGE/PNG", "GDALID":"PNG"}, \
+                           {"MIMETYPE":"IMAGE/GIF", "GDALID":"GIF"}, \
+                           {"MIMETYPE":"IMAGE/JPEG", "GDALID":"JPEG"}, \
+                           {"MIMETYPE":"IMAGE/GEOTIFF", "GDALID":"GTiff"}, \
+                           {"MIMETYPE":"APPLICATION/HDF4Image", "GDALID":"HDF4Image"}, \
+                           {"MIMETYPE":"APPLICATION/HFA", "GDALID":"HFA"}, \
+                           {"MIMETYPE":"APPLICATION/GEOTIFF", "GDALID":"GTiff"}]
+# All supported input vector formats [mime type, schema]
+# TODO: Add more vector types (zipped shapefiles, KML, ...)
+VECTOR_MIMETYPES = [{"MIMETYPE":"TEXT/XML", "SCHEMA":"GML", "GDALID":"GML"}, \
+                           {"MIMETYPE":"TEXT/XML", "SCHEMA":"KML", "GDALID":"KML"}, \
+                           {"MIMETYPE":"APPLICATION/DGN", "SCHEMA":"", "GDALID":"DGN"}, \
+                           {"MIMETYPE":"APPLICATION/SHP", "SCHEMA":"", "GDALID":"ESRI_Shapefile"}]
 
-GMS_DEBUG = False
+
+GMS_DEBUG = True
 
 ###############################################################################
 ###############################################################################
@@ -145,12 +162,20 @@ class GrassModuleStarter(ModuleLogging):
         # the pid of the process which is currently executed, to be used for suspending
         self.runPID = -1
 
+
+
+
     ############################################################################
-    def fromTextFile(self, input, logfile, module_output, module_error):
+    ############# THIS METHOD DOES ALL THE WORK ################################
+    ############################################################################
+    def fromInputFile(self, input, logfile, module_output, module_error):
+        """This function does all the work and must be called do read the input
+        file. It will create the grass location, import the data, run the grass
+        module and export the data. At finish all temporal data is removed."""
 
         self.inputFile = input
 
-        # Initiate the logfiles
+        # Initiate the logging mechanism and the logfiles
         ModuleLogging.__init__(self, logfile, module_output, module_error)
 
         try:
@@ -162,7 +187,7 @@ class GrassModuleStarter(ModuleLogging):
                 log = "Error parsing the input file"
                 self.LogError(log)
                 raise
-            self._createMaps()
+            self._createInputOutputMaps()
             try:
                 self._createTemporalDir(self.inputParameter.workDir)
                 self._setUpGrassLocation(self.inputParameter.grassGisBase, self.inputParameter.grassAddonPath)
@@ -176,8 +201,11 @@ class GrassModuleStarter(ModuleLogging):
         finally:
             self._closeLogfiles()
 
+
+
+
     ############################################################################
-    def _createMaps(self):
+    def _createInputOutputMaps(self):
         # Create the input parameter of literal data
         self._createLiteralInputMap()
         # Create the output map for data export
@@ -252,7 +280,7 @@ class GrassModuleStarter(ModuleLogging):
     ############################################################################
     def _importRunExport(self):
         try:
-            # Create the new location based on the first input and import all maps
+            # Create the new location based on the first valid input and import all maps
             self._importData()
             # start the grass module one or multiple times, depending on the multiple import parameter
             self._startGrassModule()
@@ -316,7 +344,7 @@ class GrassModuleStarter(ModuleLogging):
 
     ############################################################################
     def _removeTempData(self):
-        """ remove the created directory """
+        """ remove the created temp directory """
         if os.path.isdir(str(self.gisdbase)):
             try:
                 self.LogInfo("Remove " + str(self.gisdbase))
@@ -347,7 +375,7 @@ class GrassModuleStarter(ModuleLogging):
 
     ############################################################################
     def _runProcess(self, inputlist):
-        """This function runs a process and logs the stdout and stderr"""
+        """This function runs a process and logs its stdout and stderr"""
 
         try:
             # inputlist = ["valgrind","--tool=memcheck"] + inputlist
@@ -378,13 +406,40 @@ class GrassModuleStarter(ModuleLogging):
             parameter = [os.path.join(self.inputParameter.grassGisBase, "bin", "g.region"), '-p']
             errorid, stdout_buff, stderr_buff = self._runProcess(parameter)
 
-        # Create a new location based on the first input map
-        self._createInputLocation(list[0])
+        self.gisrc.printFile()
 
-        # Rewrite the gisrc file to enable the new created location
-        self.gisrc.locationName = GRASS_WORK_LOCATION
-        self.gisrc.rewriteFile()
+        # Create a new location based on the first valid raster or vector input 
+        success = False
 
+        # In case no complex input is provided use the default XY projection
+        if len(list) == 0:
+            success = True
+
+        # Check for raster and
+        if success == False:
+            for input in list:
+                if self._isRaster(input) or self._isVector(input):
+                    self._createInputLocation(input)
+                    # Rewrite the gisrc file to enable the new created location
+                    self.gisrc.locationName = GRASS_WORK_LOCATION
+                    self.gisrc.rewriteFile()
+                    success = True
+                    break
+                    
+        # In case of textual input, use the default location
+        if success == False:
+            for input in list:
+                if self._isText(input):
+                    self._createInputLocation(input)
+                    success = True
+                    break
+
+        # Error if location creation did not work
+        if success == False:
+            log = "Unsupported MimeType. Unable to create input location from input " + str(input.pathToFile)
+            self.LogError(log)
+            raise GMSError(log)
+        
         # Set the region resolution in case resolution values are provided as literal data
         self._setRegionResolution()
         
@@ -404,23 +459,21 @@ class GrassModuleStarter(ModuleLogging):
     ############################################################################
     def _isRaster(self, input):
         """Check for raster input"""
-        if input.mimeType.upper() == "IMAGE/TIFF":
-            self.LogInfo("Raster map is of type TIFF")
-            return "GTiff"
-        elif input.mimeType.upper() == "IMAGE/PNG":
-            self.LogInfo("Raster map is of type PNG")
-            return "PNG"
-        else:
-            return ""
+        for rasterType in RASTER_MIMETYPES:
+            if input.mimeType.upper() == rasterType["MIMETYPE"]:
+                self.LogInfo("Raster map is of type " + str(rasterType["MIMETYPE"]))
+                return rasterType["GDALID"]
+        return None
 
     ############################################################################
     def _isVector(self, input):
         """Check for vector input"""
-        if input.mimeType.upper() == "TEXT/XML" and input.schema.upper().find("GML") != -1:
-            self.LogInfo("Vector map is of type GML")
-            return "GML"
-        else:
-            return ""
+        for vectorType in VECTOR_MIMETYPES:
+            if input.mimeType.upper() == vectorType["MIMETYPE"] \
+               and input.schema.upper().find(vectorType["SCHEMA"]) != -1:
+                self.LogInfo("Vector map is of type " + str(vectorType))
+                return vectorType["GDALID"]
+        return None
 
     ############################################################################
     def _isTextFile(self, input):
@@ -429,34 +482,36 @@ class GrassModuleStarter(ModuleLogging):
             self.LogInfo("Text file recognized")
             return "TXT"
         else:
-            return ""
+            return None
 
     ############################################################################
     def _createInputLocation(self, input):
         """Creat a new work location based on an input dataset"""
         
-        if self._isRaster(input) != "":
+        if self._isRaster(input) != None:
             parameter = [os.path.join(self.inputParameter.grassGisBase, "bin", "r.in.gdal"), "input=" + input.pathToFile, "location=" + GRASS_WORK_LOCATION , "-ce", "output=undefined"]
             errorid, stdout_buff, stderr_buff = self._runProcess(parameter)
 
             if errorid != 0:
-                log = "Unable to create input location from input " + str(input.pathToFile)
+                log = "GDLA error while import. Unable to create input location from input " + str(input.pathToFile)
                 self.LogError(log)
                 raise GMSError(log)
 
-        elif self._isVector(input) != "":
+        elif self._isVector(input) != None:
             parameter = [os.path.join(self.inputParameter.grassGisBase, "bin", "v.in.ogr"), "dsn=" + input.pathToFile, "location=" + GRASS_WORK_LOCATION , "-ce", "output=undefined"]
             errorid, stdout_buff, stderr_buff = self._runProcess(parameter)
 
             if errorid != 0:
-                log = "Unable to create input location from input " + str(input.pathToFile)
+                log = "GDLA error while import. Unable to create input location from input " + str(input.pathToFile)
                 self.LogError(log)
                 raise GMSError(log)
             
-        elif self._isTextFile(input) != "":
+        elif self._isTextFile(input) != None:
+            log = "Using XY projection for data processing."
+            self.LogError(log)
             return
         else:
-            log = "Unable to create input location from input " + str(input.pathToFile)
+            log = "Unsupported MimeType. Unable to create input location from input " + str(input.pathToFile)
             self.LogError(log)
             raise GMSError(log)
 
@@ -689,7 +744,7 @@ class GrassModuleStarter(ModuleLogging):
                 errorid, stdout_buff, stderr_buff = self._runProcess(parameter)
 
                 if errorid != 0:
-                    log = "Unable to export " + inputName
+                    log = "Unable to export " + outputName
                     self.LogError(log)
                     raise GMSError(log)
 
@@ -699,11 +754,11 @@ class GrassModuleStarter(ModuleLogging):
                 errorid, stdout_buff, stderr_buff = self._runProcess(parameter)
 
                 if errorid != 0:
-                    log = "Unable to export " + inputName
+                    log = "Unable to export " + outputName
                     self.LogError(log)
                     raise GMSError(log)
             else:
-                log = "Unable to export " + inputName
+                log = "Unable to export " + outputName
                 self.LogError(log)
                 raise GMSError(log)
 
@@ -776,6 +831,8 @@ def main():
     parser = OptionParser(usage=usage, description=description)
     parser.add_option("-f", "--file", dest="filename",
                       help="The path to the input file", metavar="FILE")
+    parser.add_option("-p", "--printmime", dest="printmime",
+                      help="Print supported input and output mime types and exit.")
     parser.add_option("-l", "--logfile", dest="logfile", default="logfile.txt", \
                       help="The name to the logfile. This file logs everything "\
                       "which happens in this module (import, export, location creation ...).", metavar="FILE")
@@ -788,13 +845,19 @@ def main():
 
     (options, args) = parser.parse_args()
 
+    if options.printmime != None:
+        print "Supported raster mime types: "
+        print RASTER_MIMETYPES
+        print "Supported vector mime types: "
+        print VECTOR_MIMETYPES
+        exit(0)
 
     if options.filename == None:
         parser.print_help()
         parser.error("A file name must be provided")
 
     starter = GrassModuleStarter()
-    starter.fromTextFile(options.filename, options.logfile, options.module_output, options.module_error)
+    starter.fromInputFile(options.filename, options.logfile, options.module_output, options.module_error)
     exit(0)
 
 ###############################################################################
