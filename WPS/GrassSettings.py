@@ -76,6 +76,7 @@ class GrassGisRC(ProcessLogging):
 
     ############################################################################
     def __init__(self, gisdbase, locationName, mapset, logfile):
+        ProcessLogging.__init__(self, logfile)
         self.locationName = locationName
         self.mapset = mapset
         self.gisdbase = gisdbase
@@ -100,6 +101,16 @@ class GrassGisRC(ProcessLogging):
                 self.LogError("Error writing the gisrc file")
                 raise
 
+    ############################################################################
+    def printFile(self):
+        try:
+            gisrc = open(self.__gisrcFile, 'r')
+            self.LogInfo(str(gisrc.read()))
+            gisrc.close()
+        except:
+            self.LogError("Error printing the gisrc file")
+            raise
+        
     ############################################################################
     def __writeFile(self):
         try:
