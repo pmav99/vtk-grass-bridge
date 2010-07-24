@@ -13,6 +13,7 @@
 
 import unittest
 import os
+import subprocess
 from libvtkCommonPython import *
 from libvtkFilteringPython import *
 from libvtkGraphicsPython import *
@@ -24,15 +25,56 @@ from libvtkGRASSBridgeRasterPython import *
 from libvtkGRASSBridgeVectorPython import *
 from libvtkGRASSBridgeCommonPython import *
 
+firstCheck = False
+
 class GRASSVectorPolyDataReaderTest(unittest.TestCase):
+
+    def setUp(self):
+        global firstCheck
+        if firstCheck == False:
+            # Create the input data
+            inputlist = ["v.random", "--o", "-z", "n=20", "zmin=-20", "zmax=2500", "output=random_points"]
+            proc = subprocess.Popen(args=inputlist)
+            proc.communicate()
+            inputlist = ["v.voronoi", "--o", "-l", "input=random_points", "output=random_lines"]
+            proc = subprocess.Popen(args=inputlist)
+            proc.communicate()
+            inputlist = ["v.voronoi", "--o", "input=random_points", "output=random_areas"]
+            proc = subprocess.Popen(args=inputlist)
+            proc.communicate()
+            firstCheck = True
+
+    def view(self, input):
+        normals = vtkPolyDataNormals()
+        normals.SetInput(input)
+        mapMesh = vtkPolyDataMapper()
+        mapMesh.SetInputConnection(normals.GetOutputPort())
+        meshActor = vtkActor()
+        meshActor.SetMapper(mapMesh)
+
+        ren = vtkRenderer()
+        renWin =vtkRenderWindow()
+        renWin.AddRenderer(ren)
+        iren = vtkRenderWindowInteractor()
+        iren.SetRenderWindow(renWin)
+
+        ren.AddActor(meshActor)
+        ren.SetBackground(1, 1, 1)
+        renWin.SetSize(800, 600)
+
+        iren.Initialize()
+        renWin.Render()
+        iren.Start()
 
     def testNoTopoReader(self):
         init = vtkGRASSInit()
         init.Init("GRASSVectorPolyDataReaderTest")
         init.ExitOnErrorOn()
         rs = vtkGRASSVectorPolyDataReader()
-        rs.SetVectorName("boundary_county@user1")
+        rs.SetVectorName("random_areas")
         rs.Update()
+
+        self.view(rs.GetOutput())
 
         writer = vtkPolyDataWriter()
         writer.SetFileName("/tmp/test1.vtk")
@@ -45,9 +87,11 @@ class GRASSVectorPolyDataReaderTest(unittest.TestCase):
         init.ExitOnErrorOn()
         rs = vtkGRASSVectorTopoPolyDataReader()
         rs.SetFeatureTypeToArea()
-        rs.SetVectorName("boundary_county@user1")
+        rs.SetVectorName("random_areas")
         rs.Update()
 
+        self.view(rs.GetOutput())
+        
         writer = vtkPolyDataWriter()
         writer.SetFileName("/tmp/testAreas.vtk")
         writer.SetInputConnection(rs.GetOutputPort())
@@ -59,8 +103,10 @@ class GRASSVectorPolyDataReaderTest(unittest.TestCase):
         init.ExitOnErrorOn()
         rs = vtkGRASSVectorTopoPolyDataReader()
         rs.SetFeatureTypeToLines()
-        rs.SetVectorName("boundary_county@user1")
+        rs.SetVectorName("random_lines")
         rs.Update()
+
+        self.view(rs.GetOutput())
 
         writer = vtkPolyDataWriter()
         writer.SetFileName("/tmp/testLines.vtk")
@@ -73,8 +119,10 @@ class GRASSVectorPolyDataReaderTest(unittest.TestCase):
         init.ExitOnErrorOn()
         rs = vtkGRASSVectorTopoPolyDataReader()
         rs.SetFeatureTypeToBoundary()
-        rs.SetVectorName("boundary_county@user1")
+        rs.SetVectorName("random_areas")
         rs.Update()
+
+        self.view(rs.GetOutput())
 
         writer = vtkPolyDataWriter()
         writer.SetFileName("/tmp/testBoundaries.vtk")
@@ -87,8 +135,10 @@ class GRASSVectorPolyDataReaderTest(unittest.TestCase):
         init.ExitOnErrorOn()
         rs = vtkGRASSVectorTopoPolyDataReader()
         rs.SetFeatureTypeToCentroid()
-        rs.SetVectorName("boundary_county@user1")
+        rs.SetVectorName("random_areas")
         rs.Update()
+
+        self.view(rs.GetOutput())
 
         writer = vtkPolyDataWriter()
         writer.SetFileName("/tmp/testCentroids.vtk")
@@ -101,8 +151,10 @@ class GRASSVectorPolyDataReaderTest(unittest.TestCase):
         init.ExitOnErrorOn()
         rs = vtkGRASSVectorTopoPolyDataReader()
         rs.SetFeatureTypeToPoints()
-        rs.SetVectorName("boundary_county@user1")
+        rs.SetVectorName("random_points")
         rs.Update()
+
+        self.view(rs.GetOutput())
 
         writer = vtkPolyDataWriter()
         writer.SetFileName("/tmp/testPoints.vtk")

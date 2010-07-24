@@ -136,6 +136,8 @@ class GRASSRasterMapReaderWriterTest(unittest.TestCase):
 
         writer.CloseMap()
 
+        print "test_cell written"
+
         reader = vtkGRASSRasterMapReader()
         reader.OpenMap("test_cell")
 

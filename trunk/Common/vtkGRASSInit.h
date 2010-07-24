@@ -49,7 +49,7 @@ public:
   void ExitOnErrorOff();
   //!\brief Init GRASS
   void Init(const char *name);
-  //!\brief Parse the command line arguments which are presented as a single string
+  //!\brief Parse the command line arguments each argument is a single string in the string array
   void Parser(vtkStringArray *argv);
   //BTX
   //!\brief Prase the command line arguments

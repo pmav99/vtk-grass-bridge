@@ -22,12 +22,17 @@ from libvtkImagingPython import *
 from libvtkGRASSBridgeIOPython import *
 from libvtkGRASSBridgeCommonPython import *
 
+firstCheck = False
+
 class GRASSRasterSourceTest(unittest.TestCase):
-    def testRegion(self):
+    def setUp(self):
 
         init = vtkGRASSInit()
-        init.Init("v.GRASSRasterSourceTest")
+        init.Init("GRASSRasterSourceTest")
         init.ExitOnErrorOn()
+
+    def testRegion(self):
+
         rs = vtkGRASSRasterImageReader()
         rs.SetRasterName("lsat7_2002_80")
         rs.UseCurrentRegion()
@@ -53,9 +58,7 @@ class GRASSRasterSourceTest(unittest.TestCase):
         print rs.GetOutput()
 
     def testReadWrite(self):
-        init = vtkGRASSInit()
-        init.Init("v.GRASSRasterSourceTest")
-        init.ExitOnErrorOn()
+
         reader = vtkGRASSRasterImageReader()
         reader.SetRasterName("lsat7_2002_80")
         reader.UseRasterRegion()
@@ -71,9 +74,7 @@ class GRASSRasterSourceTest(unittest.TestCase):
         print writer.GetOutput()
 
     def testSmoke(self):
-        init = vtkGRASSInit()
-        init.Init("v.GRASSRasterSourceTest")
-        init.ExitOnErrorOn()
+
         rs = vtkGRASSRasterImageReader()
         rs.SetRasterName("lsat7_2002_80")
         rs.UseRasterRegion()

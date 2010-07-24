@@ -71,11 +71,11 @@ public:
   vtkGetMacro(FeatureType, int);
 
   //!\brief The output will only contain vertices
-  virtual void SetFeatureTypeToPoints(){this->SetFeatureType(GV_POINTS);}
+  virtual void SetFeatureTypeToPoints(){this->SetFeatureType(GV_POINT);}
   //!\brief The output will only contain vertices
   virtual void SetFeatureTypeToCentroid(){this->SetFeatureType(GV_CENTROID);}
   //!\brief The output will only contain polylines
-  virtual void SetFeatureTypeToLines(){this->SetFeatureType(GV_LINES);}
+  virtual void SetFeatureTypeToLines(){this->SetFeatureType(GV_LINE);}
   //!\brief The output will only contain polylines
   virtual void SetFeatureTypeToBoundary(){this->SetFeatureType(GV_BOUNDARY);}
   //!\brief The output will only contain ploygons

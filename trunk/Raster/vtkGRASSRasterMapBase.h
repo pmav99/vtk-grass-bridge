@@ -66,8 +66,8 @@ public:
   //! \brief open the map for reading or writing. This function must be implemented by the subclasses.
   virtual bool OpenMap(char *name){return false;}
 
-  //! \brief close the map. Must be implemented in the subclass
-  virtual bool CloseMap(){return false;}
+  //! \brief Close the raster map
+  virtual bool CloseMap();
 
   //! \brief Read a row of the map and return the content as vtkDataArray
   virtual vtkDataArray *GetRow(int idx);

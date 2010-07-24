@@ -145,39 +145,3 @@ vtkGRASSRasterMapReader::GetRange(double range[2])
     }
     return true;
 }
-
-//----------------------------------------------------------------------------
-
-bool
-vtkGRASSRasterMapReader::CloseMap()
-{
-    // Cleaning up the null buffer for reuse
-    if (this->NullBuff)
-    {
-        G_free(this->NullBuff);
-        this->NullBuff = (char*) NULL;
-    }
-
-    // Cleaning up the raster buffer for reuse
-    if (this->RasterBuff)
-    {
-        G_free(this->RasterBuff);
-        this->RasterBuff = (double*) NULL;
-    }
-    // Cleaning up the vtkDataArray for reuse
-    if (this->Row)
-    {
-        this->Row->Delete();
-        this->Row = NULL;
-    }
-
-    if (this->Open == true && this->Map != -1)
-    {
-         TRY Rast_close(this->Map);
-         CATCH_BOOL
-    }
-    // This flag is important and must be set by open and close methods
-    this->Open = false;
-
-    return true;
-}
