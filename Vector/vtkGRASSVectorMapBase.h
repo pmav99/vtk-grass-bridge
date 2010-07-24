@@ -236,12 +236,8 @@ public:
 
     //!\brief Return the number of the feature type line
     int GetFeatureTypeLine(){return GV_LINE;}
-    //!\brief Return the number of the feature type lines
-    int GetFeatureTypeLines(){return GV_LINES;}
     //!\brief Return the number of the feature type point
     int GetFeatureTypePoint(){return GV_POINT;}
-    //!\brief Return the number of the feature type points
-    int GetFeatureTypePoints(){return GV_POINTS;}
     //!\brief Return the number of the feature type boundary
     int GetFeatureTypeBoundary(){return GV_BOUNDARY;}
     //!\brief Return the number of the feature type area

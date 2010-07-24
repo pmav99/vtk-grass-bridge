@@ -46,30 +46,26 @@ public:
   bool WriteHistory(char *rastername);
 
   vtkGetStringMacro(RasterName);
-  char *GetMapId(){return this->hist.mapid;}
-  char *GetTitle(){return this->hist.title;}
-  char *GetMapset(){return this->hist.mapset;}
-  char *GetCreator(){return this->hist.creator;}
-  char *GetMaptype(){return this->hist.maptype;}
-  char *GetDataSource1(){return this->hist.datsrc_1;}
-  char *GetDataSource2(){return this->hist.datsrc_2;}
-  char *GetKeywords(){return this->hist.keywrd;}
+  const char *GetMapId(){return Rast_get_history(this->hist, HIST_MAPID);}
+  const char *GetTitle(){return Rast_get_history(this->hist, HIST_TITLE);}
+  const char *GetMapset(){return Rast_get_history(this->hist, HIST_MAPSET);}
+  const char *GetCreator(){return Rast_get_history(this->hist, HIST_CREATOR);}
+  const char *GetMaptype(){return Rast_get_history(this->hist, HIST_MAPTYPE);}
+  const char *GetDataSource1(){return Rast_get_history(this->hist, HIST_DATSRC_1);}
+  const char *GetDataSource2(){return Rast_get_history(this->hist, HIST_DATSRC_2);}
+  const char *GetKeywords(){return Rast_get_history(this->hist, HIST_KEYWRD);}
 
-  void SetTitle(const char *title);
-  void SetCreator(const char *creator);
-  void SetDataSource1(const char *datsrc_1);
-  void SetDataSource2(const char *datsrc_2);
-  void SetKeywords(const char *keywrd);
+  void SetTitle(const char *title){return Rast_set_history(this->hist, HIST_TITLE, title);}
+  void SetCreator(const char *creator){return Rast_set_history(this->hist, HIST_CREATOR, creator);}
+  void SetDataSource1(const char *datsrc_1){return Rast_set_history(this->hist, HIST_DATSRC_1, datsrc_1);}
+  void SetDataSource2(const char *datsrc_2){return Rast_set_history(this->hist, HIST_DATSRC_2, datsrc_2);}
+  void SetKeywords(const char *keywrd){return Rast_set_history(this->hist, HIST_KEYWRD, keywrd);}
   
-  //! \brief Adds a comment to the raster map history file.
-  bool InsertNextCommentLine(const char *comment);
-  //! \brief Get the number of Comments in the raster map histrory file. The maxium number is 50.
-  int GetNumbeOfComments();
-  //! \brief Get a comment of index idx from the raster map history file.
-  const char *GetComment(int idx);
+  //! \brief Append a comment to the raster map history file.
+  bool AppendComment(char *comment) {Rast_append_history(this->hist, comment);}
 
   //BTX
-  virtual struct History* GetPointer(){return &this->hist;}
+  virtual struct History* GetPointer(){return this->hist;}
   //ETX
 
 protected:
@@ -83,7 +79,7 @@ protected:
   char *Mapset;
 
   //BTX
-  struct History hist;
+  struct History *hist;
   //ETX
 
 private:

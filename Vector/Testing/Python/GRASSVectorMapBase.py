@@ -12,21 +12,36 @@
 #  GNU General Public License for more details.
 
 import unittest
+import subprocess
 from libvtkCommonPython import *
 from libvtkGRASSBridgeCommonPython import *
 from libvtkGRASSBridgeVectorPython import *
 
+firstCheck = False
+
 class GRASSVectorMapBaseTest(unittest.TestCase):
     def setUp(self):
-
-        #Initiate grass
-        init = vtkGRASSInit()
-        init.Init("GRASSVectorMapBaseTest")
-        init.ExitOnErrorOn()
+        global firstCheck
+        if firstCheck == False:
+            #Initiate grass
+            init = vtkGRASSInit()
+            init.Init("GRASSVectorMapBaseTest")
+            init.ExitOnErrorOn()
+            # Create the input data
+            inputlist = ["v.random", "--o", "-z", "n=20", "zmin=-20", "zmax=2500", "output=random_points"]
+            proc = subprocess.Popen(args=inputlist)
+            proc.communicate()
+            inputlist = ["v.voronoi", "--o", "-l", "input=random_points", "output=random_lines"]
+            proc = subprocess.Popen(args=inputlist)
+            proc.communicate()
+            inputlist = ["v.voronoi", "--o", "input=random_points", "output=random_areas"]
+            proc = subprocess.Popen(args=inputlist)
+            proc.communicate()
+            firstCheck = True
 
     def test1TopoReader(self):
         map = vtkGRASSVectorMapTopoReader()
-        map.OpenMap("nc_state@user1")
+        map.OpenMap("random_areas")
 
         box = vtkGRASSVectorBBox()
         map.GetBoundingBox(box)
@@ -45,7 +60,7 @@ class GRASSVectorMapBaseTest(unittest.TestCase):
 
     def test2TopoReader(self):
         map = vtkGRASSVectorMapTopoReader()
-        map.OpenMap("elev_lidrural_mrpts@user1")
+        map.OpenMap("random_points")
 
         box = vtkGRASSVectorBBox()
         map.GetBoundingBox(box)
@@ -64,7 +79,7 @@ class GRASSVectorMapBaseTest(unittest.TestCase):
 
     def test3TopoReader(self):
         map = vtkGRASSVectorMapTopoReader()
-        map.OpenMap("streams@user1")
+        map.OpenMap("random_lines")
 
         box = vtkGRASSVectorBBox()
         map.GetBoundingBox(box)
@@ -83,7 +98,7 @@ class GRASSVectorMapBaseTest(unittest.TestCase):
 
     def test1NoTopoReader(self):
         map = vtkGRASSVectorMapNoTopoReader()
-        map.OpenMap("nc_state")
+        map.OpenMap("random_areas")
 
         print map
 
@@ -101,7 +116,7 @@ class GRASSVectorMapBaseTest(unittest.TestCase):
 
     def test2NoTopoReader(self):
         map = vtkGRASSVectorMapNoTopoReader()
-        map.OpenMap("elev_lidrural_mrpts")
+        map.OpenMap("random_points")
 
         print map
 
@@ -119,7 +134,7 @@ class GRASSVectorMapBaseTest(unittest.TestCase):
 
     def test3NoTopoReader(self):
         map = vtkGRASSVectorMapNoTopoReader()
-        map.OpenMap("streams")
+        map.OpenMap("random_lines")
 
         print map
 

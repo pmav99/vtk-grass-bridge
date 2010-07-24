@@ -94,7 +94,7 @@ vtkGRASSVectorPolyDataReader::RequestData(vtkInformation*,
     this->SetMapset(reader->GetMapset());
 
     VGB_CREATE(vtkGRASSVectorFeatureCats, cats);
-    VGB_CREATE(vtkGRASSVectorFeaturePoints, features);
+    VGB_CREATE(vtkGRASSVectorFeaturePoints, feature);
 
     vtkPolyData* output = vtkPolyData::GetData(outputVector);
     output->Allocate(1);
@@ -107,17 +107,16 @@ vtkGRASSVectorPolyDataReader::RequestData(vtkInformation*,
 
     VGB_CREATE(vtkIdList, ids);
 
-
     // Read every feature in vector map
-    while (reader->ReadNextFeature(features, cats) > 0)
+    while (reader->ReadNextFeature(feature, cats) > 0)
     {
-        for(i = 0; i < features->GetNumberOfPoints(); i++)
+        for(i = 0; i < feature->GetNumberOfPoints(); i++)
         {
-            double *point = features->GetPoint(i);
+            double *point = feature->GetPoint(i);
             id = points->InsertNextPoint(point[0], point[1], point[2]);
             ids->InsertNextId(id);
         }
-        output->InsertNextCell(features->GetVTKCellId(), ids);
+        output->InsertNextCell(feature->GetVTKCellId(), ids);
         ids->Initialize();
 
         categories->InsertNextValue(cats->GetCat(1));

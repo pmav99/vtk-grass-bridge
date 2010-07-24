@@ -46,9 +46,6 @@ public:
   //! \param name the name of an existing raster map
   //! \return true for success, false fo error
   virtual bool OpenMap(char *name);
-  //! \brief Close Map
-  //! \return true for success, false for error
-  virtual bool CloseMap();
   
   //! \brief Return the min and max range as double for all map types.
   //! Call only after the raster map was opened.

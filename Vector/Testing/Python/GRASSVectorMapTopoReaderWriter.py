@@ -12,25 +12,36 @@
 #  GNU General Public License for more details.
 
 import unittest
-import os
+import subprocess
 from libvtkCommonPython import *
 from libvtkGRASSBridgeCommonPython import *
 from libvtkGRASSBridgeVectorPython import *
 
+firstCheck = False
+
 class GRASSVectorMapReaderWriterTest(unittest.TestCase):
     def setUp(self):
-
-        #Initiate grass
-        init = vtkGRASSInit()
-        init.Init("GRASSVectorMapReaderWriterTest")
-        init.ExitOnErrorOn()
+        global firstCheck
+        if firstCheck == False:
+            #Initiate grass
+            init = vtkGRASSInit()
+            init.Init("GRASSVectorMapReaderWriterTest")
+            init.ExitOnErrorOn()
+            # Create the input data
+            inputlist = ["v.random", "--o", "-z", "n=20", "zmin=-20", "zmax=2500", "output=random_points"]
+            proc = subprocess.Popen(args=inputlist)
+            proc.communicate()
+            inputlist = ["v.voronoi", "--o", "input=random_points", "output=random_areas"]
+            proc = subprocess.Popen(args=inputlist)
+            proc.communicate()
+            firstCheck = True
 
     def test1NoTopoWriter(self):
         reader = vtkGRASSVectorMapNoTopoReader()
-        reader.OpenMap("nc_state@user1")
+        reader.OpenMap("random_areas")
 
         writer = vtkGRASSVectorMapWriter()
-        writer.OpenMap("nc_state_copy_1", 0)
+        writer.OpenMap("random_areas_copy_1", 0)
 
         points = vtkGRASSVectorFeaturePoints()
         cats = vtkGRASSVectorFeatureCats()
@@ -49,10 +60,10 @@ class GRASSVectorMapReaderWriterTest(unittest.TestCase):
 
     def test2TopoWriter(self):
         reader = vtkGRASSVectorMapTopoReader()
-        reader.OpenMap("nc_state@user1")
+        reader.OpenMap("random_areas")
 
         writer = vtkGRASSVectorMapWriter()
-        writer.OpenMap("nc_state_copy_1_1", 0)
+        writer.OpenMap("random_areas_copy_1_1", 0)
 
         points = vtkGRASSVectorFeaturePoints()
         cats = vtkGRASSVectorFeatureCats()
@@ -78,11 +89,11 @@ class GRASSVectorMapReaderWriterTest(unittest.TestCase):
 
     def test3TopoUpdate(self):
         reader = vtkGRASSVectorMapTopoReader()
-        reader.OpenMap("nc_state@user1")
+        reader.OpenMap("random_areas")
 
         writer = vtkGRASSVectorMapWriter()
         writer.SetVectorLevelToTopo()
-        writer.OpenMap("nc_state_copy_2", 1)
+        writer.OpenMap("random_areas_copy_2", 1)
 
         writer.SetOrganisation("giscoder.de")
         writer.SetTitle("vtkGRASSBBridgeTest")
@@ -99,7 +110,7 @@ class GRASSVectorMapReaderWriterTest(unittest.TestCase):
 
         updater = vtkGRASSVectorMapUpdater()
         updater.SetVectorLevelToTopo()
-        updater.OpenMap("nc_state_copy_2", 0)
+        updater.OpenMap("random_areas_copy_2", 0)
         updater.BuildBase()
         offset = []
         for i  in range(updater.GetNumberOfFeatures()):
@@ -131,11 +142,11 @@ class GRASSVectorMapReaderWriterTest(unittest.TestCase):
 
     def test4TopoUpdate(self):
         reader = vtkGRASSVectorMapTopoReader()
-        reader.OpenMap("nc_state@user1")
+        reader.OpenMap("random_areas")
 
         writer = vtkGRASSVectorMapWriter()
         writer.SetVectorLevelToTopo()
-        writer.OpenMap("nc_state_copy_3", 1)
+        writer.OpenMap("random_areas_copy_3", 1)
 
         writer.SetOrganisation("giscoder.de")
         writer.SetTitle("vtkGRASSBBridgeTest")
@@ -156,7 +167,7 @@ class GRASSVectorMapReaderWriterTest(unittest.TestCase):
 
         reader.CloseMap()
         writer.CloseMap(1)
-        reader.OpenMap("nc_state_copy_3")
+        reader.OpenMap("random_areas_copy_3")
         print reader
 
 

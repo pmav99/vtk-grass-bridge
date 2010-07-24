@@ -12,22 +12,33 @@
 #  GNU General Public License for more details.
 
 import unittest
-import os
+import subprocess
 from libvtkCommonPython import *
 from libvtkGRASSBridgeCommonPython import *
 from libvtkGRASSBridgeVectorPython import *
 
+firstCheck = False
+
 class GRASSVectorMapTopoReaderTest(unittest.TestCase):
     def setUp(self):
-
-        #Initiate grass
-        init = vtkGRASSInit()
-        init.Init("GRASSVectorMapTopoReaderTest")
-        init.ExitOnErrorOn()
+        global firstCheck
+        if firstCheck == False:
+            #Initiate grass
+            init = vtkGRASSInit()
+            init.Init("GRASSVectorMapTopoReaderTest")
+            init.ExitOnErrorOn()
+            # Create the input data
+            inputlist = ["v.random", "--o", "-z", "n=20", "zmin=-20", "zmax=2500", "output=random_points"]
+            proc = subprocess.Popen(args=inputlist)
+            proc.communicate()
+            inputlist = ["v.voronoi", "--o", "input=random_points", "output=random_areas"]
+            proc = subprocess.Popen(args=inputlist)
+            proc.communicate()
+            firstCheck = True
 
     def test1TopoReader(self):
         map = vtkGRASSVectorMapTopoReader()
-        map.OpenMap("nc_state@user1")
+        map.OpenMap("random_areas")
 
         box = vtkGRASSVectorBBox()
         map.GetBoundingBox(box)

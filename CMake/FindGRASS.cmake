@@ -7,66 +7,75 @@
 # GRASS_FOUND, If false, do not try to use GRASS.
 
 FIND_PATH(GRASS_INCLUDE_DIR grass/gis.h
-  /home/soeren/src/grass_trunk/dist.i686-pc-linux-gnu/include
+  /home/soeren/src/grass7.0/grass_trunk/dist.i686-pc-linux-gnu/include
   /usr/local/include
   /usr/include
 )
 
-FIND_LIBRARY(GRASS_gis_LIBRARY grass_gis
+FIND_LIBRARY(GRASS_gis_LIBRARY grass_gis.7.0.svn
+  /home/soeren/src/grass7.0/grass_trunk/dist.i686-pc-linux-gnu/lib
   /home/soeren/src/grass_trunk/dist.i686-pc-linux-gnu/lib
   /usr/local/lib
   /usr/lib
 )
 
-FIND_LIBRARY(GRASS_raster_LIBRARY grass_raster
+FIND_LIBRARY(GRASS_raster_LIBRARY grass_raster.7.0.svn
+  /home/soeren/src/grass7.0/grass_trunk/dist.i686-pc-linux-gnu/lib
+  /usr/local/lib
+  /usr/lib
+)
+
+FIND_LIBRARY(GRASS_g3d_LIBRARY grass_g3d.7.0.svn
+  /home/soeren/src/grass7.0/grass_trunk/dist.i686-pc-linux-gnu/lib
   /home/soeren/src/grass_trunk/dist.i686-pc-linux-gnu/lib
   /usr/local/lib
   /usr/lib
 )
 
-FIND_LIBRARY(GRASS_g3d_LIBRARY grass_g3d
+FIND_LIBRARY(GRASS_vector_LIBRARY grass_vector.7.0.svn
+  /home/soeren/src/grass7.0/grass_trunk/dist.i686-pc-linux-gnu/lib
   /home/soeren/src/grass_trunk/dist.i686-pc-linux-gnu/lib
   /usr/local/lib
   /usr/lib
 )
 
-FIND_LIBRARY(GRASS_vector_LIBRARY grass_vector
+FIND_LIBRARY(GRASS_gmath_LIBRARY grass_gmath.7.0.svn
+  /home/soeren/src/grass7.0/grass_trunk/dist.i686-pc-linux-gnu/lib
   /home/soeren/src/grass_trunk/dist.i686-pc-linux-gnu/lib
   /usr/local/lib
   /usr/lib
 )
 
-FIND_LIBRARY(GRASS_gmath_LIBRARY grass_gmath
+FIND_LIBRARY(GRASS_gpde_LIBRARY grass_gpde.7.0.svn
+  /home/soeren/src/grass7.0/grass_trunk/dist.i686-pc-linux-gnu/lib
   /home/soeren/src/grass_trunk/dist.i686-pc-linux-gnu/lib
   /usr/local/lib
   /usr/lib
 )
 
-FIND_LIBRARY(GRASS_gpde_LIBRARY grass_gpde
+FIND_LIBRARY(GRASS_dbmibase_LIBRARY grass_dbmibase.7.0.svn
+  /home/soeren/src/grass7.0/grass_trunk/dist.i686-pc-linux-gnu/lib
   /home/soeren/src/grass_trunk/dist.i686-pc-linux-gnu/lib
   /usr/local/lib
   /usr/lib
 )
 
-FIND_LIBRARY(GRASS_dbmibase_LIBRARY grass_dbmibase
+FIND_LIBRARY(GRASS_dbmidriver_LIBRARY grass_dbmidriver.7.0.svn
+  /home/soeren/src/grass7.0/grass_trunk/dist.i686-pc-linux-gnu/lib
   /home/soeren/src/grass_trunk/dist.i686-pc-linux-gnu/lib
   /usr/local/lib
   /usr/lib
 )
 
-FIND_LIBRARY(GRASS_dbmidriver_LIBRARY grass_dbmidriver
+FIND_LIBRARY(GRASS_dbmiclient_LIBRARY grass_dbmiclient.7.0.svn
+  /home/soeren/src/grass7.0/grass_trunk/dist.i686-pc-linux-gnu/lib
   /home/soeren/src/grass_trunk/dist.i686-pc-linux-gnu/lib
   /usr/local/lib
   /usr/lib
 )
 
-FIND_LIBRARY(GRASS_dbmiclient_LIBRARY grass_dbmiclient
-  /home/soeren/src/grass_trunk/dist.i686-pc-linux-gnu/lib
-  /usr/local/lib
-  /usr/lib
-)
-
-FIND_LIBRARY(GRASS_datetime_LIBRARY grass_datetime
+FIND_LIBRARY(GRASS_datetime_LIBRARY grass_datetime.7.0.svn
+  /home/soeren/src/grass7.0/grass_trunk/dist.i686-pc-linux-gnu/lib
   /home/soeren/src/grass_trunk/dist.i686-pc-linux-gnu/lib
   /usr/local/lib
   /usr/lib
@@ -102,7 +111,7 @@ MARK_AS_ADVANCED(
   GRASS_datetime_LIBRARY 
   GRASS_g3d_LIBRARY 
   GRASS_raster_LIBRARY 
-  GRASS_vect_LIBRARY 
+  GRASS_vector_LIBRARY
   GRASS_gmath_LIBRARY 
   GRASS_gpde_LIBRARY 
   GRASS_dbmiclient_LIBRARY 
