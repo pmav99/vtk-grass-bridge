@@ -28,9 +28,13 @@ extern "C"
 vtkCxxRevisionMacro(vtkGRASSInit, "$Revision: 1.18 $");
 vtkStandardNewMacro(vtkGRASSInit);
 
+#ifdef threadLocal
 threadLocal const char* vgb_error_message = NULL;
 threadLocal jmp_buf vgb_stack_buffer;
-
+#else
+const char* vgb_error_message = NULL;
+jmp_buf vgb_stack_buffer;
+#endif
 
 //----------------------------------------------------------------------------
 

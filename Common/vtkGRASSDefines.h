@@ -31,8 +31,10 @@ extern "C" {
 
 #ifdef WIN32
 #define Thread   __declspec( thread )
-#else
+#elif linux
 #define threadLocal   __thread
+#else
+//no thread local support
 #endif
 
 #define TRY         if (!setjmp(vgb_stack_buffer)) {
@@ -63,5 +65,10 @@ extern "C" {
   vtkSmartPointer<type> name = vtkSmartPointer<type>::New()
 
 
+#ifdef threadLocal
 extern threadLocal jmp_buf vgb_stack_buffer;    /*to save the most important CPU register for each thread*/
 extern threadLocal const char* vgb_error_message;
+#else
+extern jmp_buf vgb_stack_buffer;    /*to save the most important CPU register for each thread*/
+extern const char* vgb_error_message;
+#endif
