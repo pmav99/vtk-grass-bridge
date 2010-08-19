@@ -52,7 +52,7 @@ public:
   //!\brief Parse the command line arguments each argument is a single string in the string array
   void Parser(vtkStringArray *argv);
   //BTX
-  //!\brief Prase the command line arguments
+  //!\brief Parse the command line arguments
   void Parser(int argc, char **argv);
   //ETX
 protected:

@@ -176,8 +176,6 @@ bool vtkGRASSRegion::SaveRegionAsDefault() {
 
 bool vtkGRASSRegion::AdjustRegion() {
 
-    char buff[1024];
-
     this->CopyRegionTo(&this->head);
 
     TRY G_adjust_Cell_head(&this->head, 1, 1);

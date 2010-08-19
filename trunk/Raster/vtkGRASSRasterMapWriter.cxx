@@ -107,9 +107,7 @@ vtkGRASSRasterMapWriter::PutNextRow(vtkDataArray *data)
 {
 
     int i;
-    int ret;
     char buff[1024];
-    int error = 0;
 
     if (data == NULL)
     {

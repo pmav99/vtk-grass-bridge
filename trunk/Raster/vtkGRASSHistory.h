@@ -27,6 +27,7 @@
 
 #include "vtkGRASSBridgeRasterWin32Header.h"
 #include "vtkObjectGRASSErrorHandler.h"
+#include "vtkGRASSDefines.h"
 
 extern "C" {
 #include <grass/gis.h>
@@ -55,14 +56,14 @@ public:
   const char *GetDataSource2(){return Rast_get_history(this->hist, HIST_DATSRC_2);}
   const char *GetKeywords(){return Rast_get_history(this->hist, HIST_KEYWRD);}
 
-  void SetTitle(const char *title){return Rast_set_history(this->hist, HIST_TITLE, title);}
-  void SetCreator(const char *creator){return Rast_set_history(this->hist, HIST_CREATOR, creator);}
-  void SetDataSource1(const char *datsrc_1){return Rast_set_history(this->hist, HIST_DATSRC_1, datsrc_1);}
-  void SetDataSource2(const char *datsrc_2){return Rast_set_history(this->hist, HIST_DATSRC_2, datsrc_2);}
-  void SetKeywords(const char *keywrd){return Rast_set_history(this->hist, HIST_KEYWRD, keywrd);}
+  void SetTitle(const char *title){TRY Rast_set_history(this->hist, HIST_TITLE, title); CATCH_VOID}
+  void SetCreator(const char *creator){TRY Rast_set_history(this->hist, HIST_CREATOR, creator); CATCH_VOID}
+  void SetDataSource1(const char *datsrc_1){TRY Rast_set_history(this->hist, HIST_DATSRC_1, datsrc_1); CATCH_VOID}
+  void SetDataSource2(const char *datsrc_2){TRY Rast_set_history(this->hist, HIST_DATSRC_2, datsrc_2); CATCH_VOID}
+  void SetKeywords(const char *keywrd){TRY Rast_set_history(this->hist, HIST_KEYWRD, keywrd); CATCH_VOID}
   
   //! \brief Append a comment to the raster map history file.
-  bool AppendComment(char *comment) {Rast_append_history(this->hist, comment);}
+  void  AppendComment(char *comment) {TRY Rast_append_history(this->hist, comment); CATCH_VOID}
 
   //BTX
   virtual struct History* GetPointer(){return this->hist;}
