@@ -69,6 +69,6 @@ extern "C" {
 extern threadLocal jmp_buf vgb_stack_buffer;    /*to save the most important CPU register for each thread*/
 extern threadLocal const char* vgb_error_message;
 #else
-extern jmp_buf vgb_stack_buffer;    /*to save the most important CPU register for each thread*/
+extern jmp_buf vgb_stack_buffer;    /*to save the most important CPU register*/
 extern const char* vgb_error_message;
 #endif
