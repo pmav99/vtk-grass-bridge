@@ -4,6 +4,8 @@
 INCLUDE (${CMAKE_ROOT}/Modules/FindVTK.cmake)
 # We need grass, so no option is defined
 INCLUDE (CMake/FindGRASS.cmake)
+INCLUDE (CMake/FindGEOS.cmake)
+INCLUDE (${CMAKE_ROOT}/Modules/FindGDAL.cmake)
 
 IF (USE_VTK_FILE)
   INCLUDE (${USE_VTK_FILE})
@@ -17,9 +19,6 @@ ENDIF (USE_VTK_FILE)
 #
 
 IF (USE_VTK_FILE)
-  #Bibliotheken fuer FePview
-  OPTION(BUILD_GRASS_VISUALIZATION "Build the visualization libraries" ON)
-
   # Standard CMake option for building libraries shared or static by default.
   OPTION(BUILD_SHARED_LIBS 
          "Build with shared libraries." 

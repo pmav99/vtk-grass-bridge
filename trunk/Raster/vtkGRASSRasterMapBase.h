@@ -119,7 +119,6 @@ protected:
 //  struct Range crange;
 //  struct FPRange range;
 //  struct Categories cats;
-//  struct History hist;
 //  struct TimeStamp ts;
   vtkSmartPointer<vtkDataArray> Row;
   vtkSmartPointer<vtkCharArray> NullRow;

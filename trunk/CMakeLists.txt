@@ -38,10 +38,8 @@ IF (VTK_GRASS_BRIDGE_CAN_BUILD)
   # numerous dependencies problems.
   #
 
-  #Common, Filtering und IO sollte immer gebaut werden
   SUBDIRS (
      Common
-#     Filtering
      IO
      Raster
      Vector
@@ -53,15 +51,12 @@ IF (VTK_GRASS_BRIDGE_CAN_BUILD)
   INCLUDE_DIRECTORIES (${VTK_GRASS_BRIDGE_SOURCE_DIR}/Raster)
   INCLUDE_DIRECTORIES (${VTK_GRASS_BRIDGE_SOURCE_DIR}/Vector)
   INCLUDE_DIRECTORIES (${GRASS_INCLUDE_DIR})
-
-  # Die Visualisierungsbibliothek ist optional, da nur von FePview verwendet
-#  IF (BUILD_GRASS_VISUALIZATION)
-    # Diese Bibliotheken dienen zur Darstellung
-#      SUBDIRS (
-#         Graphics     
-#      )
-#      INCLUDE_DIRECTORIES (${VTK_GRASS_BRIDGE_SOURCE_DIR}/Graphics)
-#  ENDIF (BUILD_FP_VISUALIZATION)
+  IF (GDAL_FOUND)
+    INCLUDE_DIRECTORIES (${GDAL_INCLUDE_DIRS})
+  ENDIF (GDAL_FOUND)
+  IF (GEOS_FOUND)
+    INCLUDE_DIRECTORIES (${GEOS_INCLUDE_DIRS})
+  ENDIF (GEOS_FOUND)
 
   CONFIGURE_FILE(
     ${VTK_GRASS_BRIDGE_SOURCE_DIR}/vtkGRASSBridgeConfigure.h.in 
