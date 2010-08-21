@@ -26,10 +26,18 @@ vtkGRASSRegion::vtkGRASSRegion() {
     this->CompressionFlag = 0;
     this->Rows = 0;
     this->Cols = 0;
+    this->Rows3d = 0;
+    this->Cols3d = 0;
+    this->Depths = 0;
+    this->Top = 0;
+    this->Bottom = 0;
     this->Projection = 0;
     this->Zone = 0;
     this->EastWestResolution = 0;
     this->NorthSouthResolution = 0;
+    this->EastWestResolution3d = 0;
+    this->NorthSouthResolution3d = 0;
+    this->TopBottomResolution = 0;
     this->NorthernEdge = 0;
     this->SouthernEdge = 0;
     this->EasternEdge = 0;
@@ -47,6 +55,16 @@ vtkGRASSRegion::~vtkGRASSRegion() {
     if(this->Name)
         delete [] this->Name;
 }
+
+//----------------------------------------------------------------------------
+
+bool vtkGRASSRegion::SetCurrentRegion() {
+    this->CopyRegionTo(&this->head);
+    TRY G_set_window(&this->head);
+    CATCH_BOOL
+    return true;
+}
+
 //----------------------------------------------------------------------------
 
 bool vtkGRASSRegion::ReadCurrentRegion() {
@@ -136,6 +154,7 @@ bool vtkGRASSRegion::SaveRegion(char *regionName) {
 
     TRY
     G_adjust_Cell_head(&this->head, 1, 1);
+    G_adjust_Cell_head3(&this->head, 1, 1, 1);
     CATCH_BOOL
 
 
@@ -159,6 +178,7 @@ bool vtkGRASSRegion::SaveRegionAsDefault() {
     this->CopyRegionTo(&this->head);
 
     TRY G_adjust_Cell_head(&this->head, 1, 1);
+    G_adjust_Cell_head3(&this->head, 1, 1, 1);
     CATCH_BOOL
 
     if(G_put_window(&this->head) != 1)
@@ -188,6 +208,20 @@ bool vtkGRASSRegion::AdjustRegion() {
 
 //----------------------------------------------------------------------------
 
+bool vtkGRASSRegion::AdjustRegion3d() {
+
+    this->CopyRegionTo(&this->head);
+
+    TRY G_adjust_Cell_head3(&this->head, 1, 1, 1);
+    CATCH_BOOL
+
+    this->CopyRegionFrom(&this->head);
+
+    return true;
+}
+
+//----------------------------------------------------------------------------
+
 bool vtkGRASSRegion::CopyRegionFrom(struct Cell_head *head) {
     this->BytesPerCell = head->format;
     this->CompressionFlag = head->compressed;
@@ -195,6 +229,8 @@ bool vtkGRASSRegion::CopyRegionFrom(struct Cell_head *head) {
     this->Cols = head->cols;
     this->Rows3d = head->rows3;
     this->Cols3d = head->cols3;
+    this->Top = head->top;
+    this->Bottom = head->bottom;
     this->Projection = head->proj;
     this->Zone = head->zone;
     this->EastWestResolution = head->ew_res;
@@ -218,6 +254,9 @@ bool vtkGRASSRegion::CopyRegionTo(struct Cell_head *head) {
     head->cols = this->Cols;
     head->rows3 = this->Rows3d;
     head->cols3 = this->Cols3d;
+    head->depths = this->Depths;
+    head->top = this->Top;
+    head->bottom = this->Bottom;
     head->proj = this->Projection;
     head->zone = this->Zone;
     head->ew_res = this->EastWestResolution;
@@ -242,6 +281,9 @@ void vtkGRASSRegion::DeepCopy(vtkGRASSRegion *region) {
     this->Cols = region->Cols;
     this->Rows3d = region->Rows3d;
     this->Cols3d = region->Cols3d;
+    this->Depths = region->Depths;
+    this->Top = region->Top;
+    this->Bottom = region->Bottom;
     this->Projection = region->Projection;
     this->Zone = region->Zone;
     this->EastWestResolution = region->EastWestResolution;
@@ -270,6 +312,9 @@ void vtkGRASSRegion::PrintSelf(ostream& os, vtkIndent indent) {
     os << indent << "Cols: " << this->Cols << endl;
     os << indent << "Rows3d: " << this->Rows3d << endl;
     os << indent << "Cols3d: " << this->Cols3d << endl;
+    os << indent << "Depths: " << this->Depths << endl;
+    os << indent << "Top: " << this->Top << endl;
+    os << indent << "Bottom: " << this->Bottom << endl;
     os << indent << "Projection: " << this->Projection << endl;
     os << indent << "Zone: " << this->Zone << endl;
     os << indent << "EastWestResolution: " << this->EastWestResolution << endl;

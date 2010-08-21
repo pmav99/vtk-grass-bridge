@@ -46,6 +46,9 @@ public:
   vtkGetMacro(Cols, int);
   vtkGetMacro(Rows3d, int);
   vtkGetMacro(Cols3d, int);
+  vtkGetMacro(Depths, int);
+  vtkGetMacro(Top, int);
+  vtkGetMacro(Bottom, int);
   vtkGetMacro(Projection, int);
   vtkGetMacro(Zone, int);
   vtkGetMacro(EastWestResolution, double);
@@ -64,6 +67,9 @@ public:
   vtkSetMacro(Cols, int);
   vtkSetMacro(Rows3d, int);
   vtkSetMacro(Cols3d, int);
+  vtkSetMacro(Depths, int);
+  vtkSetMacro(Top, int);
+  vtkSetMacro(Bottom, int);
   vtkSetMacro(Projection, int);
   vtkSetMacro(Zone, int);
   vtkSetMacro(EastWestResolution, double);
@@ -76,6 +82,9 @@ public:
   vtkSetMacro(EasternEdge, double);
   vtkSetMacro(WesternEdge, double);
 
+  //! \brief Sets the current grass region with the internal data
+  //! \return ture for succsess, false for error
+  bool SetCurrentRegion();
   //! \brief Reads the current grass region
   //! \return ture for succsess, false for error
   bool ReadCurrentRegion();
@@ -95,6 +104,10 @@ public:
   //! \brief Adjust the region resolution using the rows and cols settings
   //! \return true for success, false for error
   bool AdjustRegion();
+  //! \brief Adjust the region 3d resolution using the depth, rows and cols
+  //! settings
+  //! \return true for success, false for error
+  bool AdjustRegion3d();
 
   vtkGetStringMacro(Name);
 
@@ -121,6 +134,9 @@ protected:
   int Cols;
   int Rows3d;
   int Cols3d;
+  int Top;
+  int Bottom;
+  int Depths;
   int Projection;
   int Zone;
   double EastWestResolution3d;

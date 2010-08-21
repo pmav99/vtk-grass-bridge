@@ -26,28 +26,59 @@ class GRASSRegionTest(unittest.TestCase):
         init.Init("GRASSRegionTest")
         init.ExitOnErrorOn()
 
-        ret = region = vtkGRASSRegion()
-        if ret != True:
-            print region.GetError();
-        print region
+        region = vtkGRASSRegion()
+        print "Current region", region
 
-        ret =region.ReadDefaultRegion()
+        ret = region.ReadDefaultRegion()
         if ret != True:
             print region.GetError();
-        print region
+        print "Default region", region
 
         ret = region.ReadCurrentRegion()
         if ret != True:
             print region.GetError();
-        print region
+        print "Current region", region
 
-        print region
-        region.SetRows(region.GetRows() - 250);
-        region.SetCols(region.GetCols() - 250);
+        region.SetRows(region.GetRows() + 25);
+        region.SetCols(region.GetCols() + 25);
         ret = region.AdjustRegion()
         if ret != True:
             print region.GetError();
-        print region
+        print "Modified region rows and cols", region
+
+        region.SetRows3d(region.GetRows3d() + 25);
+        region.SetCols3d(region.GetCols3d() + 25);
+        region.SetDepths(region.GetCols3d() + 25);
+        ret = region.AdjustRegion3d()
+        if ret != True:
+            print region.GetError();
+        print "Modified region 3d", region
+
+        region.SetEastWestResolution(region.GetEastWestResolution() + 25);
+        region.SetNorthSouthResolution(region.GetNorthSouthResolution() + 25);
+        ret = region.AdjustRegion()
+        if ret != True:
+            print region.GetError();
+        print "Modified region resolution", region
+
+        region.SetEastWestResolution3d(region.GetEastWestResolution3d() + 25);
+        region.SetNorthSouthResolution3d(region.GetNorthSouthResolution3d() + 25);
+        region.SetTopBottomResolution(region.GetTopBottomResolution() + 25);
+        region.SetTop(region.GetTop() + 25);
+        region.SetBottom(region.GetBottom() + 25);
+        ret = region.AdjustRegion3d()
+        if ret != True:
+            print region.GetError();
+        print "Modified region 3d resolution", region
+
+        ret = region.SetCurrentRegion()
+        if ret != True:
+            print region.GetError();
+
+        ret = region.ReadCurrentRegion()
+        if ret != True:
+            print region.GetError();
+        print "Current region", region
 
         print "Save regions"
         ret = region.SaveRegion("testregion")
