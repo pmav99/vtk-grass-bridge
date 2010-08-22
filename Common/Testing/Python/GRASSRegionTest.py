@@ -108,9 +108,17 @@ class GRASSRegionTest(unittest.TestCase):
             
         rows = 1000
         cols = 600
+        n = region.GetNorthernEdge() + region.GetNorthernEdge()/1000.0
+        s = region.GetSouthernEdge() + region.GetNorthernEdge()/1000.0
+        e = region.GetEasternEdge() + region.GetEasternEdge()/1000.0
+        w = region.GetWesternEdge() + region.GetEasternEdge()/1000.0
 
         region.SetRows(rows);
         region.SetCols(cols);
+        region.SetNorthernEdge(n)
+        region.SetSouthernEdge(s)
+        region.SetEasternEdge(e)
+        region.SetWesternEdge(w)
         region.AdjustRegionResolution()
 
         ret = region.SetCurrentRegion()
@@ -124,6 +132,10 @@ class GRASSRegionTest(unittest.TestCase):
 
         self.assertEqual(region.GetRows(), rows, "Rows differ")
         self.assertEqual(region.GetCols(), cols, "Cols differ")
+        self.assertEqual(region.GetNorthernEdge(), n, "north differ")
+        self.assertEqual(region.GetSouthernEdge(), s, "south differ")
+        self.assertEqual(region.GetEasternEdge(), e, "east differ")
+        self.assertEqual(region.GetWesternEdge(), w, "west differ")
 
     def testRegionSize3d(self):
 
@@ -136,10 +148,18 @@ class GRASSRegionTest(unittest.TestCase):
         rows = 1000
         cols = 600
         depths = 100
+        n = region.GetNorthernEdge() + region.GetNorthernEdge()/1000.0
+        s = region.GetSouthernEdge() + region.GetNorthernEdge()/1000.0
+        e = region.GetEasternEdge() + region.GetEasternEdge()/1000.0
+        w = region.GetWesternEdge() + region.GetEasternEdge()/1000.0
 
         region.SetRows3d(rows);
         region.SetCols3d(cols);
         region.SetDepths(depths)
+        region.SetNorthernEdge(n)
+        region.SetSouthernEdge(s)
+        region.SetEasternEdge(e)
+        region.SetWesternEdge(w)
         region.AdjustRegion3dResolution()
 
         ret = region.SetCurrentRegion()
@@ -151,9 +171,13 @@ class GRASSRegionTest(unittest.TestCase):
             print region.GetError();
         print "region", region
 
-        self.assertEqual(region.GetRows3d(), rows, "Rows differ")
-        self.assertEqual(region.GetCols3d(), cols, "Cols differ")
+        self.assertEqual(region.GetRows3d(), rows, "Rows3d differ")
+        self.assertEqual(region.GetCols3d(), cols, "Cols3d differ")
         self.assertEqual(region.GetDepths(), depths, "Depths differ")
+        self.assertEqual(region.GetNorthernEdge(), n, "north differ")
+        self.assertEqual(region.GetSouthernEdge(), s, "south differ")
+        self.assertEqual(region.GetEasternEdge(), e, "east differ")
+        self.assertEqual(region.GetWesternEdge(), w, "west differ")
 
     def testRegionResolution2d(self):
 
