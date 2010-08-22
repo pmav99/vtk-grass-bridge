@@ -114,7 +114,7 @@ vtkGRASSRasterImageWriter::SimpleExecute(vtkImageData* input, vtkImageData* outp
     // We need to adjust the region to the image dimension
     region->SetRows(dims[1]);
     region->SetCols(dims[0]);
-    region->AdjustRegion();
+    region->AdjustRegionResolution();
 
     this->RasterMap->SetRegion(region);
     this->RasterMap->UseUserDefinedRegion();

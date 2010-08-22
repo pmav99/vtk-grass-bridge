@@ -133,9 +133,9 @@ vtkGRASSRasterMapWriter::PutNextRow(vtkDataArray *data)
     {
         if (this->MapType == CELL_TYPE)
             ((CELL*)this->RasterBuff)[i] = (CELL) data->GetTuple1(i);
-        if (this->MapType == FCELL_TYPE)
+        else if (this->MapType == FCELL_TYPE)
             ((FCELL*)this->RasterBuff)[i] = (FCELL) data->GetTuple1(i);
-        if (this->MapType == DCELL_TYPE)
+        else if (this->MapType == DCELL_TYPE)
             ((DCELL*)this->RasterBuff)[i] = (DCELL) data->GetTuple1(i);
     }
 

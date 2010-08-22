@@ -46,6 +46,7 @@ class VTK_GRASS_BRIDGE_RASTER_EXPORT vtkGRASSRasterMapBase : public vtkObjectGRA
 public:
   static  vtkGRASSRasterMapBase *New();
   vtkTypeRevisionMacro(vtkGRASSRasterMapBase,vtkObjectGRASSErrorHandler);
+  void PrintSelf(ostream& os, vtkIndent indent);
 
   vtkGetStringMacro(RasterName);
   vtkGetStringMacro(Mapset);
@@ -55,6 +56,9 @@ public:
   virtual void UseRasterRegion(){this->SetRegionUsage(VTK_GRASS_REGION_RASTER);}
   virtual void UseUserDefinedRegion(){this->SetRegionUsage(VTK_GRASS_REGION_USER);}
   vtkGetMacro(RegionUsage, int);
+
+  //!\brief Return the maptype as string (CELL_TYPE; FCELL_TYPE and DCELL_TYPE or NULL if unknown)
+  virtual const char* GetMapTypeAsString();
 
   //! \brief Set the Region which should be used to open the grass raster map
   vtkSetObjectMacro(Region, vtkGRASSRegion);
@@ -122,7 +126,7 @@ protected:
 //  struct TimeStamp ts;
   vtkSmartPointer<vtkDataArray> Row;
   vtkSmartPointer<vtkCharArray> NullRow;
-  double *RasterBuff;
+  DCELL *RasterBuff;
   char *NullBuff;
   //ETX
   // Colortable, history and cats, timestamp are needed

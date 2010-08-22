@@ -20,11 +20,13 @@ from libvtkGRASSBridgeCommonPython import *
 
 
 class GRASSRegionTest(unittest.TestCase):
-    def testSmoke(self):
-
+    def setUp(self):
+        
         init = vtkGRASSInit()
         init.Init("GRASSRegionTest")
         init.ExitOnErrorOn()
+
+    def testSmoke(self):
 
         region = vtkGRASSRegion()
         print "Current region", region
@@ -41,7 +43,7 @@ class GRASSRegionTest(unittest.TestCase):
 
         region.SetRows(region.GetRows() + 25);
         region.SetCols(region.GetCols() + 25);
-        ret = region.AdjustRegion()
+        ret = region.AdjustRegionResolution()
         if ret != True:
             print region.GetError();
         print "Modified region rows and cols", region
@@ -49,14 +51,14 @@ class GRASSRegionTest(unittest.TestCase):
         region.SetRows3d(region.GetRows3d() + 25);
         region.SetCols3d(region.GetCols3d() + 25);
         region.SetDepths(region.GetCols3d() + 25);
-        ret = region.AdjustRegion3d()
+        ret = region.AdjustRegion3dResolution()
         if ret != True:
             print region.GetError();
         print "Modified region 3d", region
 
         region.SetEastWestResolution(region.GetEastWestResolution() + 25);
         region.SetNorthSouthResolution(region.GetNorthSouthResolution() + 25);
-        ret = region.AdjustRegion()
+        ret = region.AdjustRegionFromResolution()
         if ret != True:
             print region.GetError();
         print "Modified region resolution", region
@@ -66,7 +68,7 @@ class GRASSRegionTest(unittest.TestCase):
         region.SetTopBottomResolution(region.GetTopBottomResolution() + 25);
         region.SetTop(region.GetTop() + 25);
         region.SetBottom(region.GetBottom() + 25);
-        ret = region.AdjustRegion3d()
+        ret = region.AdjustRegion3dFromResolution()
         if ret != True:
             print region.GetError();
         print "Modified region 3d resolution", region
@@ -95,6 +97,124 @@ class GRASSRegionTest(unittest.TestCase):
         print "Regions in mapset " + lister.GetMapsetName()
         for i in range(num):
 		print lister.GetFileNames().GetValue(i)
+
+    def testRegionSize2d(self):
+
+        region = vtkGRASSRegion()
+
+        ret = region.ReadDefaultRegion()
+        if ret != True:
+            print region.GetError();
+            
+        rows = 1000
+        cols = 600
+
+        region.SetRows(rows);
+        region.SetCols(cols);
+        region.AdjustRegionResolution()
+
+        ret = region.SetCurrentRegion()
+        if ret != True:
+            print region.GetError();
+
+        ret = region.ReadCurrentRegion()
+        if ret != True:
+            print region.GetError();
+        print "region", region
+
+        self.assertEqual(region.GetRows(), rows, "Rows differ")
+        self.assertEqual(region.GetCols(), cols, "Cols differ")
+
+    def testRegionSize3d(self):
+
+        region = vtkGRASSRegion()
+
+        ret = region.ReadDefaultRegion()
+        if ret != True:
+            print region.GetError();
+
+        rows = 1000
+        cols = 600
+        depths = 100
+
+        region.SetRows3d(rows);
+        region.SetCols3d(cols);
+        region.SetDepths(depths)
+        region.AdjustRegion3dResolution()
+
+        ret = region.SetCurrentRegion()
+        if ret != True:
+            print region.GetError();
+
+        ret = region.ReadCurrentRegion()
+        if ret != True:
+            print region.GetError();
+        print "region", region
+
+        self.assertEqual(region.GetRows3d(), rows, "Rows differ")
+        self.assertEqual(region.GetCols3d(), cols, "Cols differ")
+        self.assertEqual(region.GetDepths(), depths, "Depths differ")
+
+    def testRegionResolution2d(self):
+
+        region = vtkGRASSRegion()
+
+        ret = region.ReadDefaultRegion()
+        if ret != True:
+            print region.GetError();
+
+        ew_res = 50
+        ns_res = 25
+
+        region.SetEastWestResolution(ew_res);
+        region.SetNorthSouthResolution(ns_res);
+        region.AdjustRegionFromResolution()
+
+        print region
+
+        ret = region.SetCurrentRegion()
+        if ret != True:
+            print region.GetError();
+
+        ret = region.ReadCurrentRegion()
+        if ret != True:
+            print region.GetError();
+        print "region", region
+
+        self.assertEqual(int(region.GetEastWestResolution()), ew_res, "ew resolution differ")
+        self.assertEqual(int(region.GetNorthSouthResolution()), ns_res, "ns resolution differ")
+
+    def testRegionResolution3d(self):
+
+        region = vtkGRASSRegion()
+
+        ret = region.ReadDefaultRegion()
+        if ret != True:
+            print region.GetError();
+
+        ew_res = 50
+        ns_res = 25
+        tb_res = 10
+
+        region.SetEastWestResolution3d(ew_res);
+        region.SetNorthSouthResolution3d(ns_res);
+        region.SetTopBottomResolution(tb_res)
+        region.AdjustRegion3dFromResolution()
+
+        print region
+
+        ret = region.SetCurrentRegion()
+        if ret != True:
+            print region.GetError();
+
+        ret = region.ReadCurrentRegion()
+        if ret != True:
+            print region.GetError();
+        print "region", region
+
+        self.assertEqual(int(region.GetEastWestResolution3d()), ew_res, "ew resolution differ")
+        self.assertEqual(int(region.GetNorthSouthResolution3d()), ns_res, "ns resolution differ")
+        self.assertEqual(int(region.GetTopBottomResolution()), tb_res, "tb resolution differ")
 
 if __name__ == '__main__':
     suite = unittest.TestLoader().loadTestsFromTestCase(GRASSRegionTest)

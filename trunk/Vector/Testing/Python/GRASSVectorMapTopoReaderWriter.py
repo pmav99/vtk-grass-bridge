@@ -134,8 +134,8 @@ class GRASSVectorMapReaderWriterTest(unittest.TestCase):
 
         updater.BuildAll()
         updater.RemoveDuplicates(updater.GetFeatureTypeBoundary());
-        updater.RemoveDuplicates(updater.GetFeatureTypePoints());
-        updater.RemoveDuplicates(updater.GetFeatureTypeLines());
+        updater.RemoveDuplicates(updater.GetFeatureTypePoint());
+        updater.RemoveDuplicates(updater.GetFeatureTypeLine());
         updater.RemoveSmallAreas(0.001);
         print updater
         updater.CloseMap(1)

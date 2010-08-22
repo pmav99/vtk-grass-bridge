@@ -104,7 +104,6 @@ int vtkGRASSRasterToImageReader::RequestInformation(
     }
     else if(this->RegionUsage == VTK_GRASS_REGION_USER && this->Region != NULL)
     {
-        this->Region->AdjustRegion();
         this->Region->CopyRegionTo(&head);
         G_set_window(&head);
     }
