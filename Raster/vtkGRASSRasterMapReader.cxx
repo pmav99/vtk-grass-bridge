@@ -95,6 +95,10 @@ vtkGRASSRasterMapReader::OpenMap(char *name)
         return false;
     }
 
+    // Get the map type
+    TRY this->MapType = Rast_get_map_type(this->Map);
+    CATCH_BOOL
+
     this->Open = true;
     return true;
 }

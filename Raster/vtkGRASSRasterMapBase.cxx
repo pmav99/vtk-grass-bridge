@@ -44,7 +44,7 @@ vtkGRASSRasterMapBase::vtkGRASSRasterMapBase()
     this->Row = NULL;
     this->NullRow = vtkSmartPointer<vtkCharArray>::New();
     this->RegionUsage = VTK_GRASS_REGION_CURRENT;
-    this->RasterBuff = (double*) NULL;
+    this->RasterBuff = (DCELL*) NULL;
     this->NullBuff = (char*) NULL;
     this->NullValue = -9999;
     this->UseGRASSNulleValue = 1;
@@ -66,8 +66,42 @@ vtkGRASSRasterMapBase::~vtkGRASSRasterMapBase()
 
     if (this->RasterBuff)
         G_free(this->RasterBuff);
+    if (this->NullBuff)
+        G_free(this->NullBuff);
 }
 
+//----------------------------------------------------------------------------
+
+void
+vtkGRASSRasterMapBase::PrintSelf(ostream& os, vtkIndent indent)
+{
+    this->Superclass::PrintSelf(os, indent);
+
+    os << indent << "Is map open: " << (this->Open ? "YES" : "NO") << endl;
+    if(this->Open) {
+        os << indent << "Name   : " << this->RasterName << endl;
+        os << indent << "Mapset : " << this->Mapset << endl;
+        os << indent << "Maptype: " << this->GetMapTypeAsString() << endl;
+        os << indent << "Cols   : " << this->NumberOfCols << endl;
+        os << indent << "Rows   : " << this->NumberOfRows << endl;
+        os << indent << "UseGRASSNulleValue: " << this->UseGRASSNulleValue << endl;
+    }
+    return;
+}
+
+//----------------------------------------------------------------------------
+
+const char* vtkGRASSRasterMapBase::GetMapTypeAsString()
+{
+    if(this->MapType == CELL_TYPE)
+        return "CELL_TYPE";
+    if(this->MapType == FCELL_TYPE)
+        return "FCELL_TYPE";
+    if(this->MapType == DCELL_TYPE)
+        return "DCELL_TYPE";
+
+    return NULL;
+}
 
 //----------------------------------------------------------------------------
 
@@ -103,7 +137,6 @@ vtkGRASSRasterMapBase::SetRegion()
         }
         else if (this->RegionUsage == VTK_GRASS_REGION_USER && this->Region != NULL)
         {
-            this->Region->AdjustRegion();
             this->Region->CopyRegionTo(&head);
             G_set_window(&head);
         }
@@ -141,18 +174,17 @@ vtkGRASSRasterMapBase::SetUpRasterBuffer()
     {
         if (this->MapType == CELL_TYPE)
             this->Row = vtkSmartPointer<vtkIntArray>::New();
-        if (this->MapType == FCELL_TYPE)
+        else if (this->MapType == FCELL_TYPE)
             this->Row = vtkSmartPointer<vtkFloatArray>::New();
-        if (this->MapType == DCELL_TYPE)
+        else if (this->MapType == DCELL_TYPE)
             this->Row = vtkSmartPointer<vtkDoubleArray>::New();
 
         this->Row->SetNumberOfTuples(this->NumberOfCols);
-        this->MapType = Rast_get_map_type(this->Map);
     }
 
     if (this->RasterBuff == NULL)
     {
-        this->RasterBuff = (double*)G_calloc(this->NumberOfCols, sizeof(double));
+        this->RasterBuff = (DCELL*)G_calloc(this->NumberOfCols, sizeof(DCELL));
     }
 
     return true;
@@ -175,6 +207,7 @@ vtkGRASSRasterMapBase::GetRow(int idx)
     }
 
     this->SetUpRasterBuffer();
+    // We read the raster row always as DCELL type
     TRY Rast_get_d_row(this->Map, this->RasterBuff, idx);
     CATCH_NULL
 
@@ -185,10 +218,10 @@ vtkGRASSRasterMapBase::GetRow(int idx)
             if(Rast_is_d_null_value(&this->RasterBuff[i]))
                 this->Row->SetTuple1(i, this->NullValue);
             else
-                this->Row->SetTuple1(i, this->RasterBuff[i]);
+                this->Row->SetTuple1(i, (double)this->RasterBuff[i]);
         }else
         {
-            this->Row->SetTuple1(i, this->RasterBuff[i]);
+            this->Row->SetTuple1(i, (double)this->RasterBuff[i]);
         }
     }
 
@@ -239,7 +272,7 @@ vtkGRASSRasterMapBase::CloseMap()
     if (this->RasterBuff)
     {
         G_free(this->RasterBuff);
-        this->RasterBuff = (double*) NULL;
+        this->RasterBuff = (DCELL*) NULL;
     }
 
     if (this->Open == true && this->Map != -1)

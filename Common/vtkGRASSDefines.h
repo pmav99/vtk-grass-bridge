@@ -40,23 +40,38 @@ extern "C" {
 #define TRY         if (!setjmp(vgb_stack_buffer)) {
 
 #define CATCH_INT   } else { \
-                    this->InsertNextError(vgb_error_message); \
+                    char __buff[1024]; \
+                    G_snprintf(__buff, 1024, "class: %s line: %i : %s", \
+                    this->GetClassName(), __LINE__, vgb_error_message); \
+                    this->InsertNextError(__buff); \
                     return -1;}
 
 #define CATCH_VINT (int num)  } else { \
-                    this->InsertNextError(vgb_error_message); \
+                    char __buff[1024]; \
+                    G_snprintf(__buff, 1024, "class: %s line: %i : %s", \
+                    this->GetClassName(), __LINE__, vgb_error_message); \
+                    this->InsertNextError(__buff); \
                     return num;}
 
 #define CATCH_VOID  } else { \
-                    this->InsertNextError(vgb_error_message); \
+                    char __buff[1024]; \
+                    G_snprintf(__buff, 1024, "class: %s line: %i : %s", \
+                    this->GetClassName(), __LINE__, vgb_error_message); \
+                    this->InsertNextError(__buff); \
                     return;}
 
 #define CATCH_BOOL  } else { \
-                    this->InsertNextError(vgb_error_message); \
+                    char __buff[1024]; \
+                    G_snprintf(__buff, 1024, "class: %s line: %i : %s", \
+                    this->GetClassName(), __LINE__, vgb_error_message); \
+                    this->InsertNextError(__buff); \
                     return false;}
 
 #define CATCH_NULL  } else { \
-                    this->InsertNextError(vgb_error_message); \
+                    char __buff[1024]; \
+                    G_snprintf(__buff, 1024, "class: %s line: %i : %s", \
+                    this->GetClassName(), __LINE__, vgb_error_message); \
+                    this->InsertNextError(__buff); \
                     return NULL;}
 
 

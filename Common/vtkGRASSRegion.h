@@ -103,11 +103,17 @@ public:
   bool SaveRegionAsDefault();
   //! \brief Adjust the region resolution using the rows and cols settings
   //! \return true for success, false for error
-  bool AdjustRegion();
+  bool AdjustRegionResolution();
+  //! \brief Adjust the rows and cols the from region resolution
+  //! \return true for success, false for error
+  bool AdjustRegionFromResolution();
   //! \brief Adjust the region 3d resolution using the depth, rows and cols
   //! settings
   //! \return true for success, false for error
-  bool AdjustRegion3d();
+  bool AdjustRegion3dResolution();
+  //! \brief Adjust the rows, cols and depths the from region resolution
+  //! \return true for success, false for error
+  bool AdjustRegion3dFromResolution();
 
   vtkGetStringMacro(Name);
 

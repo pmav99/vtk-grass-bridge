@@ -194,7 +194,7 @@ bool vtkGRASSRegion::SaveRegionAsDefault() {
 
 //----------------------------------------------------------------------------
 
-bool vtkGRASSRegion::AdjustRegion() {
+bool vtkGRASSRegion::AdjustRegionResolution() {
 
     this->CopyRegionTo(&this->head);
 
@@ -208,11 +208,39 @@ bool vtkGRASSRegion::AdjustRegion() {
 
 //----------------------------------------------------------------------------
 
-bool vtkGRASSRegion::AdjustRegion3d() {
+bool vtkGRASSRegion::AdjustRegionFromResolution() {
+
+    this->CopyRegionTo(&this->head);
+
+    TRY G_adjust_Cell_head(&this->head, 0, 0);
+    CATCH_BOOL
+
+    this->CopyRegionFrom(&this->head);
+
+    return true;
+}
+
+//----------------------------------------------------------------------------
+
+bool vtkGRASSRegion::AdjustRegion3dResolution() {
 
     this->CopyRegionTo(&this->head);
 
     TRY G_adjust_Cell_head3(&this->head, 1, 1, 1);
+    CATCH_BOOL
+
+    this->CopyRegionFrom(&this->head);
+
+    return true;
+}
+
+//----------------------------------------------------------------------------
+
+bool vtkGRASSRegion::AdjustRegion3dFromResolution() {
+
+    this->CopyRegionTo(&this->head);
+
+    TRY G_adjust_Cell_head3(&this->head, 0, 0, 0);
     CATCH_BOOL
 
     this->CopyRegionFrom(&this->head);
@@ -229,6 +257,7 @@ bool vtkGRASSRegion::CopyRegionFrom(struct Cell_head *head) {
     this->Cols = head->cols;
     this->Rows3d = head->rows3;
     this->Cols3d = head->cols3;
+    this->Depths = head->depths;
     this->Top = head->top;
     this->Bottom = head->bottom;
     this->Projection = head->proj;
