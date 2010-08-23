@@ -31,6 +31,7 @@
 
 extern "C" {
 #include <grass/gis.h>
+#include <grass/G3d.h>
 #include <grass/raster.h>
 }
 
@@ -42,28 +43,37 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   //! \brief Read the history of a raster map
-  bool ReadHistory(char *rastername);
+  virtual bool ReadHistory(char *rastername);
   //! \brief Write the history of a raster map
-  bool WriteHistory(char *rastername);
+  virtual bool WriteHistory(char *rastername);
+
+  //! \brief Read the history of a 3d raster map
+  virtual bool Read3dHistory(char *rastername);
+  //! \brief Write the history of a 3d raster map
+  virtual bool Write3dHistory(char *rastername);
 
   vtkGetStringMacro(RasterName);
-  const char *GetMapId(){return Rast_get_history(this->hist, HIST_MAPID);}
-  const char *GetTitle(){return Rast_get_history(this->hist, HIST_TITLE);}
-  const char *GetMapset(){return Rast_get_history(this->hist, HIST_MAPSET);}
-  const char *GetCreator(){return Rast_get_history(this->hist, HIST_CREATOR);}
-  const char *GetMaptype(){return Rast_get_history(this->hist, HIST_MAPTYPE);}
-  const char *GetDataSource1(){return Rast_get_history(this->hist, HIST_DATSRC_1);}
-  const char *GetDataSource2(){return Rast_get_history(this->hist, HIST_DATSRC_2);}
-  const char *GetKeywords(){return Rast_get_history(this->hist, HIST_KEYWRD);}
+  virtual const char *GetMapId(){return Rast_get_history(this->hist, HIST_MAPID);}
+  virtual const char *GetTitle(){return Rast_get_history(this->hist, HIST_TITLE);}
+  virtual const char *GetMapset(){return Rast_get_history(this->hist, HIST_MAPSET);}
+  virtual const char *GetCreator(){return Rast_get_history(this->hist, HIST_CREATOR);}
+  virtual const char *GetMaptype(){return Rast_get_history(this->hist, HIST_MAPTYPE);}
+  virtual const char *GetDataSource1(){return Rast_get_history(this->hist, HIST_DATSRC_1);}
+  virtual const char *GetDataSource2(){return Rast_get_history(this->hist, HIST_DATSRC_2);}
+  virtual const char *GetKeywords(){return Rast_get_history(this->hist, HIST_KEYWRD);}
 
-  void SetTitle(const char *title){TRY Rast_set_history(this->hist, HIST_TITLE, title); CATCH_VOID}
-  void SetCreator(const char *creator){TRY Rast_set_history(this->hist, HIST_CREATOR, creator); CATCH_VOID}
-  void SetDataSource1(const char *datsrc_1){TRY Rast_set_history(this->hist, HIST_DATSRC_1, datsrc_1); CATCH_VOID}
-  void SetDataSource2(const char *datsrc_2){TRY Rast_set_history(this->hist, HIST_DATSRC_2, datsrc_2); CATCH_VOID}
-  void SetKeywords(const char *keywrd){TRY Rast_set_history(this->hist, HIST_KEYWRD, keywrd); CATCH_VOID}
+  virtual void SetTitle(const char *title){TRY Rast_set_history(this->hist, HIST_TITLE, title); CATCH_VOID}
+  virtual void SetCreator(const char *creator){TRY Rast_set_history(this->hist, HIST_CREATOR, creator); CATCH_VOID}
+  virtual void SetMaptype(const char *maptype){TRY Rast_set_history(this->hist, HIST_MAPTYPE, maptype); CATCH_VOID}
+  virtual void SetDataSource1(const char *datsrc_1){TRY Rast_set_history(this->hist, HIST_DATSRC_1, datsrc_1); CATCH_VOID}
+  virtual void SetDataSource2(const char *datsrc_2){TRY Rast_set_history(this->hist, HIST_DATSRC_2, datsrc_2); CATCH_VOID}
+  virtual void SetKeywords(const char *keywrd){TRY Rast_set_history(this->hist, HIST_KEYWRD, keywrd); CATCH_VOID}
   
   //! \brief Append a comment to the raster map history file.
-  void  AppendComment(char *comment) {TRY Rast_append_history(this->hist, comment); CATCH_VOID}
+  virtual void  AppendComment(char *comment) {TRY Rast_append_history(this->hist, comment); CATCH_VOID}
+
+  //! \brief Return true if the history is of an 3d raster map
+  virtual bool Check3d(){return this->Is3d;}
 
   //BTX
   virtual struct History* GetPointer(){return this->hist;}
@@ -78,6 +88,7 @@ protected:
 
   char *RasterName;
   char *Mapset;
+  bool Is3d;
 
   //BTX
   struct History *hist;
