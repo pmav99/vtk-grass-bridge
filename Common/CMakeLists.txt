@@ -10,6 +10,7 @@ SET (Common_SRCS
 vtkGRASSDatabaseInfo.cxx
 vtkGRASSFileLister.cxx
 vtkGRASSRasterMapLister.cxx
+vtkGRASSRaster3dMapLister.cxx
 vtkGRASSVectorMapLister.cxx
 vtkGRASSRegion.cxx
 vtkObjectGRASSErrorHandler.cxx
@@ -24,6 +25,7 @@ SET (Common_H
 vtkGRASSDatabaseInfo.h
 vtkGRASSFileLister.h
 vtkGRASSRasterMapLister.h
+vtkGRASSRaster3dMapLister.h
 vtkGRASSVectorMapLister.h
 vtkGRASSRegion.h
 vtkGRASSInit.h

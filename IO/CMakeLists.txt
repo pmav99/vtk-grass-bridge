@@ -8,6 +8,7 @@
 
 SET (IO_SRCS
 vtkGRASSRasterImageReader.cxx
+vtkGRASSRaster3dImageReader.cxx
 vtkGRASSRasterImageWriter.cxx
 vtkGRASSRasterToImageReader.cxx
 vtkGRASSVectorPolyDataReader.cxx
@@ -17,6 +18,7 @@ vtkGRASSVectorTopoPolyDataReader.cxx
 
 SET (IO_H
 vtkGRASSRasterImageReader.h
+vtkGRASSRaster3dImageReader.h
 vtkGRASSRasterImageWriter.h
 vtkGRASSRasterToImageReader.h
 vtkGRASSVectorPolyDataReader.h
@@ -30,13 +32,13 @@ vtkGRASSBridgeIOWin32Header.h
 
 # Create the vtkGRASSBridgeIO C++ library.
 ADD_LIBRARY (vtkGRASSBridgeIO ${IO_SRCS}  ${IO_H})
-TARGET_LINK_LIBRARIES(vtkGRASSBridgeIO vtkGRASSBridgeCommon vtkGRASSBridgeRaster vtkGRASSBridgeVector vtkIO vtkFiltering vtkCommon vtkImaging ${GRASS_gis_LIBRARY} ${GRASS_raster_LIBRARY} ${GRASS_vector_LIBRARY} ${GRASS_g3d_LIBRARY})
+TARGET_LINK_LIBRARIES(vtkGRASSBridgeIO vtkGRASSBridgeCommon vtkGRASSBridgeRaster vtkGRASSBridgeRaster3d vtkGRASSBridgeVector vtkIO vtkFiltering vtkCommon vtkImaging ${GRASS_gis_LIBRARY} ${GRASS_raster_LIBRARY} ${GRASS_vector_LIBRARY} ${GRASS_g3d_LIBRARY})
 
 # Create the vtkGRASSBridgeIO Java library.
 IF (VTK_WRAP_JAVA AND VTK_GRASS_BRIDGE_WRAP_JAVA)
   VTK_WRAP_JAVA3 (vtkGRASSBridgeIOJava IOJava_SRCS "${IO_SRCS}")
   ADD_LIBRARY (vtkGRASSBridgeIOJava SHARED ${IOJava_SRCS})
-  TARGET_LINK_LIBRARIES (vtkGRASSBridgeIOJava vtkGRASSBridgeIO vtkGRASSBridgeCommonJava vtkGRASSBridgeRasterJava vtkGRASSBridgeVectorJava vtkIOJava vtkFilteringJava vtkImagingJava vtkCommonJava)
+  TARGET_LINK_LIBRARIES (vtkGRASSBridgeIOJava vtkGRASSBridgeIO vtkGRASSBridgeCommonJava vtkGRASSBridgeRasterJava vtkGRASSBridgeRaster3dJava vtkGRASSBridgeVectorJava vtkIOJava vtkFilteringJava vtkImagingJava vtkCommonJava)
 ENDIF (VTK_WRAP_JAVA AND VTK_GRASS_BRIDGE_WRAP_JAVA)
 
 # Create the vtkGRASSBridgeLibraryFilter Python library.
@@ -44,7 +46,7 @@ IF (VTK_WRAP_PYTHON AND VTK_GRASS_BRIDGE_WRAP_PYTHON)
   VTK_WRAP_PYTHON3 (vtkGRASSBridgeIOPython IOPython_SRCS "${IO_SRCS}")
   ADD_LIBRARY (vtkGRASSBridgeIOPythonD ${IOPython_SRCS})
   ADD_LIBRARY (vtkGRASSBridgeIOPython MODULE vtkGRASSBridgeIOPythonInit.cxx)
-  TARGET_LINK_LIBRARIES(vtkGRASSBridgeIOPythonD vtkGRASSBridgeIO vtkGRASSBridgeCommonPythonD vtkGRASSBridgeRasterPythonD vtkGRASSBridgeVectorPythonD vtkIOPythonD vtkFilteringPythonD vtkImagingPythonD)
+  TARGET_LINK_LIBRARIES(vtkGRASSBridgeIOPythonD vtkGRASSBridgeIO vtkGRASSBridgeCommonPythonD vtkGRASSBridgeRasterPythonD vtkGRASSBridgeRaster3dPythonD vtkGRASSBridgeVectorPythonD vtkIOPythonD vtkFilteringPythonD vtkImagingPythonD)
   TARGET_LINK_LIBRARIES(vtkGRASSBridgeIOPython vtkGRASSBridgeIOPythonD)
 ENDIF (VTK_WRAP_PYTHON AND VTK_GRASS_BRIDGE_WRAP_PYTHON)
 
