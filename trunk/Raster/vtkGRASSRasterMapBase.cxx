@@ -85,6 +85,7 @@ vtkGRASSRasterMapBase::PrintSelf(ostream& os, vtkIndent indent)
         os << indent << "Cols   : " << this->NumberOfCols << endl;
         os << indent << "Rows   : " << this->NumberOfRows << endl;
         os << indent << "UseGRASSNulleValue: " << this->UseGRASSNulleValue << endl;
+        this->History->PrintSelf(os, indent.GetNextIndent());
     }
     return;
 }
@@ -126,12 +127,6 @@ vtkGRASSRasterMapBase::SetRegion()
         else if (this->RegionUsage == VTK_GRASS_REGION_DEFAULT)
         {
             G_get_default_window(&head);
-            G_set_window(&head);
-            this->Region->CopyRegionFrom(&head);
-        }
-        else if (this->RegionUsage == VTK_GRASS_REGION_RASTER)
-        {
-            Rast_get_cellhd(this->GetRasterName(), this->GetMapset(), &head);
             G_set_window(&head);
             this->Region->CopyRegionFrom(&head);
         }
@@ -197,8 +192,8 @@ vtkGRASSRasterMapBase::GetRow(int idx)
 {
     int i;
     char buff[1024];
-
-    if (idx < 0 || idx > this->NumberOfCols - 1)
+    
+    if (idx < 0 || idx > this->NumberOfRows - 1)
     {
         G_snprintf(buff, 1024, "class: %s line: %i The index %i is out of range.",
                    this->GetClassName(), __LINE__, idx);
@@ -236,7 +231,7 @@ vtkGRASSRasterMapBase::GetNullRow(int idx)
     int i;
     char buff[1024];
 
-    if (idx < 0 || idx > this->NumberOfCols - 1)
+    if (idx < 0 || idx > this->NumberOfRows - 1)
     {
         G_snprintf(buff, 1024, "class: %s line: %i The index %i is out of range.",
                    this->GetClassName(), __LINE__, idx);

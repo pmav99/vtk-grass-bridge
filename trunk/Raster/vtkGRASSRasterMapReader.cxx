@@ -60,9 +60,19 @@ vtkGRASSRasterMapReader::OpenMap(char *name)
     }
 
     this->SetMapset(mapset);
-
-    // Set the region for the map
-    this->SetRegion();
+    
+    if (this->RegionUsage == VTK_GRASS_REGION_RASTER)
+    {
+        struct Cell_head head;
+        Rast_get_cellhd(this->GetRasterName(), this->GetMapset(), &head);
+        G_set_window(&head);
+        this->Region->CopyRegionFrom(&head);
+        this->NumberOfRows = head.rows;
+        this->NumberOfCols = head.cols;
+    } else {
+        // Set the region for the map
+        this->SetRegion();
+    }
 
     if (!setjmp(vgb_stack_buffer))
     {

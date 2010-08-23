@@ -12,7 +12,6 @@
 #  GNU General Public License for more details.
 
 import unittest
-import os
 from libvtkCommonPython import *
 from libvtkFilteringPython import *
 from libvtkGraphicsPython import *
@@ -26,7 +25,7 @@ class GRASSRasterMapReaderWriterTest(unittest.TestCase):
     def setUp(self):
         init = vtkGRASSInit()
         init.Init("GRASSRasterMapReaderWriterTest")
-        init.ExitOnErrorOff()
+        init.ExitOnErrorOn()
 
     def testSimpleReadWriteCycleDCELL(self):
 
@@ -34,7 +33,7 @@ class GRASSRasterMapReaderWriterTest(unittest.TestCase):
         region.ReadCurrentRegion()
         region.SetCols(10)
         region.SetRows(10)
-        region.AdjustRegion()
+        region.AdjustRegionResolution()
 
         writer = vtkGRASSRasterMapWriter()
         writer.SetMapTypeToDCELL()
@@ -59,6 +58,7 @@ class GRASSRasterMapReaderWriterTest(unittest.TestCase):
 
             writer.PutNextRow(data)
 
+        print writer
         writer.CloseMap()
 
         reader = vtkGRASSRasterMapReader()
@@ -82,7 +82,6 @@ class GRASSRasterMapReaderWriterTest(unittest.TestCase):
         val = [0,0]
         reader.GetRange(val);
         print "Range ", val
-        print reader.GetHistory()
         print reader
 
         self.assertEqual(val[0], min, "Error range is incorrect")
@@ -98,7 +97,7 @@ class GRASSRasterMapReaderWriterTest(unittest.TestCase):
         region.ReadCurrentRegion()
         region.SetCols(10)
         region.SetRows(10)
-        region.AdjustRegion()
+        region.AdjustRegionResolution()
 
         writer = vtkGRASSRasterMapWriter()
         writer.SetMapTypeToFCELL()
@@ -122,11 +121,11 @@ class GRASSRasterMapReaderWriterTest(unittest.TestCase):
                 data.SetTuple1(j, val)
             writer.PutNextRow(data)
 
+        print writer
         writer.CloseMap()
 
         reader = vtkGRASSRasterMapReader()
         reader.OpenMap("test_fcell")
-
 
         newMin = 100000000.0
         newMax = 0.0
@@ -146,8 +145,8 @@ class GRASSRasterMapReaderWriterTest(unittest.TestCase):
         val = [0,0]
         reader.GetRange(val);
         print "Range ", val
-        print reader.GetHistory()
         print reader
+
         self.assertEqual(val[0], min, "Error range is incorrect")
         self.assertEqual(val[1], max, "Error range is incorrect")
         self.assertEqual(reader.GetNumberOfRows(), region.GetRows(), "Error rows differ")
@@ -159,9 +158,9 @@ class GRASSRasterMapReaderWriterTest(unittest.TestCase):
 
         region = vtkGRASSRegion()
         region.ReadCurrentRegion()
-        region.SetCols(10)
-        region.SetRows(10)
-        region.AdjustRegion()
+        region.SetCols(100)
+        region.SetRows(70)
+        region.AdjustRegionResolution()
 
         writer = vtkGRASSRasterMapWriter()
         writer.SetMapTypeToCELL()
@@ -185,6 +184,7 @@ class GRASSRasterMapReaderWriterTest(unittest.TestCase):
                 data.SetTuple1(j, val)
             writer.PutNextRow(data)
 
+        print writer
         writer.CloseMap()
 
         reader = vtkGRASSRasterMapReader()
@@ -207,8 +207,8 @@ class GRASSRasterMapReaderWriterTest(unittest.TestCase):
         val = [0,0]
         reader.GetRange(val);
         print "Range ", val
-        print reader.GetHistory()
         print reader
+
         self.assertEqual(val[0], min, "Error range is incorrect")
         self.assertEqual(val[1], max, "Error range is incorrect")
         self.assertEqual(reader.GetNumberOfRows(), region.GetRows(), "Error rows differ")

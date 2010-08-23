@@ -31,6 +31,8 @@ vtkGRASSHistory::vtkGRASSHistory()
 
     this->hist = (History*)G_calloc(1, sizeof(struct History));
 
+    this->Is3d = false;
+
     Rast_short_history("Title", "raster", this->hist);
     Rast_set_history(this->hist, HIST_KEYWRD, G_program_name());
 
@@ -78,6 +80,39 @@ vtkGRASSHistory::ReadHistory(char *rastername)
     }
 
     this->SetRasterName(rastername);
+    this->Is3d = false;
+
+    return true;
+}
+
+//----------------------------------------------------------------------------
+
+bool
+vtkGRASSHistory::Read3dHistory(char *rastername)
+{
+    const char *mapset;
+    char buff[1024];
+
+
+    mapset = G_find_grid3(rastername, "");
+    if (mapset == NULL)
+    {
+        G_snprintf(buff, 1024, "class: %s line: %i Unable to find 3d raster map %s.",
+                   this->GetClassName(), __LINE__, rastername);
+        this->InsertNextError(buff);
+        return false;
+    }
+
+    if (G3d_readHistory(rastername, mapset, this->hist) == -1)
+    {
+        G_snprintf(buff, 1024, "class: %s line: %i Unable to read history file of 3d raster map %s.",
+                   this->GetClassName(), __LINE__, rastername);
+        this->InsertNextError(buff);
+        return false;
+    }
+
+    this->SetRasterName(rastername);
+    this->Is3d = true;
 
     return true;
 }
@@ -92,7 +127,22 @@ vtkGRASSHistory::WriteHistory(char *rastername)
     CATCH_BOOL
 
     this->SetRasterName(rastername);
+    this->Is3d = false;
     
+    return true;
+}
+
+//----------------------------------------------------------------------------
+
+bool
+vtkGRASSHistory::Write3dHistory(char *rastername)
+{
+    TRY G3d_writeHistory(rastername, this->hist);
+    CATCH_BOOL
+
+    this->SetRasterName(rastername);
+    this->Is3d = true;
+
     return true;
 }
 
