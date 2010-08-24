@@ -53,3 +53,11 @@ writer = vtkXMLImageDataWriter()
 writer.SetInput(filter.GetOutput())
 writer.SetFileName("/tmp/test.vti")
 writer.Write()
+
+#Choose the first raster map in the list (which is hopefully not empty)
+ws = vtkGRASSRaster3dImageWriter()
+ws.SetInput(filter.GetOutput())
+ws.SetRaster3dName("zImageGaussianSmooth")
+#Use the region of the raster map
+ws.UseCurrentRegion()
+ws.Update()

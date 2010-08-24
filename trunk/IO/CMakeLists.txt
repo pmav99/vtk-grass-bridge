@@ -10,6 +10,7 @@ SET (IO_SRCS
 vtkGRASSRasterImageReader.cxx
 vtkGRASSRaster3dImageReader.cxx
 vtkGRASSRasterImageWriter.cxx
+vtkGRASSRaster3dImageWriter.cxx
 vtkGRASSRasterToImageReader.cxx
 vtkGRASSVectorPolyDataReader.cxx
 vtkGRASSVectorPolyDataWriter.cxx
@@ -20,6 +21,7 @@ SET (IO_H
 vtkGRASSRasterImageReader.h
 vtkGRASSRaster3dImageReader.h
 vtkGRASSRasterImageWriter.h
+vtkGRASSRaster3dImageWriter.h
 vtkGRASSRasterToImageReader.h
 vtkGRASSVectorPolyDataReader.h
 vtkGRASSVectorPolyDataWriter.h
