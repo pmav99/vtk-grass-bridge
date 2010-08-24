@@ -1,33 +1,28 @@
 #!/usr/bin/env python
 #
-#  Program: vtkGRASSBridge
-#  COPYRIGHT: (C) 2009 by Soeren Gebbert, soerengebbert@googlemail.com
+############################################################################
 #
-#  This program is free software; you can redistribute it and/or modify
-#  it under the terms of the GNU General Public License as published by
-#  the Free Software Foundation; version 2 of the License.
+# MODULE:       r3.gauss.smooth
+# AUTHOR(S):    Soeren Gebbert
+# PURPOSE:      Demonstrate the usage of VTK and vtkGRASSBridge to implement
+#               grass modules
 #
-#  This program is distributed in the hope that it will be useful,
-#  but WITHOUT ANY WARRANTY; without even the implied warranty of
-#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-#  GNU General Public License for more details.
-
-#include the VTK and vtkGRASSBridge Python libraries
-from libvtkCommonPython import *
-from libvtkFilteringPython import *
-from libvtkGraphicsPython import *
-from libvtkRenderingPython import *
-from libvtkIOPython import *
-from libvtkImagingPython import *
-from libvtkGRASSBridgeIOPython import *
-from libvtkGRASSBridgeCommonPython import *
-
-import grass.script as grass
+# COPYRIGHT:    (C) 2009 Soeren Gebbert
+#
+#               This program is free software under the GNU General Public
+#               License (>=v2). Read the file COPYING that comes with GRASS
+#               for details.
+#
+#############################################################################
 
 #%Module
 #% description: Use gaussian smooth algorithm on raster 3d map
 #% keywords: raster3d
 #% keywords: smooth
+#%End
+#%FLag
+#% key: s
+#% description: Show the input and output map in a vtk window after computation
 #%End
 #%Option
 #% key: input
@@ -35,8 +30,8 @@ import grass.script as grass
 #% required: yes
 #% multiple: no
 #% key_desc: name
-#% description: Name of input 3d raster map
-#% gisprompt: old,g3d,raster3d
+#% description: Name of input raster map
+#% gisprompt: old,cell,raster
 #%End
 #%Option
 #% key: output
@@ -44,35 +39,60 @@ import grass.script as grass
 #% required: yes
 #% multiple: no
 #% key_desc: name
-#% description: Name of output 3d raster map
-#% gisprompt: old,g3d,raster3d
+#% description: Name for output raster map
+#% gisprompt: new,cell,raster
 #%End
+
+#include the grass, VTK and vtkGRASSBridge Python libraries
+from libvtkFilteringPython import *
+from libvtkRenderingPython import *
+from libvtkGraphicsPython import *
+from libvtkImagingPython import *
+from libvtkGRASSBridgeIOPython import *
+from libvtkGRASSBridgeCommonPython import *
+import grass.script as grass
+
 
 def main():
     input = options['input']
     output = options['output']
+    show = int(flags['s'])
 
-    #Choose the first raster map in the list (which is hopefully not empty)
-    rs = vtkGRASSRaster3dImageReader()
-    rs.SetRaster3dName(input)
-    rs.UseCurrentRegion()
-    rs.Update()
+    # Raster map reader
+    reader = vtkGRASSRaster3dImageReader()
+    reader.SetRaster3dName(input)
+    reader.UseCurrentRegion()
 
+    # The VTK filter
     filter = vtkImageGaussianSmooth()
-    filter.SetInputConnection(rs.GetOutputPort())
+    filter.SetInputConnection(reader.GetOutputPort())
 
-    writer = vtkXMLImageDataWriter()
-    writer.SetInput(filter.GetOutput())
-    writer.SetFileName("/tmp/test.vti")
-    writer.Write()
+    # Write the result
+    writer = vtkGRASSRaster3dImageWriter()
+    writer.SetInputConnection(filter.GetOutputPort())
+    writer.UseCurrentRegion()
+    writer.SetRaster3dName(output)
+    writer.Update()
 
-    #Choose the first raster map in the list (which is hopefully not empty)
-    ws = vtkGRASSRaster3dImageWriter()
-    ws.SetInput(filter.GetOutput())
-    ws.SetRaster3dName(output)
-    #Use the region of the raster map
-    ws.UseCurrentRegion()
-    ws.Update()
+    if show == 1:
+        viewInt1 = vtkRenderWindowInteractor()
+
+        viewer1 = vtkImageViewer2()
+        viewer1.SetInputConnection(filter.GetOutputPort())
+        viewer1.SetColorWindow(255)
+        viewer1.SetupInteractor(viewInt1)
+        viewer1.Render()
+
+        viewInt2 = vtkRenderWindowInteractor()
+
+        viewer2 = vtkImageViewer2()
+        viewer2.SetInputConnection(reader.GetOutputPort())
+        viewer2.SetColorWindow(255)
+        viewer2.SetupInteractor(viewInt2)
+        viewer2.Render()
+
+        viewInt1.Start()
+        viewInt2.Start()
 
 if __name__ == "__main__":
     # Initiate GRASS

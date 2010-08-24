@@ -18,7 +18,7 @@
 #%Module
 #% description: Use gaussian smooth algorithm on raster map
 #% keywords: raster
-#% keywords: buffer
+#% keywords: smooth
 #%End
 #%FLag
 #% key: s
