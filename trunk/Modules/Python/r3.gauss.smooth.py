@@ -30,7 +30,7 @@
 #% required: yes
 #% multiple: no
 #% key_desc: name
-#% description: Name of input raster map
+#% description: Name of input 3d raster map
 #% gisprompt: old,grid3,3d-raster
 #%End
 #%Option
@@ -39,7 +39,7 @@
 #% required: yes
 #% multiple: no
 #% key_desc: name
-#% description: Name for output raster map
+#% description: Name for output 3d raster map
 #% gisprompt: new,grid3,3d-raster
 #%End
 
