@@ -5,9 +5,9 @@
 # MODULE:       r3.gauss.smooth
 # AUTHOR(S):    Soeren Gebbert
 # PURPOSE:      Demonstrate the usage of VTK and vtkGRASSBridge to implement
-#               grass modules
+#               grass modules for voxel processing
 #
-# COPYRIGHT:    (C) 2009 Soeren Gebbert
+# COPYRIGHT:    (C) 2010 Soeren Gebbert
 #
 #               This program is free software under the GNU General Public
 #               License (>=v2). Read the file COPYING that comes with GRASS
@@ -31,7 +31,7 @@
 #% multiple: no
 #% key_desc: name
 #% description: Name of input raster map
-#% gisprompt: old,cell,raster
+#% gisprompt: old,grid3,3d-raster
 #%End
 #%Option
 #% key: output
@@ -40,7 +40,7 @@
 #% multiple: no
 #% key_desc: name
 #% description: Name for output raster map
-#% gisprompt: new,cell,raster
+#% gisprompt: new,grid3,3d-raster
 #%End
 
 #include the grass, VTK and vtkGRASSBridge Python libraries
@@ -58,7 +58,7 @@ def main():
     output = options['output']
     show = int(flags['s'])
 
-    # Raster map reader
+    # 3d raster map reader
     reader = vtkGRASSRaster3dImageReader()
     reader.SetRaster3dName(input)
     reader.UseCurrentRegion()
