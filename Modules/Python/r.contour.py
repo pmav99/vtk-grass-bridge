@@ -102,9 +102,6 @@ def main():
     write_vtk = int(flags['w'])
     show = int(flags['s'])
 
-    # Initiate GRASS
-    init = vtkGRASSInit()
-
     # Raster map reader
     reader = vtkGRASSRasterImageReader()
     reader.SetRasterName(input)
