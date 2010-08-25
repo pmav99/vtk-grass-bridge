@@ -2,7 +2,7 @@
 # Find the native GRASS includes and library
 #
 # This module defines
-# GRASS_INCLUDE_DIR, where to find avcodec.h, avformat.h ...
+# GRASS_INCLUDE_DIR, where to find gis.h, raster.h, vector.h ...
 # GRASS_LIBRARIES, the libraries to link against to use GRASS.
 # GRASS_FOUND, If false, do not try to use GRASS.
 

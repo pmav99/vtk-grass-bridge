@@ -47,6 +47,8 @@ IF (VTK_WRAP_JAVA AND VTK_GRASS_BRIDGE_WRAP_JAVA)
   VTK_WRAP_JAVA3 (vtkGRASSBridgeVectorJava VECTORJava_SRCS "${VECTOR_SRCS}")
   ADD_LIBRARY (vtkGRASSBridgeVectorJava SHARED ${VECTORJava_SRCS})
   TARGET_LINK_LIBRARIES (vtkGRASSBridgeVectorJava vtkGRASSBridgeVector vtkGRASSBridgeCommonJava vtkCommonJava)
+
+  INSTALL_TARGETS(/lib vtkGRASSBridgeVectorJava)
 ENDIF (VTK_WRAP_JAVA AND VTK_GRASS_BRIDGE_WRAP_JAVA)
 
 # Create the vtkGRASSBridgeLibraryFilter Python library.
@@ -56,6 +58,8 @@ IF (VTK_WRAP_PYTHON AND VTK_GRASS_BRIDGE_WRAP_PYTHON)
   ADD_LIBRARY (vtkGRASSBridgeVectorPython MODULE vtkGRASSBridgeVectorPythonInit.cxx)
   TARGET_LINK_LIBRARIES(vtkGRASSBridgeVectorPythonD vtkGRASSBridgeVector vtkGRASSBridgeCommonPythonD )
   TARGET_LINK_LIBRARIES(vtkGRASSBridgeVectorPython vtkGRASSBridgeVectorPythonD)
+
+  INSTALL_TARGETS(/lib vtkGRASSBridgeVectorPythonD vtkGRASSBridgeVectorPython)
 ENDIF (VTK_WRAP_PYTHON AND VTK_GRASS_BRIDGE_WRAP_PYTHON)
 
 IF (VTK_USE_HYBRID)
@@ -74,6 +78,6 @@ IF (VTK_USE_RENDERING)
   TARGET_LINK_LIBRARIES (vtkGRASSBridgeVector vtkRendering)
 ENDIF (VTK_USE_RENDERING)
 
-INSTALL_FILES(/include .h ${VECTOR_SRCS} ${VECTOR_H})
+INSTALL_FILES(/include .h ${VECTOR_H})
 INSTALL_TARGETS(/lib vtkGRASSBridgeVector)
 
