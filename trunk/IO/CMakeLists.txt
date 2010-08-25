@@ -41,6 +41,8 @@ IF (VTK_WRAP_JAVA AND VTK_GRASS_BRIDGE_WRAP_JAVA)
   VTK_WRAP_JAVA3 (vtkGRASSBridgeIOJava IOJava_SRCS "${IO_SRCS}")
   ADD_LIBRARY (vtkGRASSBridgeIOJava SHARED ${IOJava_SRCS})
   TARGET_LINK_LIBRARIES (vtkGRASSBridgeIOJava vtkGRASSBridgeIO vtkGRASSBridgeCommonJava vtkGRASSBridgeRasterJava vtkGRASSBridgeRaster3dJava vtkGRASSBridgeVectorJava vtkIOJava vtkFilteringJava vtkImagingJava vtkCommonJava)
+
+  INSTALL_TARGETS(/lib vtkGRASSBridgeIOJava)
 ENDIF (VTK_WRAP_JAVA AND VTK_GRASS_BRIDGE_WRAP_JAVA)
 
 # Create the vtkGRASSBridgeLibraryFilter Python library.
@@ -50,6 +52,8 @@ IF (VTK_WRAP_PYTHON AND VTK_GRASS_BRIDGE_WRAP_PYTHON)
   ADD_LIBRARY (vtkGRASSBridgeIOPython MODULE vtkGRASSBridgeIOPythonInit.cxx)
   TARGET_LINK_LIBRARIES(vtkGRASSBridgeIOPythonD vtkGRASSBridgeIO vtkGRASSBridgeCommonPythonD vtkGRASSBridgeRasterPythonD vtkGRASSBridgeRaster3dPythonD vtkGRASSBridgeVectorPythonD vtkIOPythonD vtkFilteringPythonD vtkImagingPythonD)
   TARGET_LINK_LIBRARIES(vtkGRASSBridgeIOPython vtkGRASSBridgeIOPythonD)
+
+  INSTALL_TARGETS(/lib vtkGRASSBridgeIOPythonD vtkGRASSBridgeIOPython)
 ENDIF (VTK_WRAP_PYTHON AND VTK_GRASS_BRIDGE_WRAP_PYTHON)
 
 IF (VTK_USE_HYBRID)
@@ -68,6 +72,6 @@ IF (VTK_USE_RENDERING)
   TARGET_LINK_LIBRARIES (vtkGRASSBridgeIO vtkRendering)
 ENDIF (VTK_USE_RENDERING)
 
-INSTALL_FILES(/include .h ${IO_SRCS} ${IO_H})
+INSTALL_FILES(/include .h ${IO_H})
 INSTALL_TARGETS(/lib vtkGRASSBridgeIO)
 
