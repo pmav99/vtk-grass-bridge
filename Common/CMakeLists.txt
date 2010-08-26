@@ -42,7 +42,7 @@ vtkGRASSBridgeCommonWin32Header.h
 
 # Create the vtkGRASSBridgeCommon C++ library.
 ADD_LIBRARY (vtkGRASSBridgeCommon ${Common_SRCS}  ${Common_H})
-TARGET_LINK_LIBRARIES(vtkGRASSBridgeCommon vtkCommon ${GRASS_gis_LIBRARY} ${GRASS_raster_LIBRARY} ${GRASS_vector_LIBRARY} ${GRASS_g3d_LIBRARY} )
+TARGET_LINK_LIBRARIES(vtkGRASSBridgeCommon vtkCommon ${GRASS_GIS_LIBRARY} ${GRASS_RASTER_LIBRARY} ${GRASS_VECTOR_LIBRARY} ${GRASS_G3D_LIBRARY} )
 
 # Create the vtkGRASSBridgeCommon Java library.
 IF (VTK_WRAP_JAVA AND VTK_GRASS_BRIDGE_WRAP_JAVA)

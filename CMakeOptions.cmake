@@ -62,7 +62,7 @@ IF (VTK_WRAP_PYTHON)
 
   OPTION(VTK_GRASS_BRIDGE_WRAP_PYTHON
          "Wrap classes into the Python interpreted language."
-         OFF)
+         ON)
 
   IF (VTK_GRASS_BRIDGE_WRAP_PYTHON)
     INCLUDE(${VTK_CMAKE_DIR}/vtkWrapPython.cmake)
