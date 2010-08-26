@@ -40,11 +40,12 @@ IF (VTK_GRASS_BRIDGE_CAN_BUILD)
 
   SUBDIRS (
      Common
+     Filtering
      IO
+     Modules
      Raster
      Raster3d
      Vector
-     Modules
   )
   INCLUDE_DIRECTORIES (${VTK_GRASS_BRIDGE_SOURCE_DIR}/Common)
   INCLUDE_DIRECTORIES (${VTK_GRASS_BRIDGE_SOURCE_DIR}/Filtering)

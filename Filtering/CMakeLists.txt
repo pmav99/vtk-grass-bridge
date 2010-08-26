@@ -7,9 +7,12 @@
 #
 
 SET (Filtering_SRCS
+vtkGRASSBridgeVoxelModeller.cxx
 )
 
 SET (Filtering_H
+vtkGRASSBridgeVoxelModeller.h
+vtkGRASSBridgeFilteringWin32Header.h
 )
 # --------------------------------------------------------------------------
 # You probably do not need to modify anything below this line
@@ -25,6 +28,8 @@ IF (VTK_WRAP_JAVA AND VTK_GRASS_BRIDGE_WRAP_JAVA)
   VTK_WRAP_JAVA3 (vtkGRASSBridgeFilteringJava FilteringJava_SRCS "${Filtering_SRCS}")
   ADD_LIBRARY (vtkGRASSBridgeFilteringJava SHARED ${FilteringJava_SRCS})
   TARGET_LINK_LIBRARIES (vtkGRASSBridgeFilteringJava vtkGRASSBridgeFiltering vtkFilteringJava vtkCommonJava)
+
+  INSTALL_TARGETS(/lib vtkGRASSBridgeFilteringJava)
 ENDIF (VTK_WRAP_JAVA AND VTK_GRASS_BRIDGE_WRAP_JAVA)
 
 # Create the vtkGRASSBridgeFiltering Python library.
@@ -34,6 +39,9 @@ IF (VTK_WRAP_PYTHON AND VTK_GRASS_BRIDGE_WRAP_PYTHON)
   ADD_LIBRARY (vtkGRASSBridgeFilteringPython MODULE vtkGRASSBridgeFilteringPythonInit.cxx)
   TARGET_LINK_LIBRARIES(vtkGRASSBridgeFilteringPythonD vtkGRASSBridgeFiltering vtkFilteringPythonD vtkCommonPythonD)
   TARGET_LINK_LIBRARIES(vtkGRASSBridgeFilteringPython vtkGRASSBridgeFilteringPythonD)
+
+
+  INSTALL_TARGETS(/lib vtkGRASSBridgeFilteringPython vtkGRASSBridgeFilteringPythonD)
 ENDIF (VTK_WRAP_PYTHON AND VTK_GRASS_BRIDGE_WRAP_PYTHON)
 
 IF (VTK_USE_HYBRID)
