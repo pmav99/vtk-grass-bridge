@@ -26,7 +26,7 @@ vtkGRASSBridgeRasterWin32Header.h
 
 # Create the vtkGRASSBridgeRaster C++ library.
 ADD_LIBRARY (vtkGRASSBridgeRaster ${IO_SRCS}  ${IO_H})
-TARGET_LINK_LIBRARIES(vtkGRASSBridgeRaster vtkGRASSBridgeCommon vtkCommon ${GRASS_gis_LIBRARY} ${GRASS_g3d_LIBRARY} ${GRASS_raster_LIBRARY})
+TARGET_LINK_LIBRARIES(vtkGRASSBridgeRaster vtkGRASSBridgeCommon vtkCommon ${GRASS_GIS_LIBRARY} ${GRASS_G3D_LIBRARY} ${GRASS_RASTER_LIBRARY})
 
 # Create the vtkGRASSBridgeRaster Java library.
 IF (VTK_WRAP_JAVA AND VTK_GRASS_BRIDGE_WRAP_JAVA)
@@ -43,9 +43,9 @@ IF (VTK_WRAP_PYTHON AND VTK_GRASS_BRIDGE_WRAP_PYTHON)
   ADD_LIBRARY (vtkGRASSBridgeRasterPythonD ${IOPython_SRCS})
   ADD_LIBRARY (vtkGRASSBridgeRasterPython MODULE vtkGRASSBridgeRasterPythonInit.cxx)
   TARGET_LINK_LIBRARIES(vtkGRASSBridgeRasterPythonD vtkGRASSBridgeRaster vtkGRASSBridgeCommonPythonD)
-INSTALL_TARGETS(/lib vtkGRASSBridgeRasterPythonD vtkGRASSBridgeRasterPython)
-
   TARGET_LINK_LIBRARIES(vtkGRASSBridgeRasterPython vtkGRASSBridgeRasterPythonD)
+
+  INSTALL_TARGETS(/lib vtkGRASSBridgeRasterPythonD vtkGRASSBridgeRasterPython)
 ENDIF (VTK_WRAP_PYTHON AND VTK_GRASS_BRIDGE_WRAP_PYTHON)
 
 IF (VTK_USE_HYBRID)
