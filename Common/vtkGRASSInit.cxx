@@ -100,7 +100,7 @@ void vtkGRASSInit::Parser(vtkStringArray *argv)
 
 	buff = (char **)G_calloc(argv->GetNumberOfValues(), sizeof(char*));
 
-	// Put the arguments into the charachter array
+	// Put the arguments into the character array
 
 	for(i = 0; i < argv->GetNumberOfValues(); i++)
 	{
