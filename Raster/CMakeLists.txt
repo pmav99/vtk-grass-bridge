@@ -26,7 +26,7 @@ vtkGRASSBridgeRasterWin32Header.h
 
 # Create the vtkGRASSBridgeRaster C++ library.
 ADD_LIBRARY (vtkGRASSBridgeRaster ${IO_SRCS}  ${IO_H})
-TARGET_LINK_LIBRARIES(vtkGRASSBridgeRaster vtkGRASSBridgeCommon vtkCommon ${GRASS_GIS_LIBRARY} ${GRASS_G3D_LIBRARY} ${GRASS_RASTER_LIBRARY})
+TARGET_LINK_LIBRARIES(vtkGRASSBridgeRaster vtkGRASSBridgeCommon vtkCommon  ${GRASS_LIBRARIES})
 
 # Create the vtkGRASSBridgeRaster Java library.
 IF (VTK_WRAP_JAVA AND VTK_GRASS_BRIDGE_WRAP_JAVA)

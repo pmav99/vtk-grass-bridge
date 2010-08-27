@@ -59,6 +59,7 @@ vtkGRASSRasterImageReader::vtkGRASSRasterImageReader()
     this->RasterMap = vtkGRASSRasterMapReader::New();
 
     this->NullValue = this->RasterMap->GetNullValue();
+    this->UseNullValue = 1;
 
     //G_gisinit("vtkGRASSRasterImageReader");
 }
@@ -103,7 +104,8 @@ vtkGRASSRasterImageReader::RequestInformation(
     }
 
     this->RasterMap->SetNullValue(this->NullValue);
-    this->RasterMap->UseGRASSNulleValueOn();
+    if(this->UseNullValue)
+        this->RasterMap->UseNullValueOn();
 
     // The region settings are made in the OpenMap method.
     // So we need to open the map here to get the correct

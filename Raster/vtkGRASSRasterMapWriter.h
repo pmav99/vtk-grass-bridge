@@ -62,11 +62,18 @@ public:
   //! \brief the current position of the row in the new raster map
   vtkSetStringMacro(MapTitle);
   vtkGetStringMacro(MapTitle);
-  
+
+  //! \brief Use the grass NULL value to be stored in the raster map, the NullValue will be interpreted
+  vtkGetMacro(UseNullValue, int);
+  //! \brief Use the grass NULL value to be stored in the raster map, the NullValue will be interpreted
+  vtkBooleanMacro(UseNullValue, int);
+
 protected:
   vtkGRASSRasterMapWriter();
   ~vtkGRASSRasterMapWriter(){};
 
+  vtkSetMacro(UseNullValue, int);
+  
 private:
 
     char* MapTitle;

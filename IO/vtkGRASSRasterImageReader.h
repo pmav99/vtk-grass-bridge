@@ -77,12 +77,20 @@ public:
    * */
   vtkGetObjectMacro(RasterMap, vtkGRASSRasterMapReader);
 
-    //! \brief Null value which should replace the default grass null value for CELL, FCELL andDCELL maps
-  //! to enable the NullValue, set the this->UseGRASSNulleValueOff()
+    //! \brief Null value which should replace the default grass null value for CELL, FCELL and DCELL maps
+  //! to enable the NullValue, set this->UseGRASSNulleValueOff()
   vtkSetMacro(NullValue, double);
-  //! \brief Null value which should replace the default grass null value for CELL, FCELL andDCELL maps
-  //! to enable the NullValue, set the this->UseGRASSNulleValueOff() 
+  //! \brief Null value which should replace the default grass null value for CELL, FCELL and DCELL maps
+  //! to enable the NullValue, set this->UseGRASSNulleValueOff() 
   vtkGetMacro(NullValue, double);
+
+
+    //! Enable or disable the interpretation of a NullValue
+    vtkSetMacro(UseNullValue, int);
+    //! Enable or disable the interpretation of a NullValue
+    vtkGetMacro(UseNullValue, int);
+    //! Enable or disable the interpretation of a NullValue
+    vtkBooleanMacro(UseNullValue, int);
 
 protected:
   vtkGRASSRasterImageReader();
@@ -96,6 +104,7 @@ protected:
   int DataScalarType;
   int RegionUsage;
   double NullValue;
+  int UseNullValue;
 
   int DataExtent[6];
   double DataSpacing[3];

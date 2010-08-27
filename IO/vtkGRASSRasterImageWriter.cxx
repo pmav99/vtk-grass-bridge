@@ -40,6 +40,8 @@ vtkGRASSRasterImageWriter::vtkGRASSRasterImageWriter()
     this->Mapset = NULL;
     this->RegionUsage = VTK_GRASS_REGION_CURRENT;
     this->RasterMap = vtkGRASSRasterMapWriter::New();
+    this->NullValue = -999999;
+    this->UseNullValue = 1;
 }
 
 //----------------------------------------------------------------------------
@@ -118,6 +120,10 @@ vtkGRASSRasterImageWriter::SimpleExecute(vtkImageData* input, vtkImageData* outp
 
     this->RasterMap->SetRegion(region);
     this->RasterMap->UseUserDefinedRegion();
+    this->RasterMap->SetNullValue(this->NullValue);
+    if(this->UseNullValue)
+        this->RasterMap->UseNullValueOn();
+
 
     // Set the map data type
     if (input->GetScalarType() == VTK_CHAR ||

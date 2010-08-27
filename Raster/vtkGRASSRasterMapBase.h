@@ -86,25 +86,24 @@ public:
   virtual bool IsOpen() {return this->Open;}
 
   //! \brief Null value which should replace the default grass null value for CELL, FCELL andDCELL maps
-  //! to enable the NullValue, set the this->UseGRASSNulleValueOff()
+  //! to enable the NullValue, set the this->UseNullValueOff()
   vtkSetMacro(NullValue, double);
   //! \brief Null value which should replace the default grass null value for CELL, FCELL andDCELL maps
-  //! to enable the NullValue, set the this->UseGRASSNulleValueOff() 
+  //! to enable the NullValue, set the this->UseNullValueOff()
   vtkGetMacro(NullValue, double);
 
 
-  //! \brief Use the grass NULL value to be stored in the vtkDataArray
-  vtkGetMacro(UseGRASSNulleValue, int);
-  //! \brief Use the grass NULL value to be stored in the vtkDataArray
-  vtkBooleanMacro(UseGRASSNulleValue, int);
-  
+  //! \brief Use a user defined NULL value to be stored in the vtkDataArray, otherwise a grass NULL value is used (not recomended)
+  vtkGetMacro(UseNullValue, int);
+  //! \brief Use a user defined  NULL value to be stored in the vtkDataArray, otherwise a grass NULL value is used (not recomended)
+  vtkBooleanMacro(UseNullValue, int);
 
 protected:
   vtkGRASSRasterMapBase();
   ~vtkGRASSRasterMapBase();
 
 
-  vtkSetMacro(UseGRASSNulleValue, int);
+  vtkSetMacro(UseNullValue, int);
 
   int RegionUsage;
   bool Open; // True if the raster file was opened
@@ -115,7 +114,7 @@ protected:
   char *RasterName;
   char *Mapset;
   double NullValue;
-  int UseGRASSNulleValue;
+  int UseNullValue;
 
   vtkGRASSRegion *Region;
   vtkGRASSHistory *History;
@@ -126,7 +125,7 @@ protected:
 //  struct TimeStamp ts;
   vtkSmartPointer<vtkDataArray> Row;
   vtkSmartPointer<vtkCharArray> NullRow;
-  DCELL *RasterBuff;
+  void *RasterBuff;
   char *NullBuff;
   //ETX
   // Colortable, history and cats, timestamp are needed
