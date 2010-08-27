@@ -55,8 +55,8 @@ class GRASSRasterMapReaderWriterTest(unittest.TestCase):
                 if max < val:
                     max = val
                 data.SetTuple1(j, val)
-
             writer.PutNextRow(data)
+
 
         print writer
         writer.CloseMap()
@@ -75,7 +75,12 @@ class GRASSRasterMapReaderWriterTest(unittest.TestCase):
                     newMin = val
                 if newMax < val:
                     newMax = val
+                print val,
+            print " "
+        print " "
 
+        print "Min ", newMin, min
+        print "Max ", newMax, max
         self.assertEqual(newMin, min, "Error while reading map")
         self.assertEqual(newMax, max, "Error while reading map")
 
@@ -137,7 +142,12 @@ class GRASSRasterMapReaderWriterTest(unittest.TestCase):
                     newMin = val
                 if newMax < val:
                     newMax = val
+                print val,
+            print " "
+        print " "
 
+        print "Min ", newMin, min
+        print "Max ", newMax, max
         self.assertEqual(newMin, min, "Error while reading map")
         self.assertEqual(newMax, max, "Error while reading map")
 
@@ -200,7 +210,12 @@ class GRASSRasterMapReaderWriterTest(unittest.TestCase):
                     newMin = val
                 if newMax < val:
                     newMax = val
+                print val,
+            print " "
+        print " "
 
+        print "Min ", newMin, min
+        print "Max ", newMax, max
         self.assertEqual(newMin, min, "Error while reading map")
         self.assertEqual(newMax, max, "Error while reading map")
 

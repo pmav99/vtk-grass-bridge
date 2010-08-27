@@ -131,12 +131,25 @@ vtkGRASSRasterMapWriter::PutNextRow(vtkDataArray *data)
     // copy data
     for (i = 0; i < this->NumberOfCols; i++)
     {
-        if (this->MapType == CELL_TYPE)
-            ((CELL*)this->RasterBuff)[i] = (CELL) data->GetTuple1(i);
-        else if (this->MapType == FCELL_TYPE)
-            ((FCELL*)this->RasterBuff)[i] = (FCELL) data->GetTuple1(i);
-        else if (this->MapType == DCELL_TYPE)
-            ((DCELL*)this->RasterBuff)[i] = (DCELL) data->GetTuple1(i);
+        if(this->UseNullValue && data->GetTuple1(i) == this->NullValue)
+        {
+            if (this->MapType == CELL_TYPE)
+                Rast_set_c_null_value(&((CELL*)this->RasterBuff)[i], 1);
+            else if (this->MapType == FCELL_TYPE)
+                Rast_set_f_null_value(&((FCELL*)this->RasterBuff)[i], 1);
+            else if (this->MapType == DCELL_TYPE)
+                Rast_set_d_null_value(&((DCELL*)this->RasterBuff)[i], 1);
+        } else {
+            if (this->MapType == CELL_TYPE) {
+                ((CELL*)this->RasterBuff)[i] = (CELL) data->GetTuple1(i);
+            }
+            else if (this->MapType == FCELL_TYPE) {
+                ((FCELL*)this->RasterBuff)[i] = (FCELL) data->GetTuple1(i);
+            }
+            else if (this->MapType == DCELL_TYPE) {
+                ((DCELL*)this->RasterBuff)[i] = (DCELL) data->GetTuple1(i);
+            }
+        }
     }
 
     TRY Rast_put_row(this->Map, this->RasterBuff, this->MapType);

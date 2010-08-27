@@ -70,6 +70,22 @@ public:
         return this->RasterMap->GetRegion();
     }
 
+    //! Enable or disable the interpretation of a NullValue
+    vtkSetMacro(UseNullValue, int);
+    //! Enable or disable the interpretation of a NullValue
+    vtkGetMacro(UseNullValue, int);
+    //! Enable or disable the interpretation of a NullValue 
+    vtkBooleanMacro(UseNullValue, int);
+
+    //! \brief Null value which represent the default grass null value for CELL, FCELL and DCELL maps.
+    //! In case a NullValue is found, the grass null value will be set in the raster map
+    //! to enable the NullValue, set this->InterpretNulleValueOn()
+    vtkSetMacro(NullValue, double);
+    //! \brief Null value which should replace the default grass null value for CELL, FCELL and DCELL maps
+    //! In case a NullValue is found, the grass null value will be set in the raster map
+    //! to enable the NullValue, set this->InterpretNulleValueOn()
+    vtkGetMacro(NullValue, double);
+
     vtkGetObjectMacro(RasterMap, vtkGRASSRasterMapWriter);
 
 protected:
@@ -82,6 +98,8 @@ protected:
     char *RasterName;
     char *Mapset;
     int RegionUsage;
+    double NullValue;
+    int UseNullValue;
 
     vtkGRASSRasterMapWriter *RasterMap;
 
