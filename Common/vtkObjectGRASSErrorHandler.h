@@ -14,7 +14,7 @@
 
 
 /**
- * \brief The GRASSErrorHandler class is the base class of all
+ * \brief The vtkObjectGRASSErrorHandler class is the base class of all
  *  classes in vtkGRASSBridge which are derived from vtkObject.
  * It provides an mechanism to log and store errors and warning.
  *
