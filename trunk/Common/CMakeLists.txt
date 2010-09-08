@@ -18,6 +18,7 @@ vtkGRASSInit.cxx
 vtkGRASSModule.cxx
 vtkGRASSFlag.cxx
 vtkGRASSOption.cxx
+vtkGRASSOptionFactory.cxx
 vtkGRASSMessagingInterface.cxx
 )
 
@@ -32,6 +33,7 @@ vtkGRASSInit.h
 vtkGRASSModule.h
 vtkGRASSFlag.h
 vtkGRASSOption.h
+vtkGRASSOptionFactory.h
 vtkObjectGRASSErrorHandler.h
 vtkGRASSMessagingInterface.h
 vtkGRASSBridgeCommonWin32Header.h

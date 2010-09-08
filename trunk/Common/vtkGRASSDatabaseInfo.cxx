@@ -21,7 +21,7 @@ extern "C" {
 #include <math.h>
 }
 
-vtkCxxRevisionMacro(vtkGRASSDatabaseInfo, "$Revision: 1.18 $");
+vtkCxxRevisionMacro(vtkGRASSDatabaseInfo, "$Revision: 1.1 $");
 vtkStandardNewMacro(vtkGRASSDatabaseInfo);
 
 //----------------------------------------------------------------------------
