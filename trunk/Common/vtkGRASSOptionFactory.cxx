@@ -14,7 +14,32 @@
 
 #include "vtkGRASSOptionFactory.h"
 #include <vtkObjectFactory.h>
+#include "vtkGRASSOption.h"
 
 vtkCxxRevisionMacro(vtkGRASSOptionFactory, "$Revision: 1.18 $");
 vtkStandardNewMacro(vtkGRASSOptionFactory);
 
+vtkGRASSOptionFactory::vtkGRASSOptionFactory() {
+    ;
+}
+
+vtkGRASSOption* vtkGRASSOptionFactory::CreateInstance(int OptionType) {
+    vtkGRASSOption *option = vtkGRASSOption::New();
+    option->CreateOption(OptionType);
+    return option;
+}
+
+vtkGRASSOption* vtkGRASSOptionFactory::CreateInstance(int OptionType, const char* key) {
+    vtkGRASSOption *option = vtkGRASSOption::New();
+    option->CreateOption(OptionType);
+    option->SetKey(key);
+    return option;
+}
+
+vtkGRASSOption* vtkGRASSOptionFactory::CreateInstance(int OptionType, const char *key, const char *description) {
+    vtkGRASSOption *option = vtkGRASSOption::New();
+    option->CreateOption(OptionType);
+    option->SetKey(key);
+    option->SetDescription(description);
+    return option;
+}

@@ -14,10 +14,19 @@
 
 
 /**
- * \brief 
+ * \brief This class creates grass command line flags
+ *
+ * Example python code how to use this class:
+ *
+ * \verbatim
+   flag = vtkGRASSFlag()
+   flag.SetDescription("This is a flag")
+   flag.SetKey('f')
+   flag.SetGuiSection("Flags")
+ * \endverbatim
  *
  * \author Soeren Gebbert
- * \author Berlin, Germany Aug. 2009
+ * \author Berlin, Germany Sep. 2010
  * \author soerengebbert@googlemail.com
  *
  *
