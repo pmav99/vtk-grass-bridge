@@ -14,7 +14,23 @@
 
 
 /**
- * \brief
+ * \brief This class creates grass command line options
+ *
+ * Several methods are available to set and get specific option variables.
+ * To create standard options you must use the vtkGRASSOptionFactory. Python
+ * code example how to use this class:
+ * \verbatim
+    option1 = vtkGRASSOption()
+    option1.SetKey("option1")
+    option1.SetDescription("This is option one")
+    option1.SetGuiSection("Options")
+    option1.SetGisprompt("old,raster,cell")
+    option1.RequiredOff()
+    option1.MultipleOff()
+    option1.SetTypeToString()
+ * \endverbatim
+ *
+ *
  *
  * \author Soeren Gebbert
  * \author Berlin, Germany Aug. 2009
@@ -37,6 +53,7 @@ extern "C"
 }
 
 class vtkStringArray;
+class vtkGRASSOptionFactory;
 #define VGB_CHECK_OPTION if(this->option == NULL){ this->option = G_define_option();}
 
 class VTK_GRASS_BRIDGE_COMMON_EXPORT vtkGRASSOption : public vtkObjectGRASSErrorHandler
@@ -45,9 +62,13 @@ public:
   static  vtkGRASSOption *New();
   vtkTypeRevisionMacro(vtkGRASSOption,vtkObjectGRASSErrorHandler);
 
+  //BTX
+  friend class vtkGRASSOptionFactory;
+  //ETX
+
   //!\brief Set the key.
   //! This will set the identifier string
-  void SetKey(char *key){VGB_CHECK_OPTION this->option->key = key;}
+  void SetKey(const char *key){VGB_CHECK_OPTION this->option->key = key;}
   //!\brief Set the description of the option
   //! This description will be used within the help and the manual page
   void SetDescription(const char *description){VGB_CHECK_OPTION this->option->description = description;}
@@ -57,7 +78,7 @@ public:
   //! specific tabs in the generated gui
   void SetGuiSection(const char *guisection){VGB_CHECK_OPTION this->option->guisection = guisection;}
   //!\brief Set the gispompt string ("old,raster,cell" or "new,vector,vector")
-  void SetGisprompt(char *gisprompt){VGB_CHECK_OPTION this->option->gisprompt = gisprompt;}
+  void SetGisprompt(const char *gisprompt){VGB_CHECK_OPTION this->option->gisprompt = gisprompt;}
   //!\brief Set default options ("a,b,c,d")
   void SetDefaultOptions(const char *options) {VGB_CHECK_OPTION this->option->options = options;}
   //!\brief Set the default answer
@@ -79,69 +100,38 @@ public:
   void SetTypeToString() {VGB_CHECK_OPTION this->option->type = TYPE_STRING;}
   
   //!\brief Return the option desription
-  const char * GetDescription(){VGB_CHECK_OPTION return this->option->description;}
+  const char * GetDescription(){return (this->option?this->option->description:NULL);}
   //!\brief Return the guisection string
-  const char* GetGuiSection() {VGB_CHECK_OPTION return this->option->guisection;}
+  const char* GetGuiSection() {return (this->option?this->option->guisection:NULL);}
   //!\brief Return the label string
-  const char* GetLabel() {VGB_CHECK_OPTION return this->option->label;}
+  const char* GetLabel() {return (this->option?this->option->label:NULL);}
   //!\brief Return the gisprompt string
-  const char* GetGisprompt() {VGB_CHECK_OPTION return this->option->gisprompt;}
+  const char* GetGisprompt() {return (this->option?this->option->gisprompt:NULL);}
   //!\brief Return the answer string
-  const char* GetAnswer() {VGB_CHECK_OPTION return this->option->answer;}
+  const char* GetAnswer() {return (this->option?this->option->answer:NULL);}
   //!\brief Return the answer strings in a vtkStringArray
   void GetAnswers(vtkStringArray *answers);
   //!\brief Return the options string
-  const char* GetOptions() {VGB_CHECK_OPTION return this->option->options;}
+  const char* GetOptions() {return (this->option?this->option->options:NULL);}
   //!\brief Check if the option is multiple (true/false)
-  bool IsMultiple() {VGB_CHECK_OPTION return (this->option->multiple?true:false);}
+  bool IsMultiple() {return ((this->option && this->option->multiple)?true:false);}
   //!\brief Check if the option is required (true/false)
-  bool IsRequired() {VGB_CHECK_OPTION return (this->option->required?true:false);}
+  bool IsRequired() {return ((this->option && this->option->required)?true:false);}
   //!\brief Check if the type is integer (true/false)
-  bool IsTypeInteger() {VGB_CHECK_OPTION return (this->option->type == TYPE_INTEGER?true:false);}
+  bool IsTypeInteger() {return ((this->option && this->option->type == TYPE_INTEGER)?true:false);}
   //!\brief Check if the type is double (true/false)
-  bool IsTypeDouble() {VGB_CHECK_OPTION return (this->option->type == TYPE_DOUBLE ?true:false);}
+  bool IsTypeDouble() {return ((this->option && this->option->type == TYPE_DOUBLE) ?true:false);}
   //!\brief Check if the type is string (true/false)
-  bool IsTypeString() {VGB_CHECK_OPTION return (this->option->type == TYPE_STRING?true:false);}
+  bool IsTypeString() {return ((this->option && this->option->type == TYPE_STRING)?true:false);}
 
-  //!\brief Create a standard option: "WHERE conditions of SQL statement without 'where' keyword"
-  void CreateOption_DB_Where(){this->option = G_define_standard_option(G_OPT_DB_WHERE);}
-  //!\brief Create a standard option: Table name
-  void CreateOption_DB_TABLE(){this->option = G_define_standard_option(G_OPT_DB_TABLE);}
-  //!\brief Create a standard option: Driver name
-  void CreateOption_DB_DRIVER(){this->option = G_define_standard_option(G_OPT_DB_DRIVER);}
-  //!\brief Create a standard option: Database name
-  void CreateOption_DB_DATABASE(){this->option = G_define_standard_option(G_OPT_DB_DATABASE);}
-  //!\brief Create a standard option: Database schema
-  void CreateOption_DB_SCHEMA(){this->option = G_define_standard_option(G_OPT_DB_SCHEMA);}
-  //!\brief Create a standard option: attribute column
-  void CreateOption_DB_COLUMN(){this->option = G_define_standard_option(G_OPT_DB_COLUMN);}
-  //!\brief Create a standard option: attribute column(s)
-  void CreateOption_DB_COLUMNS(){this->option = G_define_standard_option(G_OPT_DB_COLUMNS);}
-  //!\brief Create a standard option: input raster map
-  void CreateOption_R_INPUT(){this->option = G_define_standard_option(G_OPT_R_INPUT);}
-  //!\brief Create a standard option: input raster map(s)
-  void CreateOption_R_INPUTS(){this->option = G_define_standard_option(G_OPT_R_INPUTS);}
-  //!\brief Create a standard option: output raster map
-  void CreateOption_R_OUTPUT(){this->option = G_define_standard_option(G_OPT_R_OUTPUT);}
-  //!\brief Create a standard option: input vector map
-  void CreateOption_V_INPUT(){this->option = G_define_standard_option(G_OPT_V_INPUT);}
-  //!\brief Create a standard option: input vector map(s)
-  void CreateOption_V_INPUTS(){this->option = G_define_standard_option(G_OPT_V_INPUTS);}
-  //!\brief Create a standard option: output vector map
-  void CreateOption_V_OUTPUT(){this->option = G_define_standard_option(G_OPT_V_OUTPUT);}
-  //!\brief Create a standard option: Feature type
-  void CreateOption_V_TYPE(){this->option = G_define_standard_option(G_OPT_V_TYPE);}
-  //!\brief Create a standard option: number or name
-  void CreateOption_V_FIELD(){this->option = G_define_standard_option(G_OPT_V_FIELD);}
-  //!\brief Create a standard option: input file
-  void CreateOption_F_INPUT(){this->option = G_define_standard_option(G_OPT_F_INPUT);}
-  //!\brief Create a standard option: output file
-  void CreateOption_F_OUTPUT(){this->option = G_define_standard_option(G_OPT_F_OUTPUT);}
 
 protected:
   vtkGRASSOption();
   ~vtkGRASSOption() {};
 
+  //!\brief Create a standard option. This methd is used by the option factory to create default options
+  bool CreateOption(int OptionType);
+  
   //BTX
   struct Option *option;
   //ETX

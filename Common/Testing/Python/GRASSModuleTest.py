@@ -54,14 +54,20 @@ class GRASSModuleTest(unittest.TestCase):
 	option2.MultipleOn()
 	option2.SetTypeToString()
 
-        option3 =  vtkGRASSOption()
-        option3.CreateOption_DB_Where()
+        # Using default options is implemented in the option factory
+        option3 =  vtkGRASSOptionFactory().CreateInstance(vtkGRASSOptionFactory.GetRasterInputType())
+        option4 =  vtkGRASSOptionFactory().CreateInstance(vtkGRASSOptionFactory.GetRasterInputType(), "elev")
+        option5 =  vtkGRASSOptionFactory().CreateInstance(vtkGRASSOptionFactory.GetRasterInputType(), "topo", "The topographic index")
+        option6 =  vtkGRASSOptionFactory().CreateInstance(vtkGRASSOptionFactory.GetDataBaseWhereType())
 
         argv = vtkStringArray()
         argv.InsertNextValue("test")
         argv.InsertNextValue("-f")
-        argv.InsertNextValue("option1=test")
+        argv.InsertNextValue("option1=test1")
         argv.InsertNextValue("option2=aa,bb,cc,dd")
+        argv.InsertNextValue("input=test2")
+        argv.InsertNextValue("elev=test3")
+        argv.InsertNextValue("topo=test4")
         argv.InsertNextValue("where=income < 1000 and inhab >= 10000")
 
 	init.Parser(argv)
@@ -70,12 +76,15 @@ class GRASSModuleTest(unittest.TestCase):
         option2.GetAnswers(answers)
 
         self.assertEqual(flag.GetAnswer(), True, "Flag is not functional")
-        self.assertEqual(option1.GetAnswer(), "test", "Options is not functional")
+        self.assertEqual(option1.GetAnswer(), "test1", "Options is not functional")
+        self.assertEqual(option3.GetAnswer(), "test2", "Options is not functional")
+        self.assertEqual(option4.GetAnswer(), "test3", "Options is not functional")
+        self.assertEqual(option5.GetAnswer(), "test4", "Options is not functional")
         self.assertEqual(answers.GetValue(0), "aa", "Options is not functional")
         self.assertEqual(answers.GetValue(1), "bb", "Options is not functional")
         self.assertEqual(answers.GetValue(2), "cc", "Options is not functional")
         self.assertEqual(answers.GetValue(3), "dd", "Options is not functional")
-        self.assertEqual(option3.GetAnswer(), "income < 1000 and inhab >= 10000", "Options is not functional")
+        self.assertEqual(option6.GetAnswer(), "income < 1000 and inhab >= 10000", "Options is not functional")
 
 if __name__ == '__main__':
     suite = unittest.TestLoader().loadTestsFromTestCase(GRASSModuleTest)

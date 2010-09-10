@@ -29,6 +29,15 @@ vtkGRASSOption::vtkGRASSOption()
 	this->option = NULL;
 }
 
+bool vtkGRASSOption::CreateOption(int OptionType) {
+    if(this->option == NULL) {
+        this->option = G_define_standard_option(OptionType);
+        return true;
+    } else {
+        return false;
+    }
+}
+
 //----------------------------------------------------------------------------
 
 void vtkGRASSOption::GetAnswers(vtkStringArray *array)
