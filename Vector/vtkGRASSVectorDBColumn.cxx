@@ -26,8 +26,8 @@ vtkStandardNewMacro(vtkGRASSVectorDBColumn);
 
 vtkGRASSVectorDBColumn::vtkGRASSVectorDBColumn()
 {
-
-    this->column = NULL;
+    this->column = (dbColumn *) db_calloc(sizeof(dbColumn), ncols);
+    db_init_column(this->column);
 }
 
 //----------------------------------------------------------------------------
@@ -48,23 +48,20 @@ vtkGRASSVectorDBColumn::Initialize()
     if (this->column)
         db_free_column(this->column);
 
-    this->column = (dbColumn*) (calloc(1, sizeof (dbColumn)));
+    this->column = (dbColumn *) db_calloc(sizeof(dbColumn), ncols);
     db_init_column(this->column);
 }
 
 //----------------------------------------------------------------------------
 
 void
-vtkGRASSVectorDBColumn::SetColumn(dbColumn *column)
+vtkGRASSVectorDBColumn::DeepCopyDBColumn(dbColumn *column)
 {
 
     if (this->column == column)
         return;
 
-    if (this->column)
-        db_free_column(this->column);
-
-    this->column = column;
+    this->Initialize();
 }
 
 //----------------------------------------------------------------------------
@@ -78,14 +75,14 @@ vtkGRASSVectorDBColumn::PrintSelf(ostream& os, vtkIndent indent)
     {
         os << indent << "Name: " << this->GetName() << endl;
         os << indent << "Description: " << this->GetDescription() << endl;
-        os << indent << "Name: " << this->GetHostType() << endl;
-        os << indent << "Name: " << this->GetLength() << endl;
-        os << indent << "Name: " << this->GetSQLType() << endl;
-        os << indent << "Name: " << this->GetPrecision() << endl;
-        os << indent << "Name: " << this->GetScale() << endl;
-        os << indent << "Name: " << this->GetSelectPrivate() << endl;
-        os << indent << "Name: " << this->GetValueAsString() << endl;
-        os << indent << "Name: " << this->GetUpdatePrivate() << endl;
+        os << indent << "HostType: " << this->GetHostType() << endl;
+        os << indent << "Length: " << this->GetLength() << endl;
+        os << indent << "SQLType: " << this->GetSQLType() << endl;
+        os << indent << "Precision: " << this->GetPrecision() << endl;
+        os << indent << "Scale: " << this->GetScale() << endl;
+        os << indent << "SelectPrivileg: " << this->GetSelectPrivileg() << endl;
+        os << indent << "ValueAsString: " << this->GetValueAsString() << endl;
+        os << indent << "UpdatePrivileg: " << this->GetUpdatePrivileg() << endl;
     }
 }
 

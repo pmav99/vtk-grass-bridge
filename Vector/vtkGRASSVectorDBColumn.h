@@ -86,7 +86,7 @@ public:
         return -1;
     }
 
-    int GetSelectPrivate() {
+    int GetSelectPrivileg() {
         if (this->column)
             return db_get_column_select_priv(this->column);
         return -1;
@@ -98,7 +98,7 @@ public:
         return -1;
     }
 
-    int GetUpdatePrivate() {
+    int GetUpdatePrivileg() {
         if (this->column)
             return db_get_column_update_priv(this->column);
         return -1;
@@ -195,12 +195,12 @@ public:
             db_set_column_use_default_value(this->column);
     }
 
-    void SetSelectPrivateNotGranted() {
+    void SetSelectPrivilegNotGranted() {
         if (this->column)
             db_set_column_select_priv_not_granted(this->column);
     }
 
-    void SetSelectPrivateGranted() {
+    void SetSelectPrivilegGranted() {
         if (this->column)
             db_set_column_select_priv_granted(this->column);
     }
@@ -210,7 +210,7 @@ public:
             db_set_column_description(this->column, description);
     }
 
-    void SetHstType(int host_type) {
+    void SetHostType(int host_type) {
         if (this->column)
             db_set_column_host_type(this->column, host_type);
     }
@@ -251,7 +251,7 @@ protected:
     ~vtkGRASSVectorDBColumn();
 
     //BTX
-    void SetColumn(dbColumn *column);
+    void DeepCopyDBColumn(dbColumn *column);
     dbColumn *column;
     //ETX
 

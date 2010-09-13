@@ -25,10 +25,7 @@ vtkStandardNewMacro(vtkGRASSVectorDBTable);
 //----------------------------------------------------------------------------
 
 vtkGRASSVectorDBTable::vtkGRASSVectorDBTable() {
-    this->driver = NULL;
     this->table = NULL;
-    this->handle = NULL;
-    this->cursor = NULL;
 }
 
 //----------------------------------------------------------------------------
@@ -38,8 +35,23 @@ vtkGRASSVectorDBTable::~vtkGRASSVectorDBTable() {
 }
 
 void
+vtkGRASSVectorDBTable::DeepCopyDBTable(dbTable *table) {
+
+    
+    return;
+}
+
+
+void
 vtkGRASSVectorDBTable::PrintSelf(ostream& os, vtkIndent indent) {
 
     this->Superclass::PrintSelf(os, indent);
+    os << indent << "Table name:  " << this->GetTableName() << "\n";
+    os << indent << "Table description:  " << this->GetTableDescription() << "\n";
+    int i;
+    for (i = 0; i < this->GetNumberOfColumns(); i++)
+    {
+        ;
+    }
 }
 

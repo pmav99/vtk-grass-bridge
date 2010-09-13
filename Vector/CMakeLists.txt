@@ -16,7 +16,7 @@ vtkGRASSVectorMapTopoReader.cxx
 vtkGRASSVectorMapNoTopoReader.cxx
 vtkGRASSVectorBBox.cxx
 #vtkGRASSVectorDBInterface.cxx
-#vtkGRASSVectorDBTable.cxx
+vtkGRASSVectorDBTable.cxx
 #vtkGRASSVectorDBColumn.cxx
 )
 
@@ -30,7 +30,7 @@ vtkGRASSVectorMapTopoReader.h
 vtkGRASSVectorMapNoTopoReader.h
 vtkGRASSVectorBBox.h
 #vtkGRASSVectorDBInterface.h
-#vtkGRASSVectorDBTable.h
+vtkGRASSVectorDBTable.h
 #vtkGRASSVectorDBColumn.h
 vtkGRASSBridgeVectorWin32Header.h
 )
