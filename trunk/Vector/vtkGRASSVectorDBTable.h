@@ -32,8 +32,6 @@
 #include "vtkGRASSVectorDBColumn.h"
 
 extern "C" {
-#include <grass/gis.h>
-#include <grass/vector.h>
 #include <grass/dbmi.h>
 }
 
@@ -48,35 +46,70 @@ public:
     vtkTypeRevisionMacro(vtkGRASSVectorDBTable, vtkObjectGRASSErrorHandler);
     void PrintSelf(ostream& os, vtkIndent indent);
 
-    int GetNumberOfRows(){
-        if(this->cursor)
-            db_get_num_rows(this->cursor);
-        else
-            return -1;
-    }
-
+    //!\brief Return the number of columns of this table
     int GetNumberOfColumns(){
         if(this->table)
             return db_get_table_number_of_columns(this->table);
-        else
-            return -1;
+        return -1;
+    }
+
+    //!\brief Set the name of the table
+    //! return 0 if success and 1 in case of failure
+    int SetTableName(const char *name) {
+        if(this->table)
+            return db_set_table_name(this->table, name);
+        return DB_FAILED;
+    }
+
+    //!\brief Get the name of the table
+    //! return NULL in case of failure
+    const char *GetTableName(){
+        if(this->table)
+            return db_get_table_name(this->table);
+        return NULL;
+    }
+
+    //!\brief Set the description of the table
+    //! return 0 if success and 1 in case of failure
+    int SetTableDescription(const char *name) {
+        if(this->table)
+            return db_set_table_name(this->table, name);
+        return DB_FAILED;
+    }
+
+    //!\brief Get the description of the table
+    //! return NULL in case of failure
+    const char *GetTableDescription(){
+        if(this->table)
+            return db_get_table_description(this->table);
+        return NULL;
+    }
+
+    //!\brief Reses the table to an initial state
+    void Reset() {
+        if(this->table)
+            db_init_table(this->table);
     }
     
+    //!\brief Reset the existing and allocate a specific number of columns
+    void Allocate(int ncols) {
+        if(this->table) 
+            db_free_table(this->table);
+        this->table = db_alloc_table(ncols);
+    }
+
+  //BTX
+  virtual dbTable * GetPointer(){return this->table;}
+  //ETX
+
 protected:
     vtkGRASSVectorDBTable();
     ~vtkGRASSVectorDBTable();
 
-    //!\brief Initialize the database, to be called by the VectorMap reader/writer
-    virtual bool InitializeTable(dbTable *table, dbDriver *driver, dbHandle *handle, dbCursor *cursor);
-
     //BTX
-    dbDriver *driver;
-    dbHandle *handle;
-    dbCursor *cursor;
     dbTable *table;
+    void DeepCopyDBTable(dbTable *table);
     //ETX
-
-    vtkGRASSVectorDBColumn *Column;
 
 
 private:
