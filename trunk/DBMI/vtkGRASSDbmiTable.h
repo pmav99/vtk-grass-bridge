@@ -22,99 +22,119 @@
  * \author soerengebbert@googlemail.com
  * */
 
-#ifndef _vtkGRASSVectorDBTable_h
-#define	_vtkGRASSVectorDBTable_h
+#ifndef _vtkGRASSDbmiTable_h
+#define	_vtkGRASSDbmiTable_h
 
 #include <vtkObjectGRASSErrorHandler.h>
-#include "vtkGRASSBridgeVectorWin32Header.h"
-#include "vtkGRASSVectorMapBase.h"
+#include "vtkGRASSBridgeDbmiWin32Header.h"
 #include "vtkGRASSDefines.h"
-#include "vtkGRASSVectorDBColumn.h"
+#include "vtkGRASSDbmiColumn.h"
 
 extern "C" {
 #include <grass/dbmi.h>
 }
 
-class VTK_GRASS_BRIDGE_VECTOR_EXPORT vtkGRASSVectorDBTable : public vtkObjectGRASSErrorHandler {
+class VTK_GRASS_BRIDGE_DBMI_EXPORT vtkGRASSDbmiTable : public vtkObjectGRASSErrorHandler {
 public:
 
     //BTX
-    friend class vtkGRASSVectorDBInterface;
+    friend class vtkGRASSDbmiInterface;
     //ETX
 
-    static vtkGRASSVectorDBTable *New();
-    vtkTypeRevisionMacro(vtkGRASSVectorDBTable, vtkObjectGRASSErrorHandler);
-    void PrintSelf(ostream& os, vtkIndent indent);
+    static vtkGRASSDbmiTable *New();
+    vtkTypeRevisionMacro(vtkGRASSDbmiTable, vtkObjectGRASSErrorHandler);
+    virtual void PrintSelf(ostream& os, vtkIndent indent);
 
     //!\brief Return the number of columns of this table
-    int GetNumberOfColumns(){
-        if(this->table)
+
+    virtual int GetNumberOfColumns() {
+        if (this->table)
             return db_get_table_number_of_columns(this->table);
         return -1;
     }
 
     //!\brief Set the name of the table
     //! return 0 if success and 1 in case of failure
-    int SetTableName(const char *name) {
-        if(this->table)
+
+    virtual int SetTableName(const char *name) {
+        if (this->table)
             return db_set_table_name(this->table, name);
         return DB_FAILED;
     }
 
     //!\brief Get the name of the table
     //! return NULL in case of failure
-    const char *GetTableName(){
-        if(this->table)
+
+    virtual const char *GetTableName() {
+        if (this->table)
             return db_get_table_name(this->table);
         return NULL;
     }
 
     //!\brief Set the description of the table
     //! return 0 if success and 1 in case of failure
-    int SetTableDescription(const char *name) {
-        if(this->table)
+
+    virtual int SetTableDescription(const char *name) {
+        if (this->table)
             return db_set_table_name(this->table, name);
         return DB_FAILED;
     }
 
     //!\brief Get the description of the table
     //! return NULL in case of failure
-    const char *GetTableDescription(){
-        if(this->table)
+
+    virtual const char *GetTableDescription() {
+        if (this->table)
             return db_get_table_description(this->table);
         return NULL;
     }
 
     //!\brief Reses the table to an initial state
-    void Reset() {
-        if(this->table)
+
+    virtual void Reset() {
+        if (this->table)
             db_init_table(this->table);
     }
-    
+
     //!\brief Reset the existing and allocate a specific number of columns
-    void Allocate(int ncols) {
-        if(this->table) 
+
+    virtual void Allocate(int ncols) {
+        if (this->table)
             db_free_table(this->table);
         this->table = db_alloc_table(ncols);
     }
 
-  //BTX
-  virtual dbTable * GetPointer(){return this->table;}
-  //ETX
+    //!\brief Set a column at a specific index
+    virtual void SetColumn(vtkGRASSDbmiColumn *column, int idx);
+
+    //!\brief Return a column at a specific index
+    virtual vtkGRASSDbmiColumn *GetColumn(int idx);
+
+    //!\brief Append a vtkGRASSDbmiColumn
+    virtual void AppendColumn(vtkGRASSDbmiColumn *column);
+
+    //!\brief Make a deep copy of an existing table
+    virtual void DeepCopy(vtkGRASSDbmiTable *table);
+
+    //BTX
+    virtual dbTable * GetPointer() {
+        return this->table;
+    }
+    virtual void DeepCopy(dbTable *table);
+    //ETX
 
 protected:
-    vtkGRASSVectorDBTable();
-    ~vtkGRASSVectorDBTable();
+    vtkGRASSDbmiTable();
+    ~vtkGRASSDbmiTable();
 
     //BTX
     dbTable *table;
-    void DeepCopyDBTable(dbTable *table);
     //ETX
 
 
 private:
-    vtkGRASSVectorDBTable(const vtkGRASSVectorDBTable&); // Not implemented.
-    void operator=(const vtkGRASSVectorDBTable&); // Not implemented.
+    vtkGRASSDbmiTable(const vtkGRASSDbmiTable&); // Not implemented.
+    void operator=(const vtkGRASSDbmiTable&); // Not implemented.
 };
 
 #endif

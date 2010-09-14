@@ -13,45 +13,31 @@
  * GNU General Public License for more details.
  */
 
-#include "vtkGRASSVectorDBTable.h"
-#include "vtkGRASSRasterMapBase.h"
+#include "vtkGRASSDbmiInterface.h"
 #include <vtkObjectFactory.h>
 #include <vtkGRASSDefines.h>
 
 
-vtkCxxRevisionMacro(vtkGRASSVectorDBTable, "$Revision: 1.18 $");
-vtkStandardNewMacro(vtkGRASSVectorDBTable);
+vtkCxxRevisionMacro(vtkGRASSDbmiInterface, "$Revision: 1.18 $");
+vtkStandardNewMacro(vtkGRASSDbmiInterface);
 
 //----------------------------------------------------------------------------
 
-vtkGRASSVectorDBTable::vtkGRASSVectorDBTable() {
-    this->table = NULL;
-}
-
-//----------------------------------------------------------------------------
-
-vtkGRASSVectorDBTable::~vtkGRASSVectorDBTable() {
+vtkGRASSDbmiInterface::vtkGRASSDbmiInterface() {
     ;
 }
 
-void
-vtkGRASSVectorDBTable::DeepCopyDBTable(dbTable *table) {
+//----------------------------------------------------------------------------
 
-    
-    return;
+vtkGRASSDbmiInterface::~vtkGRASSDbmiInterface() {
+    ;
 }
 
+//----------------------------------------------------------------------------
 
 void
-vtkGRASSVectorDBTable::PrintSelf(ostream& os, vtkIndent indent) {
+vtkGRASSDbmiInterface::PrintSelf(ostream& os, vtkIndent indent) {
 
     this->Superclass::PrintSelf(os, indent);
-    os << indent << "Table name:  " << this->GetTableName() << "\n";
-    os << indent << "Table description:  " << this->GetTableDescription() << "\n";
-    int i;
-    for (i = 0; i < this->GetNumberOfColumns(); i++)
-    {
-        ;
-    }
 }
 

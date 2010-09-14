@@ -15,9 +15,6 @@ vtkGRASSVectorMapUpdater.cxx
 vtkGRASSVectorMapTopoReader.cxx
 vtkGRASSVectorMapNoTopoReader.cxx
 vtkGRASSVectorBBox.cxx
-#vtkGRASSVectorDBInterface.cxx
-vtkGRASSVectorDBTable.cxx
-#vtkGRASSVectorDBColumn.cxx
 )
 
 SET (VECTOR_H
@@ -29,9 +26,6 @@ vtkGRASSVectorMapUpdater.h
 vtkGRASSVectorMapTopoReader.h
 vtkGRASSVectorMapNoTopoReader.h
 vtkGRASSVectorBBox.h
-#vtkGRASSVectorDBInterface.h
-vtkGRASSVectorDBTable.h
-#vtkGRASSVectorDBColumn.h
 vtkGRASSBridgeVectorWin32Header.h
 )
 

@@ -23,14 +23,13 @@
  * \author soerengebbert@googlemail.com
  * */
 
-#ifndef _vtkGRASSVectorDBInterface_h
-#define	_vtkGRASSVectorDBInterface_h
+#ifndef _vtkGRASSDbmiInterface_h
+#define	_vtkGRASSDbmiInterface_h
 
 #include <vtkObjectGRASSErrorHandler.h>
-#include "vtkGRASSBridgeVectorWin32Header.h"
+#include "vtkGRASSBridgeDbmiWin32Header.h"
 #include "vtkGRASSVectorMapBase.h"
 #include "vtkGRASSDefines.h"
-#include "vtkGRASSVectorDBColumn.h"
 
 extern "C" {
 #include <grass/gis.h>
@@ -38,15 +37,15 @@ extern "C" {
 #include <grass/dbmi.h>
 }
 
-class VTK_GRASS_BRIDGE_VECTOR_EXPORT vtkGRASSVectorDBInterface : public vtkObjectGRASSErrorHandler {
+class VTK_GRASS_BRIDGE_DBMI_EXPORT vtkGRASSDbmiInterface : public vtkObjectGRASSErrorHandler {
 public:
 
     //BTX
     friend class vtkGRASSVectorMapBase;
     //ETX
 
-    static vtkGRASSVectorDBInterface *New();
-    vtkTypeRevisionMacro(vtkGRASSVectorDBInterface, vtkObjectGRASSErrorHandler);
+    static vtkGRASSDbmiInterface *New();
+    vtkTypeRevisionMacro(vtkGRASSDbmiInterface, vtkObjectGRASSErrorHandler);
     void PrintSelf(ostream& os, vtkIndent indent);
 
     virtual const char *GetDatabaseName(){
@@ -85,8 +84,8 @@ public:
     vtkGetMacro(FieldNumber, int);
 
 protected:
-    vtkGRASSVectorDBInterface();
-    ~vtkGRASSVectorDBInterface();
+    vtkGRASSDbmiInterface();
+    ~vtkGRASSDbmiInterface();
 
     vtkSetObjectMacro(VectorMap, vtkGRASSVectorMapBase);
     vtkGetObjectMacro(VectorMap, vtkGRASSVectorMapBase);
@@ -112,8 +111,8 @@ protected:
     vtkGRASSVectorMapBase *VectorMap;
 
 private:
-    vtkGRASSVectorDBInterface(const vtkGRASSVectorDBInterface&); // Not implemented.
-    void operator=(const vtkGRASSVectorDBInterface&); // Not implemented.
+    vtkGRASSDbmiInterface(const vtkGRASSDbmiInterface&); // Not implemented.
+    void operator=(const vtkGRASSDbmiInterface&); // Not implemented.
 };
 
 #endif
