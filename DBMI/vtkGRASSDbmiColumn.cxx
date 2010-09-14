@@ -13,26 +13,25 @@
  * GNU General Public License for more details.
  */
 
-#include "vtkGRASSVectorDBColumn.h"
-#include "vtkGRASSRasterMapBase.h"
+#include "vtkGRASSDbmiColumn.h"
 #include <vtkObjectFactory.h>
 #include <vtkGRASSDefines.h>
 
 
-vtkCxxRevisionMacro(vtkGRASSVectorDBColumn, "$Revision: 1.18 $");
-vtkStandardNewMacro(vtkGRASSVectorDBColumn);
+vtkCxxRevisionMacro(vtkGRASSDbmiColumn, "$Revision: 1.18 $");
+vtkStandardNewMacro(vtkGRASSDbmiColumn);
 
 //----------------------------------------------------------------------------
 
-vtkGRASSVectorDBColumn::vtkGRASSVectorDBColumn()
+vtkGRASSDbmiColumn::vtkGRASSDbmiColumn()
 {
-    this->column = (dbColumn *) db_calloc(sizeof(dbColumn), ncols);
+    this->column = (dbColumn *) db_calloc(sizeof(dbColumn), 1);
     db_init_column(this->column);
 }
 
 //----------------------------------------------------------------------------
 
-vtkGRASSVectorDBColumn::~vtkGRASSVectorDBColumn()
+vtkGRASSDbmiColumn::~vtkGRASSDbmiColumn()
 {
 
     if (this->column)
@@ -42,32 +41,42 @@ vtkGRASSVectorDBColumn::~vtkGRASSVectorDBColumn()
 //----------------------------------------------------------------------------
 
 void
-vtkGRASSVectorDBColumn::Initialize()
+vtkGRASSDbmiColumn::Initialize()
 {
 
     if (this->column)
         db_free_column(this->column);
 
-    this->column = (dbColumn *) db_calloc(sizeof(dbColumn), ncols);
+    this->column = (dbColumn *) db_calloc(sizeof(dbColumn), 1);
     db_init_column(this->column);
 }
 
 //----------------------------------------------------------------------------
 
 void
-vtkGRASSVectorDBColumn::DeepCopyDBColumn(dbColumn *column)
+vtkGRASSDbmiColumn::DeepCopy(dbColumn *column)
 {
 
     if (this->column == column)
         return;
 
     this->Initialize();
+
+    db_copy_column(this->column, column);
 }
 
 //----------------------------------------------------------------------------
 
 void
-vtkGRASSVectorDBColumn::PrintSelf(ostream& os, vtkIndent indent)
+vtkGRASSDbmiColumn::DeepCopy(vtkGRASSDbmiColumn *column)
+{
+    this->DeepCopy(column->GetPointer());
+}
+
+//----------------------------------------------------------------------------
+
+void
+vtkGRASSDbmiColumn::PrintSelf(ostream& os, vtkIndent indent)
 {
 
     this->Superclass::PrintSelf(os, indent);

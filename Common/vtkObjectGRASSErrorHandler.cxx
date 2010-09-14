@@ -13,7 +13,6 @@
  */
 
 #include "vtkObjectGRASSErrorHandler.h"
-#include "vtkObjectGRASSErrorHandler.h"
 #include <vtkStringArray.h>
 #include <vtkObjectFactory.h>
 

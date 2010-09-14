@@ -19,7 +19,6 @@
 #include <vtkGRASSVectorFeaturePoints.h>
 #include <vtkGRASSVectorFeatureCats.h>
 #include <vtkGRASSDefines.h>
-#include "vtkGRASSVectorDBInterface.h"
 
 
 vtkCxxRevisionMacro(vtkGRASSVectorMapBase, "$Revision: 1.18 $");

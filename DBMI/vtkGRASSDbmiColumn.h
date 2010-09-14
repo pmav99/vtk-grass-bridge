@@ -22,12 +22,11 @@
  * \author soerengebbert@googlemail.com
  * */
 
-#ifndef _vtkGRASSVectorDBColumn_h
-#define	_vtkGRASSVectorDBColumn_h
+#ifndef _vtkGRASSDbmiColumn_h
+#define	_vtkGRASSDbmiColumn_h
 
 #include <vtkObjectGRASSErrorHandler.h>
-#include "vtkGRASSBridgeVectorWin32Header.h"
-#include "vtkGRASSVectorMapBase.h"
+#include "vtkGRASSBridgeDbmiWin32Header.h"
 #include "vtkGRASSDefines.h"
 
 extern "C" {
@@ -36,15 +35,15 @@ extern "C" {
 #include <grass/dbmi.h>
 }
 
-class VTK_GRASS_BRIDGE_VECTOR_EXPORT vtkGRASSVectorDBColumn : public vtkObjectGRASSErrorHandler {
+class VTK_GRASS_BRIDGE_DBMI_EXPORT vtkGRASSDbmiColumn : public vtkObjectGRASSErrorHandler {
 public:
 
     //BTX
-    friend class vtkGRASSVectorDBTable;
+    friend class vtkGRASSDbmiTable;
     //ETX
 
-    static vtkGRASSVectorDBColumn *New();
-    vtkTypeRevisionMacro(vtkGRASSVectorDBColumn, vtkObjectGRASSErrorHandler);
+    static vtkGRASSDbmiColumn *New();
+    vtkTypeRevisionMacro(vtkGRASSDbmiColumn, vtkObjectGRASSErrorHandler);
     void PrintSelf(ostream& os, vtkIndent indent);
 
     //! \brief Reset the column and fill with default values
@@ -235,29 +234,56 @@ public:
             db_set_column_scale(this->column, scale);
     }
 
-    void SetSQLType(int sql_type) {
+    void SetSQLTypeToCharacter() {
         if (this->column)
-            db_set_column_sqltype(this->column, sql_type);
+            db_set_column_sqltype(this->column, DB_SQL_TYPE_CHARACTER);
     }
+    void SetSQLTypeToDecimal() {
+        if (this->column)
+            db_set_column_sqltype(this->column, DB_SQL_TYPE_DECIMAL);
+    }
+    void SetSQLTypeToDoublePrecision() {
+        if (this->column)
+            db_set_column_sqltype(this->column, DB_SQL_TYPE_DOUBLE_PRECISION);
+    }
+    void SetSQLTypeToInteger() {
+        if (this->column)
+            db_set_column_sqltype(this->column, DB_SQL_TYPE_INTEGER);
+    }
+    void SetSQLTypeToReal() {
+        if (this->column)
+            db_set_column_sqltype(this->column, DB_SQL_TYPE_REAL);
+    }
+    void SetSQLTypeToSmallInt() {
+        if (this->column)
+            db_set_column_sqltype(this->column, DB_SQL_TYPE_SMALLINT);
+    }
+    void SetSQLTypeToUnknown() {
+        if (this->column)
+            db_set_column_sqltype(this->column, DB_SQL_TYPE_UNKNOWN);
+    }
+
+    //!\brief Make a deep copy of column
+    virtual void DeepCopy(vtkGRASSDbmiColumn *column);
 
     //BTX
     dbColumn *GetPointer() {
         return this->column;
     }
+    virtual void DeepCopy(dbColumn *column);
     // ETX
 
 protected:
-    vtkGRASSVectorDBColumn();
-    ~vtkGRASSVectorDBColumn();
+    vtkGRASSDbmiColumn();
+    ~vtkGRASSDbmiColumn();
 
     //BTX
-    void DeepCopyDBColumn(dbColumn *column);
     dbColumn *column;
     //ETX
 
 private:
-    vtkGRASSVectorDBColumn(const vtkGRASSVectorDBColumn&); // Not implemented.
-    void operator=(const vtkGRASSVectorDBColumn&); // Not implemented.
+    vtkGRASSDbmiColumn(const vtkGRASSDbmiColumn&); // Not implemented.
+    void operator=(const vtkGRASSDbmiColumn&); // Not implemented.
 };
 
 #endif
