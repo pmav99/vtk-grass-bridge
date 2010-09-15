@@ -56,9 +56,7 @@ public:
      * \param name the name of the vector map
      * \return true or false
      * */
-    virtual bool OpenMap(const char *name) {
-        return this->OpenMapReadOnly(name);
-    }
+    virtual bool OpenMap(const char *name);
 
     /*! \brief Read the line at index of the vector map (only level 2)
      *
@@ -334,11 +332,6 @@ public:
         else return -1;
     }
 
-    //!\brief Return the number of database links
-    virtual int GetNumberOfDBLinks() {
-        if (this->Open)return (int) Vect_get_num_dblinks(&this->map);
-        else return -1;
-    }
     /*!
        \brief Select lines by box.
 
@@ -399,11 +392,15 @@ public:
         else return -1; CATCH_INT
     }
 
+    //!\brief Get the database interface for the opened vector map
+    vtkGetObjectMacro(DbmiInterface, vtkGRASSDbmiInterfaceReader);
+    
 protected:
+    vtkGRASSDbmiInterfaceReader *DbmiInterface;
+
     vtkGRASSVectorMapTopoReader();
 
-    ~vtkGRASSVectorMapTopoReader() {
-    };
+    ~vtkGRASSVectorMapTopoReader();
 
     void SetVectorLevelToTopo() {
         this->SetVectorLevel(2);

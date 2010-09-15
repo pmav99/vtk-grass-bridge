@@ -14,6 +14,8 @@
  */
 
 #include "vtkGRASSDbmiInterface.h"
+#include "vtkGRASSDbmiInterfaceReader.h"
+#include "vtkGRASSDbmiValue.h"
 #include <vtkObjectFactory.h>
 #include <vtkGRASSDefines.h>
 
@@ -24,13 +26,67 @@ vtkStandardNewMacro(vtkGRASSDbmiInterface);
 //----------------------------------------------------------------------------
 
 vtkGRASSDbmiInterface::vtkGRASSDbmiInterface() {
-    ;
+    this->driver =  NULL;
+    this->Connected = false;
+    this->FieldNumber = 1;
+    this->VectorMap = NULL;
 }
 
 //----------------------------------------------------------------------------
 
 vtkGRASSDbmiInterface::~vtkGRASSDbmiInterface() {
-    ;
+
+    this->DisconnectDB();
+    
+    if(this->driver)
+        G_free(this->driver);
+}
+
+//----------------------------------------------------------------------------
+
+int vtkGRASSDbmiInterface::GetNumberOfRows()
+{
+    if(this->VectorMap && this->VectorMap->IsOpen() && this->Connected) {
+        char buff[1024];
+        struct field_info *Fi;
+        Fi = Vect_get_field(this->VectorMap->GetPointer(), this->FieldNumber);
+        G_snprintf(buff, 1024, "SELECT * FROM %s", Fi->table);
+        dbString sql;
+        db_set_string(&sql, buff);
+        return db_get_table_number_of_rows(this->driver, &sql);
+    }
+    return -1;
+}
+
+//----------------------------------------------------------------------------
+
+bool vtkGRASSDbmiInterface::DisconnectDB()
+{
+    if(this->driver && this->Connected) {
+        db_close_database_shutdown_driver(this->driver);
+    }
+}
+
+//----------------------------------------------------------------------------
+
+bool vtkGRASSDbmiInterface::SelectValue(int cat, const char* column, vtkGRASSDbmiValue* value)
+{
+    if(this->VectorMap && this->VectorMap->IsOpen() && this->Connected) {
+        struct field_info *Fi;
+        Fi = Vect_get_field(this->VectorMap->GetPointer(), this->FieldNumber);
+        if(db_select_value(this->driver, Fi->table, Fi->key, cat, column, value->GetPointer())<0)
+            return false;
+
+//        cout << Fi->table << endl;
+//        cout << Fi->key << endl;
+//        cout << cat << endl;
+//        cout << column << endl;
+//        cout << value->GetPointer()->d << endl;
+        
+    }else {
+        return false;
+    }
+    return true;
 }
 
 //----------------------------------------------------------------------------
@@ -39,5 +95,10 @@ void
 vtkGRASSDbmiInterface::PrintSelf(ostream& os, vtkIndent indent) {
 
     this->Superclass::PrintSelf(os, indent);
+    os << indent << "Field number: " << this->FieldNumber << endl;
+    os << indent << "Connected: " << this->Connected << endl;
+    os << indent << "Registered vector map: " << (this->VectorMap?this->VectorMap->GetFullName():"none") << endl;
+    if(this->VectorMap)
+        this->VectorMap->PrintSelf(os, indent.GetNextIndent());
 }
 

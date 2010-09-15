@@ -14,7 +14,7 @@
  */
 
 #include "vtkGRASSVectorMapTopoReader.h"
-
+#include "vtkGRASSDbmiInterfaceReader.h"
 #include "vtkGRASSVectorBBox.h"
 #include <vtkObjectFactory.h>
 #include <vtkGRASSVectorFeaturePoints.h>
@@ -32,6 +32,13 @@ vtkGRASSVectorMapTopoReader::vtkGRASSVectorMapTopoReader()
     this->SetVectorLevelToTopo();
 }
 
+//----------------------------------------------------------------------------
+
+vtkGRASSVectorMapTopoReader::~vtkGRASSVectorMapTopoReader()
+{
+    if(this->DbmiInterface)
+        this->DbmiInterface->Delete();
+}
 //----------------------------------------------------------------------------
 
 int
@@ -262,6 +269,20 @@ vtkGRASSVectorMapTopoReader::SelectNodesByBox(vtkGRASSVectorBBox *box, vtkIntArr
     return ret;
 }
 
+//----------------------------------------------------------------------------
+
+bool vtkGRASSVectorMapTopoReader::OpenMap(const char *name)
+{
+    bool state;
+    state = this->OpenMapReadOnly(name);
+    if(state)
+    {
+        this->DbmiInterface = vtkGRASSDbmiInterfaceReader::New();
+        this->DbmiInterface->SetVectorMap(this);
+    }
+    return state;
+}
+
 //------------------------------------------------------------------------------
 
 void
@@ -283,7 +304,6 @@ vtkGRASSVectorMapTopoReader::PrintSelf(ostream& os, vtkIndent indent)
         os << indent << "Number of isles: " << this->GetNumberOfIsles() << endl;
         os << indent << "Number of faces: " << this->GetNumberOfFaces() << endl;
         os << indent << "Number of kernels: " << this->GetNumberOfKernels() << endl;
-        os << indent << "Number of db-links: " << this->GetNumberOfDBLinks() << endl;
     }
 }
 

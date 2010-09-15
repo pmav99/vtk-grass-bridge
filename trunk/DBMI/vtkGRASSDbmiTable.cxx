@@ -87,15 +87,43 @@ vtkGRASSDbmiColumn *vtkGRASSDbmiTable::GetColumn(int idx)
 }
 
 //----------------------------------------------------------------------------
+vtkGRASSDbmiColumn *vtkGRASSDbmiTable::GetColumn(const char* name)
+{
+    dbColumn *c = NULL;
+    int i, columns = this->GetNumberOfColumns();
+
+    for(i = 0; i < columns; i++ ) {
+        c = db_get_table_column(this->table, i);
+        
+        if(c == NULL)
+            return NULL;
+
+        if(strcmp(name, db_get_string(&c->columnName)) == 0)
+            break;
+
+        c = NULL;
+    }
+ 
+    if(c == NULL)
+        return NULL;
+
+
+    VGB_CREATE(vtkGRASSDbmiColumn, column);
+    column->DeepCopy(c);
+    return column;
+}
+
+//----------------------------------------------------------------------------
 void
 vtkGRASSDbmiTable::PrintSelf(ostream& os, vtkIndent indent) {
 
     this->Superclass::PrintSelf(os, indent);
     os << indent << "Table name:  " << this->GetTableName() << "\n";
     os << indent << "Table description:  " << this->GetTableDescription() << "\n";
+    os << indent << "Table number of columns:  " << this->GetNumberOfColumns() << "\n";
     int i;
     for (i = 0; i < this->GetNumberOfColumns(); i++) {
-        ;
+        //this->GetColumn(i)->PrintSelf(os, indent.GetNextIndent());
     }
 }
 
