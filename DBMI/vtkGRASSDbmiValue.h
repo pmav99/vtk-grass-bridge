@@ -46,10 +46,10 @@ public:
     vtkTypeRevisionMacro(vtkGRASSDbmiValue, vtkObjectGRASSErrorHandler);
     void PrintSelf(ostream& os, vtkIndent indent);
 
-  virtual void DeepCopy(vtkGRASSDbmiValue *value);
+  virtual void DeepCopy(vtkGRASSDbmiValue *value){;}
   //BTX
   virtual dbValue * GetPointer(){return this->value;}
-  virtual void DeepCopy(dbValue *value);
+  virtual void DeepCopy(dbValue *value){;}
   //ETX
 
 protected:

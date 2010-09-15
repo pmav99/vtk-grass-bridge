@@ -33,10 +33,10 @@
 #include "vtkGRASSBridgeVectorWin32Header.h"
 #include "vtkGRASSDefines.h"
 
-//class vtkGRASSVectorDBInterface;
 class vtkGRASSVectorFeaturePoints;
 class vtkGRASSVectorFeatureCats;
 class vtkGRASSVectorBBox;
+class vtkGRASSDbmiInterfaceReader;
 
 extern "C" {
 #include <grass/gis.h>
@@ -149,6 +149,12 @@ public:
         else return NULL;
     }
 
+    //!\brief Return the number of database links
+    virtual int GetNumberOfDBLinks() {
+        if (this->Open)return (int) Vect_get_num_dblinks(&this->map);
+        else return -1;
+    }
+    
     /*!
        \brief Check if vector map is 3D (with z)
 
@@ -250,7 +256,7 @@ public:
     int GetFeatureTypeFace(){return GV_FACE;}
     //!\brief Return the number of the feature type face
     int GetFeatureTypeVolume(){return GV_VOLUME;}
-
+    
     //BTX
     virtual struct Map_info *GetPointer() {
         return &this->map;
@@ -266,7 +272,6 @@ protected:
     bool Initiated;
     bool Open;
     char *VectorName;
-    //vtkGRASSVectorDBInterface *dbAccess;
 
     //BTX
     struct Map_info map;

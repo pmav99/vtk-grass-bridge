@@ -14,6 +14,7 @@
  */
 
 #include "vtkGRASSVectorMapNoTopoReader.h"
+#include "vtkGRASSDbmiInterfaceReader.h"
 #include <vtkObjectFactory.h>
 
 
@@ -24,5 +25,28 @@ vtkStandardNewMacro(vtkGRASSVectorMapNoTopoReader);
 
 vtkGRASSVectorMapNoTopoReader::vtkGRASSVectorMapNoTopoReader()
 {
+    this->DbmiInterface = NULL;
     this->SetVectorLevelToNoTopo();
+}
+
+//----------------------------------------------------------------------------
+
+vtkGRASSVectorMapNoTopoReader::~vtkGRASSVectorMapNoTopoReader()
+{
+    if(this->DbmiInterface)
+        this->DbmiInterface->Delete();
+}
+
+//----------------------------------------------------------------------------
+
+bool vtkGRASSVectorMapNoTopoReader::OpenMap(const char *name)
+{
+    bool state;
+    state = this->OpenMapReadOnly(name);
+    if(state)
+    {
+        this->DbmiInterface = vtkGRASSDbmiInterfaceReader::New();
+        this->DbmiInterface->SetVectorMap(this);
+    }
+    return state;
 }

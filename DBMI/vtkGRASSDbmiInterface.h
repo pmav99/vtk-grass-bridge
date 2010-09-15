@@ -30,6 +30,12 @@
 #include "vtkGRASSBridgeDbmiWin32Header.h"
 #include "vtkGRASSVectorMapBase.h"
 #include "vtkGRASSDefines.h"
+#include "vtkGRASSDbmiCatValueArray.h"
+
+class vtkIntArray;
+class vtkDataArray;
+class vtkGRASSDbmiValue;
+class vtkGRASSDbmiCatValueArray;
 
 extern "C" {
 #include <grass/gis.h>
@@ -40,74 +46,47 @@ extern "C" {
 class VTK_GRASS_BRIDGE_DBMI_EXPORT vtkGRASSDbmiInterface : public vtkObjectGRASSErrorHandler {
 public:
 
-    //BTX
-    friend class vtkGRASSVectorMapBase;
-    //ETX
-
     static vtkGRASSDbmiInterface *New();
     vtkTypeRevisionMacro(vtkGRASSDbmiInterface, vtkObjectGRASSErrorHandler);
     void PrintSelf(ostream& os, vtkIndent indent);
 
-    virtual const char *GetDatabaseName(){
-        if(this->fieldInfo)
-        return this->fieldInfo->database;
-        else return NULL;
-    }
+    //!\brief Open a connection to the database. This method must be implemented
+    //!in the subclasses
+    virtual bool ConnectDB(){;}
+    //!\brief Close the database connection
+    virtual bool DisconnectDB();
+    //!\brief Select a value from the vector map table. This works only when the
+    //!database connection is established.
+    virtual bool SelectValue(int cat, const char *column, vtkGRASSDbmiValue *value);
+    //!Get the number of rows of the entire table
+    virtual int GetNumberOfRows();
+    //!\brief Write the values of the cat value array into a data array based on the categories stored in cats
+    //static bool ConvertCatValueArray(vtkGRASSDbmiCatValueArray *catval, vtkIntArray *cats, vtkDataArray *values);
 
-    virtual const char *GetDriverName(){
-        if(this->fieldInfo)
-        return this->fieldInfo->driver;
-        else return NULL;
-    }
-
-    virtual const char *GetKeyName(){
-        if(this->fieldInfo)
-        return this->fieldInfo->key;
-        else return NULL;
-    }
-    virtual const char *GetName(){
-        if(this->fieldInfo)
-        return this->fieldInfo->name;
-        else return NULL;
-    }
-    virtual const char *GetTableName(){
-        if(this->fieldInfo)
-        return this->fieldInfo->table;
-        else return NULL;
-    }
-
-    virtual bool IsInitialized() {
-        return this->Initialized;
-    }
-    
+    //!\brief Which field number should be used to access the vector database
     vtkSetMacro(FieldNumber, int);
+    //!\brief Which field number should be used to access the vector database
     vtkGetMacro(FieldNumber, int);
+
+    //!\brief Get the vector map from which the database connection is based on
+    vtkGetObjectMacro(VectorMap, vtkGRASSVectorMapBase);
+
+    //!\brief Check if the database connection is established
+    bool IsConnected(){return this->Connected;}
 
 protected:
     vtkGRASSDbmiInterface();
     ~vtkGRASSDbmiInterface();
 
     vtkSetObjectMacro(VectorMap, vtkGRASSVectorMapBase);
-    vtkGetObjectMacro(VectorMap, vtkGRASSVectorMapBase);
-
-    //!\brief Initialize the database, to be called by the VectorMap reader/writer
-    virtual bool InitializeDB(vtkGRASSVectorMapBase *VectorMap);
-    virtual bool ShutdownDB();
 
     int FieldNumber;
+    bool Connected;
     //BTX
     dbDriver *driver;
-    dbHandle handle;
-    dbCursor cursor;
-    dbTable *table;
-    dbString table_name;
-    dbString dbsql;
-    dbString valstr;
-    struct field_info *fieldInfo;
     //ETX
 
-    bool Initialized;
-
+    //The vector map which the database connection is based on
     vtkGRASSVectorMapBase *VectorMap;
 
 private:

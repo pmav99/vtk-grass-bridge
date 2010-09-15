@@ -36,10 +36,13 @@ vtkGRASSDbmiValue::~vtkGRASSDbmiValue() {
     this->value = NULL;
 }
 
+//----------------------------------------------------------------------------
 
 void
 vtkGRASSDbmiValue::PrintSelf(ostream& os, vtkIndent indent) {
 
     this->Superclass::PrintSelf(os, indent);
+        os << indent <<  "Table double  value: " <<  db_get_value_double(this->value) << endl;
+        os << indent <<  "Table integer value: " <<  db_get_value_int(this->value) << endl;
 }
 

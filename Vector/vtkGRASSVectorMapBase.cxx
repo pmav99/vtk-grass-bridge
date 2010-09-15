@@ -95,9 +95,6 @@ vtkGRASSVectorMapBase::OpenMapReadOnly(const char *name)
 
     this->Open = true;
 
-    //this->dbAccess->SetFieldNumber(1);
-    //this->dbAccess->InitializeDB(this);
-
     return true;
 }
 
@@ -269,6 +266,7 @@ vtkGRASSVectorMapBase::PrintSelf(ostream& os, vtkIndent indent)
         os << indent << "ProjectionName: " << this->GetProjectionName() << endl;
         os << indent << "Is 3d: " << (this->Is3d() ? "Yes" : "No") << endl;
         os << indent << "Total number of coor points: " << this->GetTotalNumberOfPoints() << endl;
+        os << indent << "Number of db-links: " << this->GetNumberOfDBLinks() << endl;
     }
 }
 

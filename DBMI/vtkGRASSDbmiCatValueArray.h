@@ -42,7 +42,7 @@ public:
 
     void DeepCopy(vtkGRASSDbmiCatValueArray *catval);
   //BTX
-  virtual dbTable * GetPointer(){return this->catval;}
+  virtual dbCatValArray * GetPointer(){return this->catval;}
     void DeepCopy(dbCatValArray *catval);
   //ETX
 

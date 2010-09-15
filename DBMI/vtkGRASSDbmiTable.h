@@ -107,6 +107,9 @@ public:
     //!\brief Set a column at a specific index
     virtual void SetColumn(vtkGRASSDbmiColumn *column, int idx);
 
+    //!\brief Return a column of a specific name
+    virtual vtkGRASSDbmiColumn *GetColumn(const char* column);
+
     //!\brief Return a column at a specific index
     virtual vtkGRASSDbmiColumn *GetColumn(int idx);
 

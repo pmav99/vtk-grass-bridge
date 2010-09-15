@@ -34,13 +34,13 @@ vtkGRASSBridgeVectorWin32Header.h
 
 # Create the vtkGRASSBridgeVector C++ library.
 ADD_LIBRARY (vtkGRASSBridgeVector ${VECTOR_SRCS}  ${VECTOR_H})
-TARGET_LINK_LIBRARIES(vtkGRASSBridgeVector vtkGRASSBridgeCommon vtkCommon  ${GRASS_LIBRARIES})
+TARGET_LINK_LIBRARIES(vtkGRASSBridgeVector vtkGRASSBridgeCommon vtkGRASSBridgeDbmi vtkCommon  ${GRASS_LIBRARIES})
 
 # Create the vtkGRASSBridgeVector Java library.
 IF (VTK_WRAP_JAVA AND VTK_GRASS_BRIDGE_WRAP_JAVA)
   VTK_WRAP_JAVA3 (vtkGRASSBridgeVectorJava VECTORJava_SRCS "${VECTOR_SRCS}")
   ADD_LIBRARY (vtkGRASSBridgeVectorJava SHARED ${VECTORJava_SRCS})
-  TARGET_LINK_LIBRARIES (vtkGRASSBridgeVectorJava vtkGRASSBridgeVector vtkGRASSBridgeCommonJava vtkCommonJava)
+  TARGET_LINK_LIBRARIES (vtkGRASSBridgeVectorJava vtkGRASSBridgeVector vtkGRASSBridgeDbmiJava vtkGRASSBridgeCommonJava vtkCommonJava)
 
   INSTALL_TARGETS(/lib vtkGRASSBridgeVectorJava)
 ENDIF (VTK_WRAP_JAVA AND VTK_GRASS_BRIDGE_WRAP_JAVA)
@@ -50,7 +50,7 @@ IF (VTK_WRAP_PYTHON AND VTK_GRASS_BRIDGE_WRAP_PYTHON)
   VTK_WRAP_PYTHON3 (vtkGRASSBridgeVectorPython VECTORPython_SRCS "${VECTOR_SRCS}")
   ADD_LIBRARY (vtkGRASSBridgeVectorPythonD ${VECTORPython_SRCS})
   ADD_LIBRARY (vtkGRASSBridgeVectorPython MODULE vtkGRASSBridgeVectorPythonInit.cxx)
-  TARGET_LINK_LIBRARIES(vtkGRASSBridgeVectorPythonD vtkGRASSBridgeVector vtkGRASSBridgeCommonPythonD )
+  TARGET_LINK_LIBRARIES(vtkGRASSBridgeVectorPythonD vtkGRASSBridgeVector vtkGRASSBridgeDbmiPythonD vtkGRASSBridgeCommonPythonD )
   TARGET_LINK_LIBRARIES(vtkGRASSBridgeVectorPython vtkGRASSBridgeVectorPythonD)
 
   INSTALL_TARGETS(/lib vtkGRASSBridgeVectorPythonD vtkGRASSBridgeVectorPython)
