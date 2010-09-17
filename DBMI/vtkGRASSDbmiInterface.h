@@ -30,7 +30,6 @@
 #include "vtkGRASSBridgeDbmiWin32Header.h"
 #include "vtkGRASSVectorMapBase.h"
 #include "vtkGRASSDefines.h"
-#include "vtkGRASSDbmiCatValueArray.h"
 
 class vtkIntArray;
 class vtkDataArray;
@@ -60,8 +59,10 @@ public:
     virtual bool SelectValue(int cat, const char *column, vtkGRASSDbmiValue *value);
     //!Get the number of rows of the entire table
     virtual int GetNumberOfRows();
-    //!\brief Write the values of the cat value array into a data array based on the categories stored in cats
-    //static bool ConvertCatValueArray(vtkGRASSDbmiCatValueArray *catval, vtkIntArray *cats, vtkDataArray *values);
+
+    virtual bool SelectCatValueArray(const char *column, const char *where, vtkGRASSDbmiCatValueArray *catval);
+
+    virtual bool SelectCatValueArray(const char *column, vtkGRASSDbmiCatValueArray *catval){this->SelectCatValueArray(column, NULL, catval);}
 
     //!\brief Which field number should be used to access the vector database
     vtkSetMacro(FieldNumber, int);

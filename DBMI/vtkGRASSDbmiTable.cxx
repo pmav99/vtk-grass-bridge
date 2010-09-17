@@ -74,43 +74,29 @@ void vtkGRASSDbmiTable::AppendColumn(vtkGRASSDbmiColumn *column) {
 }
 
 //----------------------------------------------------------------------------
-vtkGRASSDbmiColumn *vtkGRASSDbmiTable::GetColumn(int idx)
+bool vtkGRASSDbmiTable::GetColumn(int idx, vtkGRASSDbmiColumn *column)
 {
     dbColumn *c = NULL;
     c = db_get_table_column(this->table, idx);
     if(c == NULL)
-        return NULL;
-    
-    VGB_CREATE(vtkGRASSDbmiColumn, column);
+        return true;
+
     column->DeepCopy(c);
-    return column;
+    return true;
 }
 
 //----------------------------------------------------------------------------
-vtkGRASSDbmiColumn *vtkGRASSDbmiTable::GetColumn(const char* name)
+bool vtkGRASSDbmiTable::GetColumn(const char* name, vtkGRASSDbmiColumn *column)
 {
     dbColumn *c = NULL;
-    int i, columns = this->GetNumberOfColumns();
 
-    for(i = 0; i < columns; i++ ) {
-        c = db_get_table_column(this->table, i);
-        
-        if(c == NULL)
-            return NULL;
-
-        if(strcmp(name, db_get_string(&c->columnName)) == 0)
-            break;
-
-        c = NULL;
-    }
- 
+    c = db_get_table_column_by_name(this->table, name);
     if(c == NULL)
-        return NULL;
+        return false;
 
-
-    VGB_CREATE(vtkGRASSDbmiColumn, column);
     column->DeepCopy(c);
-    return column;
+    
+    return true;
 }
 
 //----------------------------------------------------------------------------

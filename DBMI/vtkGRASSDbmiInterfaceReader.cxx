@@ -44,6 +44,8 @@ bool vtkGRASSDbmiInterfaceReader::GetTable(vtkGRASSDbmiTable *table)
     dbString table_name;
     struct field_info *Fi = NULL;
 
+    db_init_string(&table_name);
+
     if(this->VectorMap && this->VectorMap->IsOpen() && this->VectorMap->GetNumberOfDBLinks()) {
 
         if(table == NULL)

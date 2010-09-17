@@ -38,6 +38,21 @@ vtkGRASSDbmiValue::~vtkGRASSDbmiValue() {
 
 //----------------------------------------------------------------------------
 
+void vtkGRASSDbmiValue::DeepCopy(vtkGRASSDbmiValue* value)
+{
+    this->DeepCopy(value->GetPointer());
+}
+
+//----------------------------------------------------------------------------
+
+void vtkGRASSDbmiValue::DeepCopy(dbValue* value)
+{
+    if(this->value)
+        db_copy_value(this->value, value);
+}
+
+//----------------------------------------------------------------------------
+
 void
 vtkGRASSDbmiValue::PrintSelf(ostream& os, vtkIndent indent) {
 

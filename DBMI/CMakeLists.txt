@@ -7,18 +7,20 @@
 #
 
 SET (DBMI_SRCS
+vtkGRASSDbmiCatValueArray.cxx
+vtkGRASSDbmiColumn.cxx
 vtkGRASSDbmiInterface.cxx
 vtkGRASSDbmiInterfaceReader.cxx
 vtkGRASSDbmiTable.cxx
-vtkGRASSDbmiColumn.cxx
 vtkGRASSDbmiValue.cxx
 )
 
 SET (DBMI_H
+vtkGRASSDbmiCatValueArray.h
+vtkGRASSDbmiColumn.h
 vtkGRASSDbmiInterface.h
 vtkGRASSDbmiInterfaceReader.h
 vtkGRASSDbmiTable.h
-vtkGRASSDbmiColumn.h
 vtkGRASSDbmiValue.h
 vtkGRASSBridgeDbmiWin32Header.h
 )

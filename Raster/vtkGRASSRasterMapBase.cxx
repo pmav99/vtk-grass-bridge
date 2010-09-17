@@ -109,6 +109,7 @@ vtkGRASSRasterMapBase::SetRegion() {
         char buff[1024];
         G_snprintf(buff, 1024, "class: %s line: %i Unable to set the region. RasterName is not set.",
                 this->GetClassName(), __LINE__);
+        this->InsertNextError(buff);
         return false;
     }
     TRY
