@@ -30,7 +30,7 @@
  *
  * This class uses the vtkGRASSVecctorMapTopoReader to read the vector map.
  *
- * \TODO Implement Database support to write the dat from a database as cell data arrays.
+ * \TODO Implement Database support to write the data from a database as cell data arrays.
  * \TODO Use vtkSmartPointer
  *
  * \author Soeren Gebbert
@@ -41,7 +41,7 @@
 #ifndef __vtkGRASSVectorTopoPolyDataReader_h
 #define __vtkGRASSVectorTopoPolyDataReader_h
 
-#include "vtkPolyDataAlgorithm.h"
+#include "vtkGRASSVectorPolyDataReader.h"
 #include "vtkGRASSBridgeIOWin32Header.h"
 
 extern "C" {
@@ -49,24 +49,13 @@ extern "C" {
 #include <grass/vector.h>
 }
 
-class VTK_GRASS_BRIDGE_IO_EXPORT vtkGRASSVectorTopoPolyDataReader : public vtkPolyDataAlgorithm
+class VTK_GRASS_BRIDGE_IO_EXPORT vtkGRASSVectorTopoPolyDataReader : public vtkGRASSVectorPolyDataReader
 {
 public:
   static vtkGRASSVectorTopoPolyDataReader* New();
-  vtkTypeRevisionMacro(vtkGRASSVectorTopoPolyDataReader,vtkPolyDataAlgorithm);
+  vtkTypeRevisionMacro(vtkGRASSVectorTopoPolyDataReader,vtkGRASSVectorPolyDataReader);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-
-  //! \brief Set the name of vector map
-  vtkSetStringMacro(VectorName);
-  //! \brief Set the name of vector map
-  vtkGetStringMacro(VectorName);
-  //! \brief Set the name of the mapset the vector map was read from
-  vtkGetStringMacro(Mapset);
-  //! \brief Set the name of the category array
-  vtkSetStringMacro(CategoryArrayName);
-  //! \brief Get the name of the category array
-  vtkGetStringMacro(CategoryArrayName);
   //! \brief Return the chosen feature type. Default is points
   vtkGetMacro(FeatureType, int);
 
@@ -88,16 +77,9 @@ protected:
   ~vtkGRASSVectorTopoPolyDataReader();
 
   vtkSetMacro(FeatureType, int);
-
-  char* VectorName;
-  char* Mapset;
-  char *CategoryArrayName;
-
   int FeatureType;
 
-  vtkSetStringMacro(Mapset);
-
-  int RequestData(vtkInformation*,
+  virtual int RequestData(vtkInformation*,
                   vtkInformationVector**,
                   vtkInformationVector*);
 private:

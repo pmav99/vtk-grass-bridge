@@ -27,7 +27,7 @@
 #ifndef _vtkGRASSVectorMapNoTopoReader_h
 #define	_vtkGRASSVectorMapNoTopoReader_h
 
-#include <vtkGRASSVectorMapBase.h>
+#include "vtkGRASSVectorMapBase.h"
 #include "vtkGRASSBridgeVectorWin32Header.h"
 #include "vtkGRASSDbmiInterfaceReader.h"
 

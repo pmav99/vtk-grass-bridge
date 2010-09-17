@@ -28,7 +28,6 @@
 #include <vtkObjectGRASSErrorHandler.h>
 #include "vtkGRASSBridgeDbmiWin32Header.h"
 #include "vtkGRASSDefines.h"
-#include "vtkGRASSDbmiInterface.h"
 
 extern "C" {
 #include <grass/dbmi.h>

@@ -75,6 +75,7 @@ vtkGRASSVectorFeaturePoints::GetPointDistanceFromLine(double x, double y, double
 vtkGRASSVectorBBox *vtkGRASSVectorFeaturePoints::GetBoundingBox()
 {
     VGB_CREATE(vtkGRASSVectorBBox, box);
+    //vtkGRASSVectorBBox *box = vtkGRASSVectorBBox::New();
     Vect_line_box(this->points, box->GetPointer());
     return box;
 }
@@ -186,7 +187,3 @@ vtkGRASSVectorFeaturePoints::PrintSelf(ostream& os, vtkIndent indent)
         os << indent << this->points->x[i] << " " << this->points->y[i] << " " << this->points->z[i] << endl;
     }
 }
-
-//vtkGRASSVectorBBox *vtkGRASSVectorLinePoints::GetBoundingBox();
-
-

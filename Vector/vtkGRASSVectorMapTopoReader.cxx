@@ -36,8 +36,7 @@ vtkGRASSVectorMapTopoReader::vtkGRASSVectorMapTopoReader()
 
 vtkGRASSVectorMapTopoReader::~vtkGRASSVectorMapTopoReader()
 {
-    if(this->DbmiInterface)
-        this->DbmiInterface->Delete();
+    ;
 }
 //----------------------------------------------------------------------------
 
@@ -267,20 +266,6 @@ vtkGRASSVectorMapTopoReader::SelectNodesByBox(vtkGRASSVectorBBox *box, vtkIntArr
 
     Vect_destroy_list(pids);
     return ret;
-}
-
-//----------------------------------------------------------------------------
-
-bool vtkGRASSVectorMapTopoReader::OpenMap(const char *name)
-{
-    bool state;
-    state = this->OpenMapReadOnly(name);
-    if(state)
-    {
-        this->DbmiInterface = vtkGRASSDbmiInterfaceReader::New();
-        this->DbmiInterface->SetVectorMap(this);
-    }
-    return state;
 }
 
 //------------------------------------------------------------------------------

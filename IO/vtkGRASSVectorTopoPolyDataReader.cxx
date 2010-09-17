@@ -48,10 +48,7 @@ vtkGRASSVectorTopoPolyDataReader::vtkGRASSVectorTopoPolyDataReader() {
 //----------------------------------------------------------------------------
 
 vtkGRASSVectorTopoPolyDataReader::~vtkGRASSVectorTopoPolyDataReader() {
-    if (this->VectorName)
-        delete [] this->VectorName;
-    if (this->Mapset)
-        delete [] this->Mapset;
+    ;
 }
 
 //----------------------------------------------------------------------------
@@ -82,28 +79,33 @@ vtkGRASSVectorTopoPolyDataReader::RequestData(vtkInformation*,
     }
 
     VGB_CREATE(vtkGRASSVectorMapTopoReader, reader);
-
+    //vtkGRASSVectorMapTopoReader *reader = vtkGRASSVectorMapTopoReader::New();
 
     if (!reader->OpenMap(this->VectorName)) {
         vtkErrorMacro( << "Unable to open vector map " << this->VectorName);
-        reader->Delete();
+        //reader->Delete();
         return -1;
     }
 
     this->SetMapset(reader->GetMapset());
 
     VGB_CREATE(vtkGRASSVectorFeatureCats, cats);
+    //vtkGRASSVectorFeatureCats *cats = vtkGRASSVectorFeatureCats::New();
     VGB_CREATE(vtkGRASSVectorFeaturePoints, feature);
+    //vtkGRASSVectorFeaturePoints *feature = vtkGRASSVectorFeaturePoints::New();
 
     vtkPolyData* output = vtkPolyData::GetData(outputVector);
     output->Allocate(1);
     VGB_CREATE(vtkPoints, points);
+    //vtkPoints *points = vtkPoints::New();
     
     VGB_CREATE(vtkIntArray, categories);
+    //vtkIntArray *categories = vtkIntArray::New();
     categories->SetNumberOfComponents(1);
     categories->SetName(this->CategoryArrayName);
 
     VGB_CREATE(vtkIdList, ids);
+    //vtkIdList *ids = vtkIdList::New();
 
     // Read only the requested feature in vector map
     if (this->FeatureType != GV_AREA) {
@@ -123,16 +125,19 @@ vtkGRASSVectorTopoPolyDataReader::RequestData(vtkInformation*,
     } else {
         // Save the area of the area
         VGB_CREATE(vtkDoubleArray, a);
+        //vtkDoubleArray *a = vtkDoubleArray::New();
         a->SetNumberOfComponents(1);
         a->SetNumberOfValues(reader->GetNumberOfAreas());
         a->SetName("Area");
         // Save the number of islands for each area
         VGB_CREATE(vtkIntArray, isles);
+        //vtkIntArray *isles = vtkIntArray::New();
         isles->SetNumberOfComponents(1);
         isles->SetNumberOfValues(reader->GetNumberOfAreas());
         isles->SetName("IslandsPerArea");
         // Save the state of an area (island, no island)
         VGB_CREATE(vtkShortArray, isIsle);
+        //vtkShortArray *isIsle = vtkShortArray::New();
         isIsle->SetNumberOfComponents(1);
         isIsle->SetNumberOfValues(reader->GetNumberOfAreas());
         isIsle->SetName("isIsle");
@@ -171,6 +176,9 @@ vtkGRASSVectorTopoPolyDataReader::RequestData(vtkInformation*,
 
     output->GetCellData()->AddArray(categories);
     output->GetCellData()->SetActiveScalars(categories->GetName());
+
+    // Read all data from the database into cell arrays
+    this->ReadDatabaseData(reader, categories, output->GetCellData());
 
     // Store the points in the output data object.
     output->SetPoints(points);

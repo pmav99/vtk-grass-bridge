@@ -48,7 +48,7 @@ public:
   vtkSetStringMacro(VectorName);
   //! \brief Set the name of vector map
   vtkGetStringMacro(VectorName);
-  //! \brief Set the name of the mapset the vector map was read from
+  //! \brief Get the name of the mapset the vector map was written to
   vtkGetStringMacro(Mapset);
   //! \brief Set the name of the category array
   vtkSetStringMacro(CategoryArrayName);

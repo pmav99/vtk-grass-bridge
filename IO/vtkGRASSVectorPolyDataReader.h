@@ -36,24 +36,35 @@
 
 #include "vtkPolyDataAlgorithm.h"
 #include "vtkGRASSBridgeIOWin32Header.h"
+#include "vtkStringArray.h"
+
+class vtkStringArray;
+class vtkCellData;
+class vtkIntArray;
+class vtkGRASSVectorMapNoTopoReader;
 
 class VTK_GRASS_BRIDGE_IO_EXPORT vtkGRASSVectorPolyDataReader : public vtkPolyDataAlgorithm
 {
 public:
   static vtkGRASSVectorPolyDataReader* New();
   vtkTypeRevisionMacro(vtkGRASSVectorPolyDataReader,vtkPolyDataAlgorithm);
-  void PrintSelf(ostream& os, vtkIndent indent);
+  virtual void PrintSelf(ostream& os, vtkIndent indent);
 
   //! \brief Set the name of vector map
   vtkSetStringMacro(VectorName);
   //! \brief Set the name of vector map
   vtkGetStringMacro(VectorName);
-  //! \brief Set the name of the mapset the vector map was read from
+  //! \brief Get the name of the mapset the vector map was read from
   vtkGetStringMacro(Mapset);
   //! \brief Set the name of the category array
   vtkSetStringMacro(CategoryArrayName);
   //! \brief Get the name of the category array
   vtkGetStringMacro(CategoryArrayName);
+
+  //!\brief Get the array of column names which should be read as celldata
+  vtkGetObjectMacro(ColumnNames, vtkStringArray);
+  //!\brief Set the array of column names which should be read as celldata
+  vtkSetObjectMacro(ColumnNames, vtkStringArray);
 
 protected:
   vtkGRASSVectorPolyDataReader();
@@ -63,11 +74,20 @@ protected:
   char* Mapset;
   char *CategoryArrayName;
 
+  vtkStringArray *ColumnNames;
+
   vtkSetStringMacro(Mapset);
 
-  int RequestData(vtkInformation*,
+  virtual int RequestData(vtkInformation*,
                   vtkInformationVector**,
                   vtkInformationVector*);
+
+  //!\brief Read selected double and integer database columns as celldata arrays
+  //! The selection is based on column names located in the internal vtkStringArray ColumnNames
+  //! In case this array is empty, all available double and integer columns are readed.
+  //! The cell data arrays are named like the column names of the database table.
+  virtual void ReadDatabaseData(vtkGRASSVectorMapNoTopoReader *map, vtkIntArray *cats, vtkCellData *cdata);
+
 private:
   vtkGRASSVectorPolyDataReader(const vtkGRASSVectorPolyDataReader&);  // Not implemented.
   void operator=(const vtkGRASSVectorPolyDataReader&);  // Not implemented.

@@ -294,13 +294,6 @@ protected:
         this->SetVectorLevel(2);
     }
 
-    /*!\brief Open the vector map read only
-     *
-     * \param name the name of the vector map
-     * \return true or false
-     * */
-    virtual bool OpenMapReadOnly(const char *name);
-
 private:
     vtkGRASSVectorMapBase(const vtkGRASSVectorMapBase&); // Not implemented.
     void operator=(const vtkGRASSVectorMapBase&); // Not implemented.
