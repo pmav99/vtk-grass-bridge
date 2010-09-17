@@ -30,6 +30,10 @@
 #include "vtkGRASSRasterMapWriter.h"
 #include <vtkInformationVector.h>
 #include <vtkInformation.h>
+#include "vtkGRASSDbmiInterfaceReader.h"
+#include "vtkGRASSDbmiTable.h"
+#include "vtkGRASSDbmiColumn.h"
+#include "vtkGRASSDbmiValue.h"
 
 vtkCxxRevisionMacro(vtkGRASSVectorPolyDataWriter, "$Revision: 1.1 $");
 vtkStandardNewMacro(vtkGRASSVectorPolyDataWriter);
@@ -97,6 +101,10 @@ vtkGRASSVectorPolyDataWriter::RequestData(
     }
 
     VGB_CREATE(vtkGRASSVectorMapWriter, writer);
+    VGB_CREATE(vtkGRASSDbmiInterfaceReader, db);
+    VGB_CREATE(vtkGRASSDbmiCatValueArray, catval);
+    VGB_CREATE(vtkGRASSDbmiTable, table);
+    VGB_CREATE(vtkGRASSDbmiColumn, column);
 
 
     if (!writer->OpenMap(this->VectorName, 1))

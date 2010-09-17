@@ -33,7 +33,7 @@ class GRASSVectorPolyDataReaderTest(unittest.TestCase):
         global firstCheck
         if firstCheck == False:
             # Create the input data
-            inputlist = ["v.random", "--o", "-z", "n=20", "zmin=-20", "zmax=2500", "output=random_points"]
+            inputlist = ["v.random", "--o", "column=elev", "n=20", "zmin=-20", "zmax=2500", "output=random_points"]
             proc = subprocess.Popen(args=inputlist)
             proc.communicate()
             inputlist = ["v.voronoi", "--o", "-l", "input=random_points", "output=random_lines"]
@@ -45,6 +45,7 @@ class GRASSVectorPolyDataReaderTest(unittest.TestCase):
             firstCheck = True
 
     def view(self, input):
+        return
         normals = vtkPolyDataNormals()
         normals.SetInput(input)
         mapMesh = vtkPolyDataMapper()

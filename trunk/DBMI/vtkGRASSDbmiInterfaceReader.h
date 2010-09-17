@@ -29,8 +29,8 @@
 #include <vtkObjectGRASSErrorHandler.h>
 #include "vtkGRASSBridgeDbmiWin32Header.h"
 #include "vtkGRASSDefines.h"
-#include "vtkGRASSDbmiCatValueArray.h"
 #include "vtkGRASSDbmiInterface.h"
+#include "vtkGRASSDbmiCatValueArray.h"
 
 class vtkIntArray;
 class vtkDataArray;

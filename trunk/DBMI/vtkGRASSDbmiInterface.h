@@ -44,6 +44,9 @@ extern "C" {
 
 class VTK_GRASS_BRIDGE_DBMI_EXPORT vtkGRASSDbmiInterface : public vtkObjectGRASSErrorHandler {
 public:
+    //BTX
+    friend class vtkGRASSVectorMapNoTopoReader;
+    //ETX
 
     static vtkGRASSDbmiInterface *New();
     vtkTypeRevisionMacro(vtkGRASSDbmiInterface, vtkObjectGRASSErrorHandler);

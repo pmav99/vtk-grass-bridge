@@ -30,7 +30,7 @@
 #ifndef _vtkGRASSVectorMapTopoReader_h
 #define	_vtkGRASSVectorMapTopoReader_h
 
-#include <vtkGRASSVectorMapBase.h>
+#include "vtkGRASSVectorMapNoTopoReader.h"
 #include "vtkGRASSBridgeVectorWin32Header.h"
 #include "vtkGRASSVectorFeaturePoints.h"
 #include "vtkGRASSVectorBBox.h"
@@ -45,18 +45,11 @@ class vtkGRASSVectorFeatureCats;
 class vtkGRASSVectorBBox;
 class vtkIntArray;
 
-class VTK_GRASS_BRIDGE_VECTOR_EXPORT vtkGRASSVectorMapTopoReader : public vtkGRASSVectorMapBase {
+class VTK_GRASS_BRIDGE_VECTOR_EXPORT vtkGRASSVectorMapTopoReader : public vtkGRASSVectorMapNoTopoReader {
 public:
     static vtkGRASSVectorMapTopoReader *New();
-    vtkTypeRevisionMacro(vtkGRASSVectorMapTopoReader, vtkGRASSVectorMapBase);
+    vtkTypeRevisionMacro(vtkGRASSVectorMapTopoReader, vtkGRASSVectorMapNoTopoReader);
     void PrintSelf(ostream& os, vtkIndent indent);
-
-    /*!\brief Open the vector map read only
-     *
-     * \param name the name of the vector map
-     * \return true or false
-     * */
-    virtual bool OpenMap(const char *name);
 
     /*! \brief Read the line at index of the vector map (only level 2)
      *
@@ -392,14 +385,8 @@ public:
         else return -1; CATCH_INT
     }
 
-    //!\brief Get the database interface for the opened vector map
-    vtkGetObjectMacro(DbmiInterface, vtkGRASSDbmiInterfaceReader);
-    
 protected:
-    vtkGRASSDbmiInterfaceReader *DbmiInterface;
-
     vtkGRASSVectorMapTopoReader();
-
     ~vtkGRASSVectorMapTopoReader();
 
     void SetVectorLevelToTopo() {

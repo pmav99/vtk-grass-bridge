@@ -25,8 +25,8 @@ vtkStandardNewMacro(vtkGRASSVectorMapNoTopoReader);
 
 vtkGRASSVectorMapNoTopoReader::vtkGRASSVectorMapNoTopoReader()
 {
-    this->DbmiInterface = NULL;
     this->SetVectorLevelToNoTopo();
+    this->DbmiInterface = NULL;
 }
 
 //----------------------------------------------------------------------------
@@ -39,14 +39,57 @@ vtkGRASSVectorMapNoTopoReader::~vtkGRASSVectorMapNoTopoReader()
 
 //----------------------------------------------------------------------------
 
-bool vtkGRASSVectorMapNoTopoReader::OpenMap(const char *name)
+bool
+vtkGRASSVectorMapNoTopoReader::OpenMap(const char *name)
 {
-    bool state;
-    state = this->OpenMapReadOnly(name);
-    if(state)
+    char *mapset = NULL;
+    char buff[1024];
+
+    // Check if the same map is already opened
+    if (this->Open == true && strcmp(name, this->VectorName) == 0)
     {
-        this->DbmiInterface = vtkGRASSDbmiInterfaceReader::New();
-        this->DbmiInterface->SetVectorMap(this);
+        G_snprintf(buff, 1024, "class: %s line: %i Vector map %s is already open.",
+                   this->GetClassName(), __LINE__, this->VectorName);
+        this->InsertNextError(buff);
+        return false;
     }
-    return state;
+    else if (this->Open == true)
+    {
+        // If a new name is given, the open map will be closed
+        this->CloseMap();
+    }
+
+    this->SetVectorName(name);
+
+    Vect_set_open_level(this->VectorLevel);
+
+    if (!setjmp(vgb_stack_buffer))
+    {
+        if (1 > Vect_open_old(&this->map, name, mapset))
+        {
+            G_snprintf(buff, 1024, "class: %s line: %i Unable to open vector map <%s>.",
+                       this->GetClassName(), __LINE__, name);
+            this->InsertNextError(buff);
+            return false;
+        }
+    }
+    else
+    {
+        this->InsertNextError(vgb_error_message);
+        this->Open = false;
+        return false;
+    }
+    this->RewindMap();
+
+    if (mapset)
+        G_free(mapset);
+
+    this->Open = true;
+
+    // Create the Dbmi interface for datase read operations
+    if(this->DbmiInterface == NULL)
+        this->DbmiInterface = vtkGRASSDbmiInterfaceReader::New();
+    this->DbmiInterface->SetVectorMap(this);
+
+    return true;
 }

@@ -25,8 +25,13 @@
 #include "vtkGRASSVectorMapBase.h"
 #include "vtkGRASSVectorFeaturePoints.h"
 #include <vtkIdList.h>
+#include <vtkDoubleArray.h>
+#include <vtkIntArray.h>
 #include "vtkGRASSVectorFeatureCats.h"
-
+#include "vtkGRASSDbmiInterfaceReader.h"
+#include "vtkGRASSDbmiTable.h"
+#include "vtkGRASSDbmiColumn.h"
+#include "vtkGRASSDbmiValue.h"
 
 vtkCxxRevisionMacro(vtkGRASSVectorPolyDataReader, "$Revision: 1.1 $");
 vtkStandardNewMacro(vtkGRASSVectorPolyDataReader);
@@ -40,6 +45,8 @@ vtkGRASSVectorPolyDataReader::vtkGRASSVectorPolyDataReader()
     this->CategoryArrayName = NULL;
     this->SetCategoryArrayName("cats");
     this->SetNumberOfInputPorts(0);
+
+    this->ColumnNames = vtkStringArray::New();
 }
 
 //----------------------------------------------------------------------------
@@ -50,6 +57,10 @@ vtkGRASSVectorPolyDataReader::~vtkGRASSVectorPolyDataReader()
         delete [] this->VectorName;
     if (this->Mapset)
         delete [] this->Mapset;
+    if (this->CategoryArrayName)
+        delete [] this->CategoryArrayName;
+
+    this->ColumnNames->Delete();
 }
 
 //----------------------------------------------------------------------------
@@ -62,6 +73,8 @@ vtkGRASSVectorPolyDataReader::PrintSelf(ostream& os, vtkIndent indent)
         << (this->VectorName ? this->VectorName : "(none)") << "\n";
     os << indent << "Mapset: "
         << (this->Mapset ? this->Mapset : "(none)") << "\n";
+    os << indent << "CategoryArrayName: "
+        << (this->CategoryArrayName ? this->CategoryArrayName : "(none)") << "\n";
 
 }
 
@@ -82,30 +95,36 @@ vtkGRASSVectorPolyDataReader::RequestData(vtkInformation*,
     }
 
     VGB_CREATE(vtkGRASSVectorMapNoTopoReader, reader);
+    //vtkGRASSVectorMapNoTopoReader *reader = vtkGRASSVectorMapNoTopoReader::New();
 
 
     if (!reader->OpenMap(this->VectorName))
     {
         vtkErrorMacro( << "Unable to open vector map " << this->VectorName);
-        reader->Delete();
+        //reader->Delete();
         return -1;
     }
 
     this->SetMapset(reader->GetMapset());
 
     VGB_CREATE(vtkGRASSVectorFeatureCats, cats);
+    //vtkGRASSVectorFeatureCats *cats = vtkGRASSVectorFeatureCats::New();
     VGB_CREATE(vtkGRASSVectorFeaturePoints, feature);
+    //vtkGRASSVectorFeaturePoints *feature = vtkGRASSVectorFeaturePoints::New();
 
     vtkPolyData* output = vtkPolyData::GetData(outputVector);
     output->Allocate(1);
 
     VGB_CREATE(vtkPoints, points);
+    //vtkPoints *points = vtkPoints::New();
 
     VGB_CREATE(vtkIntArray, categories);
+    //vtkIntArray *categories = vtkIntArray::New();
     categories->SetNumberOfComponents(1);
     categories->SetName(this->CategoryArrayName);
 
     VGB_CREATE(vtkIdList, ids);
+    //vtkIdList *ids = vtkIdList::New();
 
     // Read every feature in vector map
     while (reader->ReadNextFeature(feature, cats) > 0)
@@ -126,7 +145,80 @@ vtkGRASSVectorPolyDataReader::RequestData(vtkInformation*,
     output->SetPoints(points);
     output->GetCellData()->SetScalars(categories);
 
+    // Read all data from the database into cell arrays
+    this->ReadDatabaseData(reader, categories, output->GetCellData());
+
     reader->CloseMap();
 
     return 1;
 }
+
+//----------------------------------------------------------------------------
+
+void vtkGRASSVectorPolyDataReader::ReadDatabaseData(vtkGRASSVectorMapNoTopoReader *map, vtkIntArray *cats, vtkCellData *cdata)
+{
+    int i;
+    int ncols;
+    
+    VGB_CREATE(vtkGRASSDbmiCatValueArray, catval);
+    //vtkGRASSDbmiCatValueArray *catval = vtkGRASSDbmiCatValueArray::New();
+    VGB_CREATE(vtkGRASSDbmiTable, table);
+    //vtkGRASSDbmiTable *table = vtkGRASSDbmiTable::New();
+    VGB_CREATE(vtkGRASSDbmiColumn, column);
+    //vtkGRASSDbmiColumn *column = vtkGRASSDbmiColumn::New();
+ 
+    vtkGRASSDbmiInterfaceReader *db = map->GetDbmiInterface();
+    db->ConnectDB();
+    db->GetTable(table);
+        
+    // In case the ColumnNames array is empty, fill it with all valid table columns
+    if(this->ColumnNames->GetNumberOfValues() == 0) {
+        ncols = table->GetNumberOfColumns();
+        for(i = 0; i < ncols; i++) {
+	    table->GetColumn(i, column);
+	    if(column->IsValueInteger() || column->IsValueDouble()) {
+                this->ColumnNames->InsertNextValue(column->GetName());
+	    }
+        }
+    }
+
+    // Read all data from the database into cell arrays
+    for(i = 0; i < this->ColumnNames->GetNumberOfValues(); i++) {
+        if(table->GetColumn(this->ColumnNames->GetValue(i), column) == false) {
+	    vtkErrorMacro(<< "Database column " << (const char*)this->ColumnNames->GetValue(i) << " not available");
+	    continue;
+	}
+
+	// The categories are already readed
+        if(strcmp(column->GetName(), "cat") == 0)
+            continue;
+
+        // Read data into the cat value array 
+        db->SelectCatValueArray(this->ColumnNames->GetValue(i), catval);
+	cout << "Reading column " << column->GetName() << endl;
+
+	if(column->IsValueDouble()) {
+            vtkDoubleArray *array = vtkDoubleArray::New();
+	    array->SetNumberOfComponents(1);
+	    array->SetName(column->GetName());
+	    catval->ValuesToDoubleArray(cats, array, -999999);
+            cdata->AddArray(array);
+	    array->Delete();
+	} else if(column->IsValueInteger()) {
+            vtkIntArray *array = vtkIntArray::New();
+	    array->SetNumberOfComponents(1);
+	    array->SetName(column->GetName());
+	    catval->ValuesToIntegerArray(cats, array, -999999);
+            cdata->AddArray(array);
+	    array->Delete();
+	} else {
+            vtkErrorMacro(<< "Databse column " << column->GetName() << " has unsupported data type");
+	    continue;
+	}
+    }
+
+    db->DisconnectDB();
+    return;
+}
+
+
