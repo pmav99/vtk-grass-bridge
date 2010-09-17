@@ -54,9 +54,9 @@ public:
 
     //!\brief Open a connection to the database. This method must be implemented
     //!in the subclasses
-    virtual bool ConnectDB(){;}
+    virtual bool ConnectDB(){return false;}
     //!\brief Close the database connection
-    virtual bool DisconnectDB();
+    virtual void DisconnectDB();
     //!\brief Select a value from the vector map table. This works only when the
     //!database connection is established.
     virtual bool SelectValue(int cat, const char *column, vtkGRASSDbmiValue *value);
@@ -65,7 +65,7 @@ public:
 
     virtual bool SelectCatValueArray(const char *column, const char *where, vtkGRASSDbmiCatValueArray *catval);
 
-    virtual bool SelectCatValueArray(const char *column, vtkGRASSDbmiCatValueArray *catval){this->SelectCatValueArray(column, NULL, catval);}
+    virtual bool SelectCatValueArray(const char *column, vtkGRASSDbmiCatValueArray *catval){return this->SelectCatValueArray(column, NULL, catval);}
 
     //!\brief Which field number should be used to access the vector database
     vtkSetMacro(FieldNumber, int);

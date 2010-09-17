@@ -61,7 +61,7 @@ int vtkGRASSDbmiInterface::GetNumberOfRows()
 
 //----------------------------------------------------------------------------
 
-bool vtkGRASSDbmiInterface::DisconnectDB()
+void vtkGRASSDbmiInterface::DisconnectDB()
 {
     if(this->driver && this->Connected) {
         db_close_database_shutdown_driver(this->driver);
