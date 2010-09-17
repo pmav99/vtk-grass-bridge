@@ -108,10 +108,10 @@ public:
     virtual void SetColumn(vtkGRASSDbmiColumn *column, int idx);
 
     //!\brief Return a column of a specific name
-    virtual vtkGRASSDbmiColumn *GetColumn(const char* column);
+    virtual bool GetColumn(const char* name, vtkGRASSDbmiColumn *column);
 
     //!\brief Return a column at a specific index
-    virtual vtkGRASSDbmiColumn *GetColumn(int idx);
+    virtual bool GetColumn(int idx, vtkGRASSDbmiColumn *column);
 
     //!\brief Append a vtkGRASSDbmiColumn
     virtual void AppendColumn(vtkGRASSDbmiColumn *column);

@@ -14,10 +14,10 @@
  */
 
 #include "vtkGRASSDbmiInterface.h"
-#include "vtkGRASSDbmiInterfaceReader.h"
 #include "vtkGRASSDbmiValue.h"
 #include <vtkObjectFactory.h>
 #include <vtkGRASSDefines.h>
+#include "vtkGRASSDbmiCatValueArray.h"
 
 
 vtkCxxRevisionMacro(vtkGRASSDbmiInterface, "$Revision: 1.18 $");
@@ -52,6 +52,7 @@ int vtkGRASSDbmiInterface::GetNumberOfRows()
         Fi = Vect_get_field(this->VectorMap->GetPointer(), this->FieldNumber);
         G_snprintf(buff, 1024, "SELECT * FROM %s", Fi->table);
         dbString sql;
+        db_init_string(&sql);
         db_set_string(&sql, buff);
         return db_get_table_number_of_rows(this->driver, &sql);
     }
@@ -76,18 +77,26 @@ bool vtkGRASSDbmiInterface::SelectValue(int cat, const char* column, vtkGRASSDbm
         Fi = Vect_get_field(this->VectorMap->GetPointer(), this->FieldNumber);
         if(db_select_value(this->driver, Fi->table, Fi->key, cat, column, value->GetPointer())<0)
             return false;
-
-//        cout << Fi->table << endl;
-//        cout << Fi->key << endl;
-//        cout << cat << endl;
-//        cout << column << endl;
-//        cout << value->GetPointer()->d << endl;
-        
     }else {
         return false;
     }
     return true;
 }
+
+bool vtkGRASSDbmiInterface::SelectCatValueArray(const char *column, const char *where, vtkGRASSDbmiCatValueArray *catval)
+{
+    if(this->VectorMap && this->VectorMap->IsOpen() && this->Connected) {
+        struct field_info *Fi;
+        Fi = Vect_get_field(this->VectorMap->GetPointer(), this->FieldNumber);
+        if(db_select_CatValArray(this->driver, Fi->table, Fi->key, column, where, catval->GetPointer())<0)
+            return false;
+    }else {
+        return false;
+    }
+    return true;
+}
+
+
 
 //----------------------------------------------------------------------------
 

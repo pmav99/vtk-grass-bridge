@@ -105,28 +105,28 @@ public:
 
     bool IsValueDouble() {
         if (this->column)
-            if (db_get_column_sqltype(this->column) == DB_C_TYPE_DOUBLE)
+            if (db_sqltype_to_Ctype(db_get_column_sqltype(this->column)) == DB_C_TYPE_DOUBLE)
                 return true;
         return false;
     }
 
     bool IsValueInteger() {
         if (this->column)
-            if (db_get_column_sqltype(this->column) == DB_C_TYPE_INT)
+            if (db_sqltype_to_Ctype(db_get_column_sqltype(this->column)) == DB_C_TYPE_INT)
                 return true;
         return false;
     }
 
     bool IsValueString() {
         if (this->column)
-            if (db_get_column_sqltype(this->column) == DB_C_TYPE_STRING)
+            if (db_sqltype_to_Ctype(db_get_column_sqltype(this->column)) == DB_C_TYPE_STRING)
                 return true;
         return false;
     }
 
     bool IsValueDatetime() {
         if (this->column)
-            if (db_get_column_sqltype(this->column) == DB_C_TYPE_DATETIME)
+            if (db_sqltype_to_Ctype(db_get_column_sqltype(this->column)) == DB_C_TYPE_DATETIME)
                 return true;
         return false;
     }
@@ -261,6 +261,10 @@ public:
     void SetSQLTypeToUnknown() {
         if (this->column)
             db_set_column_sqltype(this->column, DB_SQL_TYPE_UNKNOWN);
+    }
+    void SetSQLTypeToString() {
+        if (this->column)
+            db_set_column_sqltype(this->column, DB_SQL_TYPE_TEXT);
     }
 
     //!\brief Make a deep copy of column

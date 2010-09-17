@@ -46,10 +46,22 @@ public:
     vtkTypeRevisionMacro(vtkGRASSDbmiValue, vtkObjectGRASSErrorHandler);
     void PrintSelf(ostream& os, vtkIndent indent);
 
-  virtual void DeepCopy(vtkGRASSDbmiValue *value){;}
+    //!\brief Return the double value
+    double GetDouble(){return db_get_value_double(this->value);}
+
+    //!\brief Return the integer value
+    int GetInteger(){return db_get_value_int(this->value);}
+
+    //!\brief Return the string value
+    const char* GetString(){return db_get_value_string(this->value);}
+    
+    //!\brief Test if value is null
+    bool IsNull(){return (db_test_value_isnull(this->value)?true:false);}
+
+  virtual void DeepCopy(vtkGRASSDbmiValue *value);
   //BTX
   virtual dbValue * GetPointer(){return this->value;}
-  virtual void DeepCopy(dbValue *value){;}
+  virtual void DeepCopy(dbValue *value);
   //ETX
 
 protected:

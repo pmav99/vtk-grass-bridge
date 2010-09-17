@@ -29,7 +29,7 @@ class vtkGRASSDbmiInterfaceReaderTest(unittest.TestCase):
             init.Init("vtkGRASSDbmiInterfaceReaderTest")
             init.ExitOnErrorOn()
             # Create the input data
-            inputlist = ["v.random", "--o", "column=elev", "n=20", "zmin=-20", "zmax=2500", "output=random_points"]
+            inputlist = ["v.random", "--o", "column=elev", "n=10", "zmin=-20", "zmax=2500", "output=random_points"]
             proc = subprocess.Popen(args=inputlist)
             proc.communicate()
             firstCheck = True
@@ -39,25 +39,29 @@ class vtkGRASSDbmiInterfaceReaderTest(unittest.TestCase):
         map.OpenMap("random_points")
 
         db = map.GetDbmiInterface()
+	table = vtkGRASSDbmiTable()
+        column = vtkGRASSDbmiColumn()
         value = vtkGRASSDbmiValue()
         
         db.ConnectDB()
-	table = vtkGRASSDbmiTable()
+        
 	db.GetTable(table)
-	print table
+        table.GetColumn("elev", column)
 
-        #rows = db.GetNumberOfRows()
-        #print "Database table number of rows: ", rows
+        rows = db.GetNumberOfRows()
+        print "Database table number of rows: ", rows
 
-        for i in range(20):
+        for i in range(rows):
             db.SelectValue(i + 1, "elev", value)
-            print value
-            
-        print db
+            if column.IsValueDouble():
+                print i + 1, value.GetDouble()
+            elif column.IsValueInt():
+                print i + 1, value.GetInteger()
+            elif column.IsValueString():
+                print i + 1, value.GetString()
+            else:
+                print i + 1, "Unknown datatype at row ", i
 
-        db.DisconnectDB()
-
-        map.CloseMap()
 
 
 if __name__ == '__main__':
