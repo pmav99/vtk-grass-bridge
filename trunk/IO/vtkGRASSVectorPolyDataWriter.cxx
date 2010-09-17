@@ -172,7 +172,6 @@ vtkGRASSVectorPolyDataWriter::RequestData(
                 cell->EvaluateLocation(subId, pcoords, point, weights);
                 // Append the centroid
                 centroid->AppendPoint(point[0], point[1], point[2]);
-                delete [] weights;
 
                 if (1 > writer->WriteFeature(centroid, cats))
                 {
@@ -182,6 +181,7 @@ vtkGRASSVectorPolyDataWriter::RequestData(
                     delete [] weights;
                     return -1;
                 }
+                delete [] weights;
             }
             else
                 continue;
