@@ -13,9 +13,9 @@
 */
 
 /**
- * \brief This is the base class for grass raster map reading and writing.
+ * \brief This is the base class for grass raster3d map reading and writing.
  *
- * It provides function to allocate the raster buffer, to set and get the
+ * It provides function to set and get the
  * vtkGRASSRegion and the vtkGRASSHistory.
  *
  * \author Soeren Gebbert
@@ -58,17 +58,17 @@ public:
   //!\brief Return the maptype as string (FCELL_TYPE and DCELL_TYPE or NULL if unknown)
   virtual const char* GetMapTypeAsString();
 
-  //! \brief Set the Region which should be used to open the grass raster map
+  //! \brief Set the Region which should be used to open the grass raster3d map
   vtkSetObjectMacro(Region, vtkGRASSRegion);
   vtkGetObjectMacro(Region, vtkGRASSRegion);
 
-    //! \brief Get the History of the grass 3d raster map
+    //! \brief Get the History of the grass raster3d map
   vtkGetObjectMacro(History, vtkGRASSHistory);
   
   //! \brief open the map for reading or writing. This function must be implemented by the subclasses.
   virtual bool OpenMap(char *name){return false;}
 
-  //! \brief Close the raster map
+  //! \brief Close the raster 3d map
   virtual bool CloseMap();
 
   //! \brief Read a single value on index position x, y and z
@@ -90,7 +90,7 @@ protected:
   ~vtkGRASSRaster3dMapBase();
   
   int RegionUsage;
-  bool Open; // True if the raster file was opened
+  bool Open; // True if the raster3d map was opened
   int MapType; // FCELL or DCELL
   int NumberOfRows;
   int NumberOfCols;
@@ -99,7 +99,7 @@ protected:
   char *Mapset;
 
   //BTX
-  G3D_Map *Map;  // Pointer to the g3d map
+  G3D_Map *Map;  // Pointer to the raster3d map
   //ETX
 
   vtkGRASSRegion *Region;
@@ -108,7 +108,7 @@ protected:
   //! \brief Set the region
   bool SetRegion();
 
-  //! \brief Name of the raster map to be readed or created
+  //! \brief Name of the raster3d map to be readed or created
   vtkSetStringMacro(Raster3dName);
   vtkSetStringMacro(Mapset);
   vtkSetMacro(MapType, int);

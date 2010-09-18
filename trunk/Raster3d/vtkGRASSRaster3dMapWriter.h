@@ -13,15 +13,15 @@
  * GNU General Public License for more details.
 */
 /**
- * \brief This class provides an interface to the raster map io library to
- * write a raster map row by row.
+ * \brief This class provides an interface to the raster3d map io library to
+ * write a raster3d map.
  *
- * The user can choose the current region, the default region, the raster map region or
- * a user defined region to open the new raster map.
+ * The user can choose the current region, the default region, the raster3d map region or
+ * a user defined region to open the new raster3d map.
  *
  * This class does not use the vtk update mechanism.
- * Before writing the new raster map rows you need to open the raster map.
- * After writing you must close the raster map or delete the object. The
+ * Before writing the new raster3d map you need to open it.
+ * After writing you must close the raster3d map or delete the object. The
  * destructor will close the map.
  * 
  * The user can provide a vtkGRASSHistory object, which will be used to write the history
@@ -49,10 +49,10 @@ public:
   virtual void SetMapTypeToFCELL() {this->SetMapType(FCELL_TYPE);}
   virtual void SetMapTypeToDCELL() {this->SetMapType(DCELL_TYPE);}
 
-  //! \brief Set the histroy which should be written to the raster map
+  //! \brief Set the histroy which should be written to the raster3d map
   vtkSetObjectMacro(History, vtkGRASSHistory);
 
-  //! \brief Open old 3d raster map for reading
+  //! \brief Open new raster3d map for writing
   virtual bool OpenMap(char *name);
   //! \brief Write a single value at position x, y, and z, returns 1 on success, -1 in case of an error
   virtual int PutValue(int x, int y, int z, double value);

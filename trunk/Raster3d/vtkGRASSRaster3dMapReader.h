@@ -13,15 +13,15 @@
 */
 
 /**
- * \brief This class provides an interface to the raster map io library to
- * read a raster map row by row.
+ * \brief This class provides an interface to the raster3d map io library to
+ * read a raster3d map.
  *
  * The user can choose the current region, the default region, the raster map region or
- * a user defined region to open the raster map.
+ * a user defined region to open the raster3d map.
  *
  * This class does not use the vtk update mechanism.
- * Before reading the raster map rows you need to open the raster map.
- * After reading you must close the raster map or delete the object. The
+ * Before reading the raster3d map values you need to open the raster3d map.
+ * After reading you must close the raster3d map or delete the object. The
  * destructor will close the map.
  *
  * \author Soeren Gebbert
@@ -42,13 +42,13 @@ public:
   static  vtkGRASSRaster3dMapReader *New();
   vtkTypeRevisionMacro(vtkGRASSRaster3dMapReader,vtkGRASSRaster3dMapBase);
 
-  //! \brief Open an existing 3d raster map for reading.
-  //! \param name the name of an existing 3d raster map
+  //! \brief Open an existing raster3d map for reading.
+  //! \param name the name of an existing raster3d map
   //! \return true for success, false fo error
   virtual bool OpenMap(char *name);
   
   //! \brief Return the min and max range as double for all map types.
-  //! Call only after the 3d raster map was opened.
+  //! Call only after the raster3d map was opened.
   //! \return true for success, false for error
   virtual bool GetRange(double range[2]);
 protected:
