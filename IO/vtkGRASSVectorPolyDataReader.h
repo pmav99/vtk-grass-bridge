@@ -66,6 +66,18 @@ public:
   //!\brief Set the array of column names which should be read as celldata
   vtkSetObjectMacro(ColumnNames, vtkStringArray);
 
+  //!\brief Set the layer number (1 .. n) of the vector database connection. Default is 1
+  vtkSetMacro(Layer, int);
+  //!\brief Get the layer number (1 .. n) of the vector database connection. Default is 1
+  vtkGetMacro(Layer, int);
+
+  //!\brief Set the number which should be used if there is no valid database
+  //!table entry for the readed vector feature, default is -999999
+  vtkSetMacro(NoDataValue, int);
+  //!\brief Get the number which should be used if there is no valid database
+  //!table entry for the readed vector feature, efault is -999999
+  vtkGetMacro(NoDataValue, int);
+
 protected:
   vtkGRASSVectorPolyDataReader();
   ~vtkGRASSVectorPolyDataReader();
@@ -73,6 +85,8 @@ protected:
   char* VectorName;
   char* Mapset;
   char *CategoryArrayName;
+  int Layer;
+  int NoDataValue;
 
   vtkStringArray *ColumnNames;
 
