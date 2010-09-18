@@ -85,7 +85,7 @@ public:
   //!\brief Standard option for the column name of a database table
   static int GetDataBaseColumnType(){return G_OPT_DB_COLUMN;}
   //!\brief Standard option for several column names of a database table
-  static int GetDataBaseColumnsype(){return G_OPT_DB_COLUMNS;}
+  static int GetDataBaseColumnsType(){return G_OPT_DB_COLUMNS;}
   //!\brief Standard option for one input file
   static int GetFileInputType(){return G_OPT_F_INPUT;}
   //!\brief Standard option for a file output

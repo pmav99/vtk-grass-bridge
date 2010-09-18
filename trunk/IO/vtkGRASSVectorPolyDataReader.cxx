@@ -46,6 +46,9 @@ vtkGRASSVectorPolyDataReader::vtkGRASSVectorPolyDataReader()
     this->SetCategoryArrayName("cats");
     this->SetNumberOfInputPorts(0);
 
+    this->Layer = 1;
+    this->NoDataValue = -999999;
+
     this->ColumnNames = vtkStringArray::New();
 }
 
@@ -169,6 +172,7 @@ void vtkGRASSVectorPolyDataReader::ReadDatabaseData(vtkGRASSVectorMapNoTopoReade
  
     vtkGRASSDbmiInterfaceReader *db = map->GetDbmiInterface();
     db->ConnectDB();
+    db->SetFieldNumber(this->Layer);
     db->GetTable(table);
         
     // In case the ColumnNames array is empty, fill it with all valid table columns
@@ -195,20 +199,19 @@ void vtkGRASSVectorPolyDataReader::ReadDatabaseData(vtkGRASSVectorMapNoTopoReade
 
         // Read data into the cat value array 
         db->SelectCatValueArray(this->ColumnNames->GetValue(i), catval);
-	cout << "Reading column " << column->GetName() << endl;
 
 	if(column->IsValueDouble()) {
             vtkDoubleArray *array = vtkDoubleArray::New();
 	    array->SetNumberOfComponents(1);
 	    array->SetName(column->GetName());
-	    catval->ValuesToDoubleArray(cats, array, -999999);
+	    catval->ValuesToDoubleArray(cats, array, this->NoDataValue);
             cdata->AddArray(array);
 	    array->Delete();
 	} else if(column->IsValueInteger()) {
             vtkIntArray *array = vtkIntArray::New();
 	    array->SetNumberOfComponents(1);
 	    array->SetName(column->GetName());
-	    catval->ValuesToIntegerArray(cats, array, -999999);
+	    catval->ValuesToIntegerArray(cats, array, this->NoDataValue);
             cdata->AddArray(array);
 	    array->Delete();
 	} else {
