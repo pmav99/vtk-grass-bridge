@@ -422,7 +422,7 @@ WARN_LOGFILE           =
 # directories like "/usr/src/myproject". Separate the files or directories 
 # with spaces.
 
-INPUT                  = Common IO Raster Vector MainPage.dox
+INPUT                  = Common DBMI Filtering IO Raster Raster3d Vector MainPage.dox
 
 # If the value of the INPUT tag contains directories, you can use the 
 # FILE_PATTERNS tag to specify one or more wildcard pattern (like *.cpp 

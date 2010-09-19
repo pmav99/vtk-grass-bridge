@@ -22,7 +22,6 @@ from libvtkIOPython import *
 from libvtkImagingPython import *
 from libvtkGRASSBridgeIOPython import *
 from libvtkGRASSBridgeCommonPython import *
-import grass.script as grass
 
 
 def generateVectorOutput(build_topo, output, filter, write_vtk, show):
@@ -44,30 +43,34 @@ def generateVectorOutput(build_topo, output, filter, write_vtk, show):
     if write_vtk == 1:
         gm.Message("write VTK file")
         xmlwriter = vtkXMLPolyDataWriter()
-        xmlwriter.SetFileName(output + ".vtk")
+        xmlwriter.SetFileName(output + ".vtp")
         xmlwriter.SetInputConnection(filter.GetOutputPort())
         xmlwriter.Write()
     
     if show == 1:
         gm.Message("show visulization")
-        normals = vtkPolyDataNormals()
-        normals.SetInputConnection(filter.GetOutputPort())
-        mapMesh = vtkPolyDataMapper()
-        mapMesh.SetInputConnection(normals.GetOutputPort())
-        meshActor = vtkActor()
-        meshActor.SetMapper(mapMesh)
+        visualizeData(filter)
 
-        ren = vtkRenderer()
-        renWin =vtkRenderWindow()
-        renWin.AddRenderer(ren)
-        iren = vtkRenderWindowInteractor()
-        iren.SetRenderWindow(renWin)
 
-        ren.AddActor(meshActor)
-        ren.SetBackground(1, 1, 1)
-        renWin.SetSize(800, 600)
+def visualizeData(filter):
+    normals = vtkPolyDataNormals()
+    normals.SetInputConnection(filter.GetOutputPort())
+    mapMesh = vtkPolyDataMapper()
+    mapMesh.SetInputConnection(normals.GetOutputPort())
+    meshActor = vtkActor()
+    meshActor.SetMapper(mapMesh)
 
-        iren.Initialize()
-        renWin.Render()
-        iren.Start()
+    ren = vtkRenderer()
+    renWin =vtkRenderWindow()
+    renWin.AddRenderer(ren)
+    iren = vtkRenderWindowInteractor()
+    iren.SetRenderWindow(renWin)
+
+    ren.AddActor(meshActor)
+    ren.SetBackground(1, 1, 1)
+    renWin.SetSize(800, 600)
+
+    iren.Initialize()
+    renWin.Render()
+    iren.Start()
 
