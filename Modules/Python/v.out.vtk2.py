@@ -25,6 +25,7 @@ from libvtkImagingPython import *
 from libvtkGRASSBridgeIOPython import *
 from libvtkGRASSBridgeCommonPython import *
 
+from vtkGRASSBridgeModuleBase import *
 import sys
 
 def main():
@@ -53,6 +54,10 @@ def main():
     feature.SetDefaultOptions("point,line,boundary,centroid,area,face")
     feature.SetDefaultAnswer("line,area")
 
+    visflag = vtkGRASSFlag()
+    visflag.SetKey("s")
+    visflag.SetDescription("Enable immediate VTK visualization of exported data in a VTK render window")
+
     nodata = vtkGRASSOption()
     nodata.SetKey("nodata")
     nodata.SetDefaultAnswer("-999999")
@@ -69,8 +74,8 @@ def main():
 
     init.Parser(paramter)
 
-    # Use the GRASS GIS messaging interface for messages and noisy output
-    messages = vtkGRASSMessagingInterface()
+    # Use the GRASS GIS messaging interface for gm and noisy output
+    gm = vtkGRASSMessagingInterface()
 
     # Names of columns to extract
     colarray = vtkStringArray()
@@ -94,35 +99,47 @@ def main():
 
     for name in feature.GetAnswer().split(","):
         if name == "point":
-            messages.Message("Writing feature point")
+            gm.Message("Writing feature point")
             reader.SetFeatureTypeToPoint()
             writer.SetFileName(output.GetAnswer() + "_point.vtp")
             writer.Write()
+            if visflag.GetAnswer():
+                visualizeData(reader)
         if name == "line":
-            messages.Message("Writing feature line")
+            gm.Message("Writing feature line")
             reader.SetFeatureTypeToLine()
             writer.SetFileName(output.GetAnswer() + "_line.vtp")
             writer.Write()
+            if visflag.GetAnswer():
+                visualizeData(reader)
         if name == "boundary":
-            messages.Message("Writing feature boundary")
+            gm.Message("Writing feature boundary")
             reader.SetFeatureTypeToBoundary()
             writer.SetFileName(output.GetAnswer() + "_boundary.vtp")
             writer.Write()
+            if visflag.GetAnswer():
+                visualizeData(reader)
         if name == "centroid":
-            messages.Message("Writing feature centroid")
+            gm.Message("Writing feature centroid")
             reader.SetFeatureTypeToCentroid()
             writer.SetFileName(output.GetAnswer() + "_centroid.vtp")
             writer.Write()
+            if visflag.GetAnswer():
+                visualizeData(reader)
         if name == "area":
-            messages.Message("Writing feature area")
+            gm.Message("Writing feature area")
             reader.SetFeatureTypeToArea()
             writer.SetFileName(output.GetAnswer() + "_area.vtp")
             writer.Write()
+            if visflag.GetAnswer():
+                visualizeData(reader)
         if name == "face":
-            messages.Message("Writing feature face")
+            gm.Message("Writing feature face")
             reader.SetFeatureTypeToFace()
             writer.SetFileName(output.GetAnswer() + "_face.vtp")
             writer.Write()
+            if visflag.GetAnswer():
+                visualizeData(reader)
 
 if __name__ == "__main__":
     main()

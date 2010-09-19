@@ -20,10 +20,6 @@
 #% keywords: raster3d
 #% keywords: smooth
 #%End
-#%FLag
-#% key: s
-#% description: Show the input and output map in a vtk window after computation
-#%End
 #%Option
 #% key: input
 #% type: string
@@ -73,26 +69,6 @@ def main():
     writer.UseCurrentRegion()
     writer.SetRaster3dName(output)
     writer.Update()
-
-    if show == 1:
-        viewInt1 = vtkRenderWindowInteractor()
-
-        viewer1 = vtkImageViewer2()
-        viewer1.SetInputConnection(filter.GetOutputPort())
-        viewer1.SetColorWindow(255)
-        viewer1.SetupInteractor(viewInt1)
-        viewer1.Render()
-
-        viewInt2 = vtkRenderWindowInteractor()
-
-        viewer2 = vtkImageViewer2()
-        viewer2.SetInputConnection(reader.GetOutputPort())
-        viewer2.SetColorWindow(255)
-        viewer2.SetupInteractor(viewInt2)
-        viewer2.Render()
-
-        viewInt1.Start()
-        viewInt2.Start()
 
 if __name__ == "__main__":
     # Initiate GRASS

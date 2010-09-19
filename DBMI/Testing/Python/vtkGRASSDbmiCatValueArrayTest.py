@@ -103,7 +103,7 @@ class vtkGRASSDbmiCatValueArrayTest(unittest.TestCase):
         catval.ValuesToDoubleArray(cats, elev, -99999)
 
 
-        # ICheck
+        # Check
         for i in range(rows):
             if catval.HasValueDouble(cats.GetValue(i)):
                 #print cats.GetValue(i), elev.GetValue(i)

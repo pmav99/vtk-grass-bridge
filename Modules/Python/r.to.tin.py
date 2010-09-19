@@ -31,7 +31,7 @@
 #%End
 #%Flag
 #% key: s
-#% description: Show the input and output map in a vtk window after computation
+#% description: Show theoutput map in a vtk window after computation
 #%End
 #%Flag
 #% key: w

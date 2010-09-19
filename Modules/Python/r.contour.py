@@ -30,7 +30,7 @@
 #%End
 #%Flag
 #% key: w
-#% description: Write the triangulated map as vtk xml file to the current working directoy named <output>.vtk
+#% description: Write the triangulated map as vtk xml file to the current working directoy named <output>.vtp
 #%End
 #%Option
 #% key: input

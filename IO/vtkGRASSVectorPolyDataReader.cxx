@@ -48,6 +48,7 @@ vtkGRASSVectorPolyDataReader::vtkGRASSVectorPolyDataReader()
 
     this->Layer = 1;
     this->NoDataValue = -999999;
+    this->ReadDBTable = 1;
 
     this->ColumnNames = vtkStringArray::New();
 }
@@ -162,6 +163,9 @@ void vtkGRASSVectorPolyDataReader::ReadDatabaseData(vtkGRASSVectorMapNoTopoReade
 {
     int i;
     int ncols;
+
+    if(this->ReadDBTable == 0)
+        return;
     
     VGB_CREATE(vtkGRASSDbmiCatValueArray, catval);
     //vtkGRASSDbmiCatValueArray *catval = vtkGRASSDbmiCatValueArray::New();

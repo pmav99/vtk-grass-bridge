@@ -71,6 +71,13 @@ public:
   //!\brief Get the layer number (1 .. n) of the vector database connection. Default is 1
   vtkGetMacro(Layer, int);
 
+  //!\brief Switch database table reading on/off
+  vtkSetMacro(ReadDBTable, int);
+  //!\brief Switch database table reading on/off
+  vtkGetMacro(ReadDBTable, int);
+  //!\briefvSwitch database table reading on/off
+  vtkBooleanMacro(ReadDBTable, int);
+
   //!\brief Set the number which should be used if there is no valid database
   //!table entry for the readed vector feature, default is -999999
   vtkSetMacro(NoDataValue, int);
@@ -87,6 +94,7 @@ protected:
   char *CategoryArrayName;
   int Layer;
   int NoDataValue;
+  int ReadDBTable;
 
   vtkStringArray *ColumnNames;
 
