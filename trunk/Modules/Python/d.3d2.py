@@ -44,8 +44,8 @@ def main():
     raster =  vtkGRASSOptionFactory().CreateInstance(vtkGRASSOptionFactory.GetRasterInputType(), "elev")
     vector =  vtkGRASSOptionFactory().CreateInstance(vtkGRASSOptionFactory.GetVectorInputType(), "overlay")
     feature = vtkGRASSOptionFactory().CreateInstance(vtkGRASSOptionFactory.GetVectorFeatureType())
-    feature.SetDefaultOptions("line,boundary")
-    feature.SetDefaultAnswer("line,boundary")
+    feature.SetDefaultOptions("centroids,line,boundary")
+    feature.SetDefaultAnswer("centroids,line,boundary")
 
     scale = vtkGRASSOption()
     scale.SetKey("scale")
@@ -55,65 +55,53 @@ def main():
     scale.SetTypeToDouble()
     scale.SetDescription("Scale factor of height data")
 
-    # Put the command line arguments into a vtk string array and pass it to the parser
-    paramter = vtkStringArray()
-    for arg in sys.argv:
-        paramter.InsertNextValue(str(arg))
+    offset = vtkGRASSOption()
+    offset.SetKey("offset")
+    offset.SetDefaultAnswer("5")
+    offset.RequiredOff()
+    offset.MultipleOff()
+    offset.SetTypeToDouble()
+    offset.SetDescription("Offset of the vector data above the height raster map")
 
-    init.Parser(paramter)
+    linewidth = vtkGRASSOption()
+    linewidth.SetKey("linewidth")
+    linewidth.SetDefaultAnswer("2")
+    linewidth.RequiredOff()
+    linewidth.MultipleOff()
+    linewidth.SetTypeToInteger()
+    linewidth.SetDescription("Line width of the vector lines")
+
+    # Put the command line arguments into a vtk string array and pass it to the parser
+    parameter = vtkStringArray()
+    for arg in sys.argv:
+        parameter.InsertNextValue(str(arg))
+
+    if init.Parser(parameter) != True:
+        return -1
 
     # Use the GRASS GIS messaging interface for gm and noisy output
     gm = vtkGRASSMessagingInterface()
 
+    gm.Message("reading vector data")
     # Set up the vector reader
-    vreader = vtkGRASSVectorTopoPolyDataReader()
+    vreader = vtkGRASSVectorPolyDataReader()
     vreader.SetVectorName(vector.GetAnswer())
     vreader.ReadDBTableOff()
+    vreader.Update()
 
-    vdata = vtkAppendPolyData()
-    data = vtkPolyData()
-    
-    for name in feature.GetAnswer().split(","):
-        if name == "point":
-            gm.Message("Reading feature point")
-            vreader.SetFeatureTypeToPoint()
-            vreader.Update()
-            if vreader.GetOutput().GetNumberOfCells() > 0:
-                data.DeepCopy(vreader.GetOutput())
-                vdata.AddInput(data)
-        if name == "line":
-            gm.Message("Reading feature line")
-            vreader.SetFeatureTypeToLine()
-            vreader.Update()
-            if vreader.GetOutput().GetNumberOfCells() > 0:
-                data.DeepCopy(vreader.GetOutput())
-                vdata.AddInput(data)
-        if name == "boundary":
-            gm.Message("Reading feature boundary")
-            vreader.SetFeatureTypeToBoundary()
-            vreader.Update()
-            if vreader.GetOutput().GetNumberOfCells() > 0:
-                data.DeepCopy(vreader.GetOutput())
-                vdata.AddInput(data)
-        if name == "centroid":
-            gm.Message("Reading feature centroid")
-            vreader.SetFeatureTypeToCentroid()
-            vreader.Update()
-            if vreader.GetOutput().GetNumberOfCells() > 0:
-                data.DeepCopy(vreader.GetOutput())
-                vdata.AddInput(data)
-
-    del data
-    vdata.Update()
-
+    # The height map color table
     lut = vtkLookupTable()
     lut.SetHueRange( 0.6, 0)
     lut.SetSaturationRange( 1.0, 0)
     lut.SetValueRange( 0.5, 1.0)
 
+    gm.Message("Reading elevation map")
     rreader = vtkGRASSRasterImageReader()
     rreader.SetRasterName(raster.GetAnswer())
     rreader.UseCurrentRegion()
+    rreader.Update()
+
+    gm.Message("Processing raster and vector data")
    
     # Scale the image with the scale factor
     height = vtkImageShiftScale()
@@ -139,7 +127,7 @@ def main():
     box.SetBounds (xMin, xMax, yMin, yMax, zMin, zMax)
 
     vectors = vtkClipPolyData()
-    vectors.SetInputConnection(vdata.GetOutputPort())
+    vectors.SetInputConnection(vreader.GetOutputPort())
     vectors.SetClipFunction(box)
     vectors.InsideOutOn()
     
@@ -171,7 +159,7 @@ def main():
     projectedPaths = vtkProjectedTerrainPath()
     projectedPaths.SetInput(vectors.GetOutput())
     projectedPaths.SetSource(height.GetOutput())
-    projectedPaths.SetHeightOffset(5)
+    projectedPaths.SetHeightOffset(float(offset.GetAnswer()))
     projectedPaths.SetHeightTolerance(1)
     projectedPaths.SetProjectionModeToNonOccluded()
     projectedPaths.SetProjectionModeToHug()
@@ -181,8 +169,8 @@ def main():
 
     paths = vtkActor()
     paths.SetMapper( pathMapper)
-    paths.GetProperty().SetColor( 1, 0, 0)
-    paths.GetProperty().SetLineWidth (2)
+    paths.GetProperty().SetColor( 0, 0, 0)
+    paths.GetProperty().SetLineWidth (int(linewidth.GetAnswer()))
 
     ren1 = vtkRenderer()
     renWin = vtkRenderWindow()

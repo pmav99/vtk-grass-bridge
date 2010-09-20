@@ -50,10 +50,10 @@ public:
   //!\brief Init GRASS
   void Init(const char *name);
   //!\brief Parse the command line arguments each argument is a single string in the string array
-  void Parser(vtkStringArray *argv);
+  bool Parser(vtkStringArray *argv);
   //BTX
   //!\brief Parse the command line arguments
-  void Parser(int argc, char **argv);
+  bool Parser(int argc, char **argv);
   //ETX
 protected:
   vtkGRASSInit();
