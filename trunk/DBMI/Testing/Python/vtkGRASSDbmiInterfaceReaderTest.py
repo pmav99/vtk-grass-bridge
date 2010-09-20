@@ -55,13 +55,73 @@ class vtkGRASSDbmiInterfaceReaderTest(unittest.TestCase):
             db.SelectValue(i + 1, "elev", value)
             if column.IsValueDouble():
                 print i + 1, value.GetDouble()
-            elif column.IsValueInt():
+            elif column.IsValueInteger():
                 print i + 1, value.GetInteger()
             elif column.IsValueString():
                 print i + 1, value.GetString()
             else:
                 print i + 1, "Unknown datatype at row ", i
 
+        db.DisconnectDB()
+
+
+    def test2(self):
+        map = vtkGRASSVectorMapTopoReader()
+        map.OpenMap("random_points")
+
+        db = map.GetDbmiInterface()
+	table = vtkGRASSDbmiTable()
+        column = vtkGRASSDbmiColumn()
+
+        db.ConnectDB()
+
+	db.GetTable(table)
+
+        rows = db.GetNumberOfRows()
+
+        column.SetName("test")
+        column.SetSQLTypeToInteger()
+
+        db.AddColumn(column)
+        db.GetTable(table)
+        table.GetColumn(column.GetName(), column)
+
+        tableEntries = []
+
+        db.BeginTransaction()
+
+        for i in range(rows):
+            tableEntries.append(i * i)
+            string = "UPDATE " + str(table.GetName()) + " SET " +\
+            column.GetName() + "=" + str(tableEntries[i]) + " WHERE cat = " + str(i + 1)
+            print string
+            db.ExecuteImmediate(string)
+
+        db.CommitTransaction()
+
+        value = vtkGRASSDbmiValue()
+        
+        for i in range(rows):
+            db.SelectValue(i + 1, column.GetName(), value)
+            val = 0
+            if column.IsValueDouble():
+                 val = value.GetDouble()
+            elif column.IsValueInteger():
+                val = value.GetInteger()
+            elif column.IsValueString():
+                val =  value.GetString()
+            else:
+                print i + 1, "Unknown datatype at row ", i
+
+            print val, tableEntries[i]
+            self.assertEqual(val, tableEntries[i], "Error writing values to column")
+
+        # drop column does not work with sqlite o_O
+#        db.DropColumn(column.GetName())
+#        db.GetTable(table)
+#        print table
+
+        db.DisconnectDB()
 
 
 if __name__ == '__main__':

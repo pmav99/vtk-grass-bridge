@@ -31,6 +31,7 @@
 #include <vtkInformationVector.h>
 #include <vtkInformation.h>
 #include "vtkGRASSDbmiInterfaceReader.h"
+#include "vtkGRASSDbmiCatValueArray.h"
 #include "vtkGRASSDbmiTable.h"
 #include "vtkGRASSDbmiColumn.h"
 #include "vtkGRASSDbmiValue.h"

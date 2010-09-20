@@ -11,6 +11,7 @@ vtkGRASSDbmiCatValueArray.cxx
 vtkGRASSDbmiColumn.cxx
 vtkGRASSDbmiInterface.cxx
 vtkGRASSDbmiInterfaceReader.cxx
+vtkGRASSDbmiInterfaceWriter.cxx
 vtkGRASSDbmiTable.cxx
 vtkGRASSDbmiValue.cxx
 )
@@ -20,6 +21,7 @@ vtkGRASSDbmiCatValueArray.h
 vtkGRASSDbmiColumn.h
 vtkGRASSDbmiInterface.h
 vtkGRASSDbmiInterfaceReader.h
+vtkGRASSDbmiInterfaceWriter.h
 vtkGRASSDbmiTable.h
 vtkGRASSDbmiValue.h
 vtkGRASSBridgeDbmiWin32Header.h

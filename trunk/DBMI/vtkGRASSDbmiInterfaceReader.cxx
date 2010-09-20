@@ -16,8 +16,6 @@
 #include "vtkGRASSDbmiInterfaceReader.h"
 #include "vtkGRASSDbmiTable.h"
 #include <vtkObjectFactory.h>
-#include <vtkGRASSDefines.h>
-
 
 vtkCxxRevisionMacro(vtkGRASSDbmiInterfaceReader, "$Revision: 1.18 $");
 vtkStandardNewMacro(vtkGRASSDbmiInterfaceReader);

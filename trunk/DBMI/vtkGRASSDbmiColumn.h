@@ -97,6 +97,12 @@ public:
         return -1;
     }
 
+    const char *GetSQLTypeName() {
+        if (this->column)
+            return db_sqltype_name(db_get_column_sqltype(this->column));
+        return NULL;
+    }
+
     int GetUpdatePrivileg() {
         if (this->column)
             return db_get_column_update_priv(this->column);

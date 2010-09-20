@@ -56,7 +56,7 @@ public:
     //!\brief Set the name of the table
     //! return 0 if success and 1 in case of failure
 
-    virtual int SetTableName(const char *name) {
+    virtual int SetName(const char *name) {
         if (this->table)
             return db_set_table_name(this->table, name);
         return DB_FAILED;
@@ -65,7 +65,7 @@ public:
     //!\brief Get the name of the table
     //! return NULL in case of failure
 
-    virtual const char *GetTableName() {
+    virtual const char *GetName() {
         if (this->table)
             return db_get_table_name(this->table);
         return NULL;
