@@ -23,8 +23,8 @@
  * \author soerengebbert@googlemail.com
  * */
 
-#ifndef _vtkGRASSDbmiInterfaceReader_h
-#define	_vtkGRASSDbmiInterfaceReader_h
+#ifndef _vtkGRASSDbmiInterfaceWriter_h
+#define	_vtkGRASSDbmiInterfaceWriter_h
 
 #include <vtkObjectGRASSErrorHandler.h>
 #include "vtkGRASSBridgeDbmiWin32Header.h"
@@ -33,32 +33,35 @@
 
 class vtkGRASSDbmiTable;
 
-class VTK_GRASS_BRIDGE_DBMI_EXPORT vtkGRASSDbmiInterfaceReader : public vtkGRASSDbmiInterface {
+class VTK_GRASS_BRIDGE_DBMI_EXPORT vtkGRASSDbmiInterfaceWriter : public vtkGRASSDbmiInterface {
 public:
 
     //BTX
-    friend class vtkGRASSVectorMapNoTopoReader;
-    friend class vtkGRASSVectorMapTopoReader;
+    friend class vtkGRASSVectorMapUpdater;
+    friend class vtkGRASSVectorMapWriter;
     //ETX
 
-    static vtkGRASSDbmiInterfaceReader *New();
-    vtkTypeRevisionMacro(vtkGRASSDbmiInterfaceReader, vtkGRASSDbmiInterface);
-    void PrintSelf(ostream& os, vtkIndent indent);
+    static vtkGRASSDbmiInterfaceWriter *New();
+    vtkTypeRevisionMacro(vtkGRASSDbmiInterfaceWriter, vtkGRASSDbmiInterface);
 
     //!\brief Open a connection to the database. A databse connection can only
     //!be established when a VectorMap was specified.
-    virtual bool ConnectDB();
+    virtual bool ConnectDB(){;}
+
+    //!\brief Open a connection to the database. A databse connection can only
+    //!be established when a VectorMap was specified.
+    virtual bool ConnectDBCreateTable(vtkGRASSDbmiTable *table){;}
 
     //!\brief Get the vector table 
-    virtual bool GetTable(vtkGRASSDbmiTable *table);
+    virtual bool GetTable(vtkGRASSDbmiTable *table){;}
 
 protected:
-    vtkGRASSDbmiInterfaceReader(){;}
-    ~vtkGRASSDbmiInterfaceReader(){;}
+    vtkGRASSDbmiInterfaceWriter(){;}
+    ~vtkGRASSDbmiInterfaceWriter(){;}
 
 private:
-    vtkGRASSDbmiInterfaceReader(const vtkGRASSDbmiInterfaceReader&); // Not implemented.
-    void operator=(const vtkGRASSDbmiInterfaceReader&); // Not implemented.
+    vtkGRASSDbmiInterfaceWriter(const vtkGRASSDbmiInterfaceWriter&); // Not implemented.
+    void operator=(const vtkGRASSDbmiInterfaceWriter&); // Not implemented.
 };
 
 #endif

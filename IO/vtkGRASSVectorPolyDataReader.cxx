@@ -30,6 +30,7 @@
 #include "vtkGRASSVectorFeatureCats.h"
 #include "vtkGRASSDbmiInterfaceReader.h"
 #include "vtkGRASSDbmiTable.h"
+#include "vtkGRASSDbmiCatValueArray.h"
 #include "vtkGRASSDbmiColumn.h"
 #include "vtkGRASSDbmiValue.h"
 

@@ -16,7 +16,6 @@
 #include "vtkGRASSDbmiInterface.h"
 #include "vtkGRASSDbmiValue.h"
 #include <vtkObjectFactory.h>
-#include <vtkGRASSDefines.h>
 #include "vtkGRASSDbmiCatValueArray.h"
 
 
@@ -96,7 +95,92 @@ bool vtkGRASSDbmiInterface::SelectCatValueArray(const char *column, const char *
     return true;
 }
 
+//----------------------------------------------------------------------------
 
+bool vtkGRASSDbmiInterface::BeginTransaction()
+{
+    if(this->Connected) {
+        if(db_begin_transaction(this->driver) != DB_OK) {
+            return false;
+        }
+    } else {
+        return false;
+    }
+    return true;
+}
+
+//----------------------------------------------------------------------------
+
+bool vtkGRASSDbmiInterface::ExecuteImmediate(const char *sql)
+{
+    if(this->Connected) {
+        dbString s;
+        db_init_string(&s);
+        db_set_string(&s, sql);
+        if(db_execute_immediate(this->driver, &s) != DB_OK) {
+            return false;
+        }
+    } else {
+        return false;
+    }
+    return true;
+}
+
+//----------------------------------------------------------------------------
+
+bool vtkGRASSDbmiInterface::CommitTransaction()
+{
+    if(this->Connected) {
+        if(db_commit_transaction(this->driver) != DB_OK) {
+            return false;
+        }
+    } else {
+        return false;
+    }
+    return true;
+}
+
+//----------------------------------------------------------------------------
+
+bool vtkGRASSDbmiInterface::AddColumn(vtkGRASSDbmiColumn *column)
+{
+    if(this->VectorMap && this->VectorMap->IsOpen() && this->Connected) {
+        struct field_info *Fi;
+        Fi = Vect_get_field(this->VectorMap->GetPointer(), this->FieldNumber);
+        char sql[1024];
+
+        G_snprintf(sql, 1024, "ALTER TABLE %s ADD %s %s", Fi->table,
+            column->GetName(), column->GetSQLTypeName());
+        
+        this->BeginTransaction();
+        this->ExecuteImmediate(sql);
+        this->CommitTransaction();
+    }else {
+        return false;
+    }
+    return true;
+}
+
+//----------------------------------------------------------------------------
+
+bool vtkGRASSDbmiInterface::DropColumn(const char *column)
+{
+    if(this->VectorMap && this->VectorMap->IsOpen() && this->Connected) {
+        struct field_info *Fi;
+        Fi = Vect_get_field(this->VectorMap->GetPointer(), this->FieldNumber);
+
+        char sql[1024];
+        G_snprintf(sql, 1024, "ALTER TABLE %s DROP COLUMN %s", Fi->table, column);
+
+        this->BeginTransaction();
+        this->ExecuteImmediate(sql);
+        this->CommitTransaction();
+
+    }else {
+        return false;
+    }
+    return true;
+}
 
 //----------------------------------------------------------------------------
 

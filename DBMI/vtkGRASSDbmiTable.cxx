@@ -104,7 +104,7 @@ void
 vtkGRASSDbmiTable::PrintSelf(ostream& os, vtkIndent indent) {
 
     this->Superclass::PrintSelf(os, indent);
-    os << indent << "Table name:  " << this->GetTableName() << "\n";
+    os << indent << "Table name:  " << this->GetName() << "\n";
     os << indent << "Table description:  " << this->GetTableDescription() << "\n";
     os << indent << "Table number of columns:  " << this->GetNumberOfColumns() << "\n";
     int i;
