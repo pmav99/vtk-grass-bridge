@@ -58,6 +58,10 @@ def main():
     visflag.SetKey("s")
     visflag.SetDescription("Enable immediate VTK visualization of exported data in a VTK render window")
 
+    colflag = vtkGRASSFlag()
+    colflag.SetKey("n")
+    colflag.SetDescription("Do not read any SQL database columns")
+
     nodata = vtkGRASSOption()
     nodata.SetKey("nodata")
     nodata.SetDefaultAnswer("-999999")
@@ -68,11 +72,12 @@ def main():
                           "without database table entries or valid categories")
 
     # Put the command line arguments into a vtk string array and pass it to the parser
-    paramter = vtkStringArray()
+    parameter = vtkStringArray()
     for arg in sys.argv:
-        paramter.InsertNextValue(str(arg))
+        parameter.InsertNextValue(str(arg))
 
-    init.Parser(paramter)
+    if init.Parser(parameter) != True:
+        return -1
 
     # Use the GRASS GIS messaging interface for gm and noisy output
     gm = vtkGRASSMessagingInterface()
@@ -90,6 +95,8 @@ def main():
     reader.SetColumnNames(colarray)
     reader.SetLayer(int(field.GetAnswer()))
     reader.SetNoDataValue(int(nodata.GetAnswer()));
+    if colflag.GetAnswer():
+        reader.ReadDBTableOff()
     
     # Set up the poly data xml writer and connect it with the reader
     writer = vtkXMLPolyDataWriter()
@@ -142,4 +149,4 @@ def main():
                 visualizeData(reader)
 
 if __name__ == "__main__":
-    main()
+    exit(main())

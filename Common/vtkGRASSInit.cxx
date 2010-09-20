@@ -92,7 +92,7 @@ void vtkGRASSInit::Init(const char *name)
 
 //----------------------------------------------------------------------------
 
-void vtkGRASSInit::Parser(vtkStringArray *argv)
+bool vtkGRASSInit::Parser(vtkStringArray *argv)
 {
 	char **buff = NULL;
     int i;
@@ -109,13 +109,18 @@ void vtkGRASSInit::Parser(vtkStringArray *argv)
 	}
 
     // Start the grass command line parser
-    G_parser(argv->GetNumberOfValues(), buff);
+    if(G_parser(argv->GetNumberOfValues(), buff) < 0)
+        return false;
+
+    return true;
 }
 
 //----------------------------------------------------------------------------
 
-void vtkGRASSInit::Parser(int argc, char **argv)
+bool vtkGRASSInit::Parser(int argc, char **argv)
 {
     // Start the grass command line parser
-    G_parser(argc, argv);
+    if(G_parser(argc, argv) < 0)
+        return false;
+    return true;
 }
