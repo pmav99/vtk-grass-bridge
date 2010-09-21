@@ -95,12 +95,13 @@ vtkGRASSVectorMapUpdater::OpenMap(const char *name, int with_z)
         this->Open = false;
         return false;
     }
-    
-    // Create the Dbmi interface for datase read operations
+
+    this->Open = true;
+
+    // Create the Dbmi interface for database operations
     if(this->DbmiInterface == NULL)
         this->DbmiInterface = vtkGRASSDbmiInterface::New();
     this->DbmiInterface->SetVectorMap(this);
 
-    this->Open = true;
     return true;
 }

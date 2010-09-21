@@ -37,6 +37,10 @@
 #include "vtkPolyDataAlgorithm.h"
 #include "vtkGRASSBridgeIOWin32Header.h"
 
+class vtkGRASSVectorMapWriter;
+class vtkCellArray;
+class vtkDataArray;
+
 class VTK_GRASS_BRIDGE_IO_EXPORT vtkGRASSVectorPolyDataWriter : public vtkPolyDataAlgorithm
 {
 public:
@@ -71,6 +75,8 @@ protected:
   int BuildTopo;
 
   vtkSetStringMacro(Mapset);
+
+  void AddCellDataToVectorMap(vtkCellData *celldata, vtkDataArray *categories, vtkGRASSVectorMapWriter *writer);
 
   int RequestData(vtkInformation*,
                   vtkInformationVector**,
