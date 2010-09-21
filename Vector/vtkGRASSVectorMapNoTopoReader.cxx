@@ -85,7 +85,7 @@ vtkGRASSVectorMapNoTopoReader::OpenMap(const char *name)
 
     this->Open = true;
 
-    // Create the Dbmi interface for datase read operations
+    // Create the Dbmi interface for database operations
     if(this->DbmiInterface == NULL)
         this->DbmiInterface = vtkGRASSDbmiInterface::New();
     this->DbmiInterface->SetVectorMap(this);

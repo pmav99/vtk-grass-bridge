@@ -15,6 +15,7 @@
 #include "vtkGRASSVectorPolyDataWriter.h"
 
 #include <vtkCellArray.h>
+#include <vtkShortArray.h>
 #include <vtkCell.h>
 #include <vtkCellData.h>
 #include <vtkObjectFactory.h>
@@ -30,11 +31,15 @@
 #include "vtkGRASSRasterMapWriter.h"
 #include <vtkInformationVector.h>
 #include <vtkInformation.h>
+#include <vtkDataArrayCollection.h>
 #include "vtkGRASSDbmiInterface.h"
 #include "vtkGRASSDbmiCatValueArray.h"
 #include "vtkGRASSDbmiTable.h"
 #include "vtkGRASSDbmiColumn.h"
 #include "vtkGRASSDbmiValue.h"
+#include <iostream>
+#include <string>
+#include <sstream>
 
 vtkCxxRevisionMacro(vtkGRASSVectorPolyDataWriter, "$Revision: 1.1 $");
 vtkStandardNewMacro(vtkGRASSVectorPolyDataWriter);
@@ -79,8 +84,6 @@ vtkGRASSVectorPolyDataWriter::PrintSelf(ostream& os, vtkIndent indent)
 
 //----------------------------------------------------------------------------
 
-//----------------------------------------------------------------------------
-
 int
 vtkGRASSVectorPolyDataWriter::RequestData(
                                           vtkInformation *vtkNotUsed(request),
@@ -116,13 +119,21 @@ vtkGRASSVectorPolyDataWriter::RequestData(
     VGB_CREATE(vtkGRASSVectorFeaturePoints, feature);
     VGB_CREATE(vtkGRASSVectorFeaturePoints, centroid);
 
+    vtkDataArray *categories = NULL;
+    if (input->GetCellData()->HasArray(this->CategoryArrayName))
+        categories = input->GetCellData()->GetArray(this->CategoryArrayName);
+    else {
+        categories = vtkIntArray::New();
+        categories->SetName("cats");
+        categories->SetNumberOfComponents(1);
+        categories->SetNumberOfTuples(input->GetNumberOfCells());
+        for (i = 0; i < input->GetNumberOfCells(); i++)
+            categories->InsertTuple1(i, (double)(i + 1));
+    }
+
     // We write the data per cell
     for (i = 0; i < input->GetNumberOfCells(); i++)
     {
-        vtkDataArray *categories = NULL;
-        if (input->GetCellData()->HasArray(this->CategoryArrayName))
-            categories = input->GetCellData()->GetArray(this->CategoryArrayName);
-
         vtkCell *cell = input->GetCell(i);
 
         if (cell->GetCellType() == VTK_POLY_VERTEX)
@@ -198,10 +209,142 @@ vtkGRASSVectorPolyDataWriter::RequestData(
         }
     }
 
+    // Now add any cell data to the vector database table
+    this->AddCellDataToVectorMap(input->GetCellData(), categories, writer);
+    
     if (this->BuildTopo > 0)
         writer->CloseMap(true);
     else
         writer->CloseMap(false);
 
     return 1;
+}
+
+//----------------------------------------------------------------------------
+
+void vtkGRASSVectorPolyDataWriter::AddCellDataToVectorMap(vtkCellData *celldata, vtkDataArray *categories, vtkGRASSVectorMapWriter *writer)
+{
+    int i, j, numcols, numcells;
+    double range[2];
+    VGB_CREATE(vtkCellData, cd);
+
+    numcols = celldata->GetNumberOfArrays();
+
+    cout << numcols << endl;
+
+    // Return if nothing todo
+    if(numcols == 0)
+        return;
+
+    // Grass expects the name cat as category array
+    categories->SetName("cat");
+    categories->GetRange(range);
+    
+    if(range[1] < 1.0)
+        return;
+
+    // To make sure only unequal categories are added to the database table
+    // We use a selection array
+    VGB_CREATE(vtkShortArray, catselect);
+    catselect->SetNumberOfComponents(1);
+    catselect->SetNumberOfTuples((long long)range[1] + 1);
+    catselect->FillComponent(0, 0.0);
+
+    // The first item is the category array
+    cd->AddArray(categories);
+
+    // Add all available arrays to the collection
+    for(i = 0; i < numcols; i++)
+    {
+        vtkDataArray *array = celldata->GetArray(i);
+        if(!cd->HasArray(array->GetName()))
+            cd->AddArray(array);
+    }
+
+    numcols = cd->GetNumberOfArrays();
+
+    cd->Print(cerr);
+
+    vtkGRASSDbmiInterface *db = writer->GetDbmiInterface();
+
+    VGB_CREATE(vtkGRASSDbmiTable, table);
+    table->SetName(this->GetVectorName());
+
+    // Cats are already set, start with 1
+    for(i = 0; i < numcols; i++)
+    {
+        VGB_CREATE(vtkGRASSDbmiColumn, col);
+        vtkDataArray *array = cd->GetArray(i);
+
+        col->SetName(array->GetName());
+
+        if(array->GetDataType() == VTK_DOUBLE)
+            col->SetSQLTypeToDoublePrecision();
+        else if(array->GetDataType() == VTK_CHAR)
+            col->SetSQLTypeToCharacter();
+        else if(array->GetDataType() == VTK_INT)
+            col->SetSQLTypeToInteger();
+        else if(array->GetDataType() == VTK_LONG)
+            col->SetSQLTypeToInteger();
+        else if(array->GetDataType() == VTK_SHORT)
+            col->SetSQLTypeToSmallInt();
+        else
+            col->SetSQLTypeToDoublePrecision();
+
+        table->AppendColumn(col);
+    }
+
+    cout << table->TableToSQL() << endl;
+
+    // Create the table
+    db->ConnectDBCreateTable(table);
+    
+    db->BeginTransaction();
+
+    numcells = categories->GetNumberOfTuples();
+
+    for(i = 0; i < numcells; i++)
+    {
+        // Add only values with categories > 0
+        if(categories->GetTuple1(i) < 1)
+            continue;
+        // Do nothing if this category was already inserted
+        if(catselect->GetValue((int)categories->GetTuple1(i)) == 1)
+            continue;
+        // Create the SQL string
+        std::ostringstream os;
+        os << "INSERT INTO " << table->GetName() << " VALUES (";
+
+        for(j = 0; j < numcols; j++)
+        {
+            vtkDataArray *array = cd->GetArray(j);
+
+            if(array->GetDataType() == VTK_DOUBLE)
+                os << (double)array->GetTuple1(i);
+            else if(array->GetDataType() == VTK_CHAR)
+                os << (char)array->GetTuple1(i);
+            else if(array->GetDataType() == VTK_INT)
+                os << (int)array->GetTuple1(i);
+            else if(array->GetDataType() == VTK_LONG)
+                os << (long)array->GetTuple1(i);
+            else if(array->GetDataType() == VTK_SHORT)
+                os << (short)array->GetTuple1(i);
+            else
+                os << (double)array->GetTuple1(i);
+
+            if(j < numcols - 1)
+                os << ",";
+        }
+        os << ")";
+        cout << os.str() << endl;
+        db->ExecuteImmediate(os.str().c_str());
+        // The category was created
+        catselect->SetValue((int)categories->GetTuple1(i), 1);
+    }
+
+    db->CommitTransaction();
+    db->DisconnectDB();
+
+
+    return;
 }
