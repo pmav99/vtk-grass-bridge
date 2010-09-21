@@ -14,7 +14,6 @@
  */
 
 #include "vtkGRASSVectorMapNoTopoReader.h"
-#include "vtkGRASSDbmiInterfaceReader.h"
 #include <vtkObjectFactory.h>
 
 
@@ -88,7 +87,7 @@ vtkGRASSVectorMapNoTopoReader::OpenMap(const char *name)
 
     // Create the Dbmi interface for datase read operations
     if(this->DbmiInterface == NULL)
-        this->DbmiInterface = vtkGRASSDbmiInterfaceReader::New();
+        this->DbmiInterface = vtkGRASSDbmiInterface::New();
     this->DbmiInterface->SetVectorMap(this);
 
     return true;

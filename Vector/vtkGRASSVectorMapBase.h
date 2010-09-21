@@ -36,7 +36,6 @@
 class vtkGRASSVectorFeaturePoints;
 class vtkGRASSVectorFeatureCats;
 class vtkGRASSVectorBBox;
-class vtkGRASSDbmiInterfaceReader;
 
 extern "C" {
 #include <grass/gis.h>
@@ -45,9 +44,7 @@ extern "C" {
 
 class VTK_GRASS_BRIDGE_VECTOR_EXPORT vtkGRASSVectorMapBase : public vtkObjectGRASSErrorHandler {
 public:
-    //BTX
-    //friend class vtkGRASSVectorDBInterface;
-    //ETX
+
     static vtkGRASSVectorMapBase *New();
     vtkTypeRevisionMacro(vtkGRASSVectorMapBase, vtkObjectGRASSErrorHandler);
     void PrintSelf(ostream& os, vtkIndent indent);

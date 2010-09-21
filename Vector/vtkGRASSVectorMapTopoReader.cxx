@@ -14,7 +14,6 @@
  */
 
 #include "vtkGRASSVectorMapTopoReader.h"
-#include "vtkGRASSDbmiInterfaceReader.h"
 #include "vtkGRASSVectorBBox.h"
 #include <vtkObjectFactory.h>
 #include <vtkGRASSVectorFeaturePoints.h>

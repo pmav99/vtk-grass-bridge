@@ -28,7 +28,7 @@
 #include <vtkDoubleArray.h>
 #include <vtkIntArray.h>
 #include "vtkGRASSVectorFeatureCats.h"
-#include "vtkGRASSDbmiInterfaceReader.h"
+#include "vtkGRASSDbmiInterface.h"
 #include "vtkGRASSDbmiTable.h"
 #include "vtkGRASSDbmiCatValueArray.h"
 #include "vtkGRASSDbmiColumn.h"
@@ -175,7 +175,7 @@ void vtkGRASSVectorPolyDataReader::ReadDatabaseData(vtkGRASSVectorMapNoTopoReade
     VGB_CREATE(vtkGRASSDbmiColumn, column);
     //vtkGRASSDbmiColumn *column = vtkGRASSDbmiColumn::New();
  
-    vtkGRASSDbmiInterfaceReader *db = map->GetDbmiInterface();
+    vtkGRASSDbmiInterface *db = map->GetDbmiInterface();
     db->ConnectDB();
     db->SetFieldNumber(this->Layer);
     db->GetTable(table);

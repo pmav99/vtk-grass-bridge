@@ -29,7 +29,7 @@
 
 #include "vtkGRASSVectorMapBase.h"
 #include "vtkGRASSBridgeVectorWin32Header.h"
-#include "vtkGRASSDbmiInterfaceReader.h"
+#include "vtkGRASSDbmiInterface.h"
 
 class VTK_GRASS_BRIDGE_VECTOR_EXPORT vtkGRASSVectorMapNoTopoReader : public vtkGRASSVectorMapBase {
 public:
@@ -45,13 +45,13 @@ public:
     virtual bool OpenMap(const char *name);
 
     //!\brief Get the database interface for the opened vector map
-    vtkGetObjectMacro(DbmiInterface, vtkGRASSDbmiInterfaceReader);
+    vtkGetObjectMacro(DbmiInterface, vtkGRASSDbmiInterface);
 
 protected:
     vtkGRASSVectorMapNoTopoReader();
     ~vtkGRASSVectorMapNoTopoReader();
 
-    vtkGRASSDbmiInterfaceReader *DbmiInterface;
+    vtkGRASSDbmiInterface *DbmiInterface;
 
 private:
     vtkGRASSVectorMapNoTopoReader(const vtkGRASSVectorMapNoTopoReader&); // Not implemented.
