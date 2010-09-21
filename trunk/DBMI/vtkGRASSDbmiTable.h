@@ -119,6 +119,10 @@ public:
     //!\brief Make a deep copy of an existing table
     virtual void DeepCopy(vtkGRASSDbmiTable *table);
 
+    //!\brief Create SQL CREATE sring from table definition
+    virtual const char *TableToSQL();
+    //int db_table_to_sql(dbTable * table, dbString * sql)
+
     //BTX
     virtual dbTable * GetPointer() {
         return this->table;

@@ -100,6 +100,18 @@ bool vtkGRASSDbmiTable::GetColumn(const char* name, vtkGRASSDbmiColumn *column)
 }
 
 //----------------------------------------------------------------------------
+const char* vtkGRASSDbmiTable::TableToSQL()
+{
+    dbString sql;
+    db_init_string(&sql);
+    if(db_table_to_sql(this->table, &sql) != DB_OK)
+        return NULL;
+
+    char *s = db_get_string(&sql);
+    return s;
+}
+
+//----------------------------------------------------------------------------
 void
 vtkGRASSDbmiTable::PrintSelf(ostream& os, vtkIndent indent) {
 

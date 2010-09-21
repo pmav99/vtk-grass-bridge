@@ -20,7 +20,8 @@
  * to ensure that database tables are always related to vector maps
  *
  * This class provides methods to open and close the database connection of
- * grass vector maps as well as functions to select single values or an array of values
+ * grass vector maps as well as functions to create tables,
+ * to select single values or an array of values
  * from a table column. The selection can be modified using where statements.
  *
  * 
@@ -43,6 +44,7 @@ class vtkIntArray;
 class vtkDataArray;
 class vtkGRASSDbmiValue;
 class vtkGRASSDbmiCatValueArray;
+class vtkGRASSDbmiTable;
 
 extern "C" {
 #include <grass/gis.h>
@@ -54,17 +56,30 @@ class VTK_GRASS_BRIDGE_DBMI_EXPORT vtkGRASSDbmiInterface : public vtkObjectGRASS
 public:
     //BTX
     friend class vtkGRASSVectorMapNoTopoReader;
+    friend class vtkGRASSVectorMapTopoReader;
+    friend class vtkGRASSVectorMapWriter;
+    friend class vtkGRASSVectorMapUpdater;
     //ETX
 
     static vtkGRASSDbmiInterface *New();
     vtkTypeRevisionMacro(vtkGRASSDbmiInterface, vtkObjectGRASSErrorHandler);
     void PrintSelf(ostream& os, vtkIndent indent);
 
-    //!\brief Open a connection to the database. This method must be implemented
-    //!in the subclasses
-    virtual bool ConnectDB(){return false;}
+
+    //!\brief Open a connection to the database. A databse connection can only
+    //!be established when a VectorMap was specified and opened.
+    virtual bool ConnectDB();
+
+    //!\brief Open a connection to the database and create a table. A databse connection can only
+    //! be established when a VectorMap was specified and opened.
+    //! The provided table must have the same name as the vector map, if not the name will be
+    //! changed to the vector map name. In case a database connection is already
+    //! available no new table will be created.
+    virtual bool ConnectDBCreateTable(vtkGRASSDbmiTable *table);
+
     //!\brief Close the database connection
     virtual void DisconnectDB();
+
     //!\brief Select a value from the vector map table. This works only when the
     //!database connection is established.
     //!\param cat The category
@@ -72,6 +87,7 @@ public:
     //!\brief value The value object which stores the result
     //!\return true on success or false on error
     virtual bool SelectValue(int cat, const char *column, vtkGRASSDbmiValue *value);
+
     //!\brief Get the number of rows of the entire table
     virtual int GetNumberOfRows();
 
@@ -84,7 +100,6 @@ public:
     //!\return true on success or false on error
     virtual bool SelectCatValueArray(const char *column, const char *where, vtkGRASSDbmiCatValueArray *catval);
 
-
     //!\brief Select all values of a specific column and store the result in a category value array
     //!For each category a specific value is stored. Currently only integer and double values are supported.
     //!\param column The name of the column to select values from
@@ -94,6 +109,7 @@ public:
 
     //!\brief Start a database transaction request to execute SQL statements
     virtual bool BeginTransaction();
+    
     //!\brief Immediately execute an SQL statement within a transaction request
     //! This statemanet can only be executed if BeginTransaction() was called first
     //! To finish the execution, CommitTransaction() must be called.
@@ -101,17 +117,20 @@ public:
     //! INSERT, UPDATE, ALTER, CREATE and so on
     //!\param sql The SQL statement as string
     virtual bool ExecuteImmediate(const char *sql);
+
     //!\brief Commit the database transaction request
     virtual bool CommitTransaction();
 
     //!\brief Add a column to the existing vector table
-    //!Do not use this method within a transaction request
+    //!\attentio Do not use this method within a transaction request
     virtual bool AddColumn(vtkGRASSDbmiColumn *column);
     //!\brief Dropcd a column to the existing vector table
     //!\attention This method does not work with sqlite databases
     //!\attention Do not use this method within a transaction request
     virtual bool DropColumn(const char *column);
 
+    //!\brief Get the vector table
+    virtual bool GetTable(vtkGRASSDbmiTable *table);
 
     //!\brief Which field number should be used to access the vector database
     vtkSetMacro(FieldNumber, int);

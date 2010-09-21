@@ -31,6 +31,7 @@
 #include "vtkGRASSVectorFeaturePoints.h"
 #include "vtkGRASSVectorFeatureCats.h"
 
+
 class VTK_GRASS_BRIDGE_VECTOR_EXPORT vtkGRASSVectorMapWriter : public vtkGRASSVectorMapTopoReader {
 public:
     static vtkGRASSVectorMapWriter *New();
@@ -218,7 +219,6 @@ public:
         this->SetVectorLevel(2);
     }
 
-
 protected:
     vtkGRASSVectorMapWriter();
 
@@ -228,7 +228,6 @@ protected:
     vtkSetMacro(Open3D, int);
 
     int Open3D;
-
 
 private:
     vtkGRASSVectorMapWriter(const vtkGRASSVectorMapWriter&); // Not implemented.

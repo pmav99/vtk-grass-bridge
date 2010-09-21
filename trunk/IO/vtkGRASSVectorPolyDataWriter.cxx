@@ -30,7 +30,7 @@
 #include "vtkGRASSRasterMapWriter.h"
 #include <vtkInformationVector.h>
 #include <vtkInformation.h>
-#include "vtkGRASSDbmiInterfaceReader.h"
+#include "vtkGRASSDbmiInterface.h"
 #include "vtkGRASSDbmiCatValueArray.h"
 #include "vtkGRASSDbmiTable.h"
 #include "vtkGRASSDbmiColumn.h"
@@ -102,12 +102,7 @@ vtkGRASSVectorPolyDataWriter::RequestData(
     }
 
     VGB_CREATE(vtkGRASSVectorMapWriter, writer);
-    VGB_CREATE(vtkGRASSDbmiInterfaceReader, db);
-    VGB_CREATE(vtkGRASSDbmiCatValueArray, catval);
-    VGB_CREATE(vtkGRASSDbmiTable, table);
-    VGB_CREATE(vtkGRASSDbmiColumn, column);
-
-
+    
     if (!writer->OpenMap(this->VectorName, 1))
     {
         vtkErrorMacro( << "Unable to open vector map " << this->VectorName);
