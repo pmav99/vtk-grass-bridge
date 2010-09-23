@@ -14,7 +14,7 @@
  */
 
 /*!
- * \brief This is the base class for read and write access to vector map database tables
+ * \brief This class provides read and write access to vector map database tables in grass
  *
  * Objects of this class and subclasses will only be created by subclasses of vtkGRASSVectorMapBase
  * to ensure that database tables are always related to vector maps
@@ -124,6 +124,7 @@ public:
     //!\brief Add a column to the existing vector table
     //!\attentio Do not use this method within a transaction request
     virtual bool AddColumn(vtkGRASSDbmiColumn *column);
+
     //!\brief Dropcd a column to the existing vector table
     //!\attention This method does not work with sqlite databases
     //!\attention Do not use this method within a transaction request

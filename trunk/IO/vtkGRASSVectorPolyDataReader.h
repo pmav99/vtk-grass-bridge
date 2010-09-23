@@ -16,15 +16,12 @@
  * and creates a vtkPolyData as output.
  *
  * Areas and isles are not supported. The only data types which are supported are points and lines.
- * The category is saved as an integer cell data array and set to active. The points may be redundent.
+ * The category is saved as an integer cell data array and set to active. Points may be redundant.
  * Use a point merger to remove redundant points from the dataset.
  *
  * To use this class make sure you are in a grass session and vtkGRASSInit was called first.
  *
- * This class uses the vtkGRASSVecctorMapNoTopoReader to read the vector map.
- *
- * \TODO Implement Database support to write the dat from a database as cell data arrays.
- * \TODO Use vtkSmartPointer
+ * This class uses the vtkGRASSVectorMapNoTopoReader to read the vector map.
  *
  * \author Soeren Gebbert
  * \author Berlin, Germany Sep. 2009
