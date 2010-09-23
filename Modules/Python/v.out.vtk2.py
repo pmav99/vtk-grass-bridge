@@ -103,7 +103,6 @@ def main():
     writer.SetInput(reader.GetOutput())
 
     # supported formats: point,line,boundary,centroid,area,face
-
     for name in feature.GetAnswer().split(","):
         if name == "point":
             gm.Message("Writing feature point")

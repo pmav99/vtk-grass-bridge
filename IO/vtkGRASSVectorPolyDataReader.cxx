@@ -44,7 +44,7 @@ vtkGRASSVectorPolyDataReader::vtkGRASSVectorPolyDataReader()
     this->Mapset = NULL;
     this->VectorName = NULL;
     this->CategoryArrayName = NULL;
-    this->SetCategoryArrayName("cats");
+    this->SetCategoryArrayName("cat");
     this->SetNumberOfInputPorts(0);
 
     this->Layer = 1;

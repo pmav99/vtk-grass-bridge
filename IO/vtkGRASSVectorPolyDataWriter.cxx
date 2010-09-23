@@ -263,8 +263,6 @@ void vtkGRASSVectorPolyDataWriter::AddCellDataToVectorMap(vtkCellData *celldata,
 
     numcols = cd->GetNumberOfArrays();
 
-    cd->Print(cerr);
-
     vtkGRASSDbmiInterface *db = writer->GetDbmiInterface();
 
     VGB_CREATE(vtkGRASSDbmiTable, table);
@@ -294,7 +292,7 @@ void vtkGRASSVectorPolyDataWriter::AddCellDataToVectorMap(vtkCellData *celldata,
         table->AppendColumn(col);
     }
 
-    cout << table->TableToSQL() << endl;
+    vtkDebugMacro(<< table->TableToSQL());
 
     // Create the table
     db->ConnectDBCreateTable(table);
@@ -336,7 +334,7 @@ void vtkGRASSVectorPolyDataWriter::AddCellDataToVectorMap(vtkCellData *celldata,
                 os << ",";
         }
         os << ")";
-        cout << os.str() << endl;
+        vtkDebugMacro(<< os.str());
         db->ExecuteImmediate(os.str().c_str());
         // The category was created
         catselect->SetValue((int)categories->GetTuple1(i), 1);

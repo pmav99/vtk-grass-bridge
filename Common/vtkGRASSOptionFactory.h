@@ -69,7 +69,7 @@ public:
   //!\brief Standard option for several vector input maps
   static int GetVectorInputsType(){return G_OPT_V_INPUTS;}
   //!\brief Standard option for a vector output map
-  static int GetVectorOutputype(){return G_OPT_V_OUTPUT;}
+  static int GetVectorOutputType(){return G_OPT_V_OUTPUT;}
   //!\brief Standard option for feature type of a vector map
   static int GetVectorFeatureType(){return G_OPT_V_TYPE;}
   //!\brief Standard option for the field index of a vector map

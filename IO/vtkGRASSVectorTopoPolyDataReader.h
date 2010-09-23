@@ -13,7 +13,7 @@
 */
 /**
  * \brief This class reads a grass vector map with topology support from a valid location/mapset
- * and creates a vtkPolyData as output.
+ * and creates a vtkPolyData output.
  *
  * Areas and isles are supported. Areas are representated as VTK_POLYGON and need to be triangulated
  * for pretty rendering. Additionally the categories, the type of an area (isle or not), the number of isles per
@@ -22,7 +22,7 @@
  * The can choose which feature typ should be created as output. Currently centroids, lines, points,
  * boundaries, areas and faces are supported. Only one feature type can be written to the output.
  * If you want to store different features in one poly data set, you need to create one reader for each feature type
- * and merge the output with the vtkAppendFilter.The points may be redundent.
+ * and merge the output with the vtkAppendFilter.The points may be redundant.
  * Use a point merger to remove redundant points from the dataset.
  *
  * To use this class make sure you are in a grass session and vtkGRASSInit was called first.

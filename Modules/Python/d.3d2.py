@@ -43,9 +43,6 @@ def main():
 
     raster =  vtkGRASSOptionFactory().CreateInstance(vtkGRASSOptionFactory.GetRasterInputType(), "elev")
     vector =  vtkGRASSOptionFactory().CreateInstance(vtkGRASSOptionFactory.GetVectorInputType(), "overlay")
-    feature = vtkGRASSOptionFactory().CreateInstance(vtkGRASSOptionFactory.GetVectorFeatureType())
-    feature.SetDefaultOptions("centroids,line,boundary")
-    feature.SetDefaultAnswer("centroids,line,boundary")
 
     scale = vtkGRASSOption()
     scale.SetKey("scale")

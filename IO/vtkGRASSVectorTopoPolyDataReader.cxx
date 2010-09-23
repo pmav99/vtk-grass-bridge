@@ -41,7 +41,7 @@ vtkGRASSVectorTopoPolyDataReader::vtkGRASSVectorTopoPolyDataReader() {
     this->VectorName = NULL;
     this->FeatureType = GV_POINTS;
     this->CategoryArrayName = NULL;
-    this->SetCategoryArrayName("cats");
+    this->SetCategoryArrayName("cat");
     this->SetNumberOfInputPorts(0);
 }
 
