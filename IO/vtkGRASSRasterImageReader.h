@@ -92,12 +92,18 @@ public:
     //! Enable or disable the interpretation of a NullValue
     vtkBooleanMacro(UseNullValue, int);
 
+    //! \brief Create a vtkImagedata with the same scalar type as the raster map
+    void ReadMapAsMapType(){this->SetMapTypeConversion(0);}
+    //! \brief Create a vtkImagedata with scalar type integer and convert the raster map type
+    void ReadMapAsInt(){this->SetMapTypeConversion(1);}
+    //! \brief Create a vtkImagedata with scalar type float and convert the raster map type
+    void ReadMapAsFloat(){this->SetMapTypeConversion(2);}
+    //! \brief Create a vtkImagedata with scalar type double and convert the raster map type
+    void ReadMapAsDouble(){this->SetMapTypeConversion(3);}
+
 protected:
   vtkGRASSRasterImageReader();
   ~vtkGRASSRasterImageReader();
-
-  vtkSetStringMacro(Mapset);
-  vtkSetMacro(RegionUsage, int);
 
   char *RasterName;
   char *Mapset;
@@ -106,12 +112,19 @@ protected:
   double NullValue;
   int UseNullValue;
 
+  int MapTypeConversion; // 0 == same as map, 1 == int, 2 == float, 3 == double
+
   int DataExtent[6];
   double DataSpacing[3];
   double DataOrigin[3];
 
   vtkGRASSRasterMapReader *RasterMap;
 
+  vtkSetStringMacro(Mapset);
+  vtkSetMacro(RegionUsage, int);
+
+  vtkSetMacro(MapTypeConversion, int);
+  
   vtkSetMacro(DataScalarType,int);
   void SetDataScalarTypeToDouble(){this->SetDataScalarType(VTK_DOUBLE);}
   void SetDataScalarTypeToFloat(){this->SetDataScalarType(VTK_FLOAT);}

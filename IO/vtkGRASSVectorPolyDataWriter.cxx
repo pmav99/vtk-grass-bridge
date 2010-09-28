@@ -230,8 +230,6 @@ void vtkGRASSVectorPolyDataWriter::AddCellDataToVectorMap(vtkCellData *celldata,
 
     numcols = celldata->GetNumberOfArrays();
 
-    cout << numcols << endl;
-
     // Return if nothing todo
     if(numcols == 0)
         return;
