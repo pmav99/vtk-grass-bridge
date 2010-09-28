@@ -44,6 +44,7 @@ vtkGRASSRasterImageReader::vtkGRASSRasterImageReader()
     this->DataExtent[5] = 0;
 
     this->DataScalarType = VTK_DOUBLE;
+    this->MapTypeConversion = 0; // Use the maptype as scalar type
 
     this->DataOrigin[0] = this->DataOrigin[1] = this->DataOrigin[2] = 0.0;
     this->DataSpacing[0] = this->DataSpacing[1] = this->DataSpacing[2] = 1.0;
@@ -116,19 +117,28 @@ vtkGRASSRasterImageReader::RequestInformation(
         return 0;
     }
 
-    if (this->RasterMap->GetMapType() == CELL_TYPE)
-    {
-        this->SetDataScalarTypeToInt();
-    }
-    else if (this->RasterMap->GetMapType() == FCELL_TYPE)
-    {
-        this->SetDataScalarTypeToFloat();
-    }
-    else
-    {
-        this->SetDataScalarTypeToDouble();
+
+    if(this->MapTypeConversion == 0) {
+        if (this->RasterMap->GetMapType() == CELL_TYPE)
+        {
+            this->SetDataScalarTypeToInt();
+        }
+        else if (this->RasterMap->GetMapType() == FCELL_TYPE)
+        {
+            this->SetDataScalarTypeToFloat();
+        }
+        else
+        {
+            this->SetDataScalarTypeToDouble();
+        }
     }
 
+    if(this->MapTypeConversion == 1)
+        this->SetDataScalarTypeToInt();
+    if(this->MapTypeConversion == 2)
+        this->SetDataScalarTypeToFloat();
+    if(this->MapTypeConversion == 3)
+        this->SetDataScalarTypeToDouble();
 
     // Init the image extent with the grass region settings
     this->DataExtent[0] = 0;

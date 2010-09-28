@@ -22,6 +22,7 @@
 #include "vtkGRASSRegion.h"
 #include "vtkGRASSRasterMapReader.h"
 #include "vtkDoubleArray.h"
+#include <vtkPointData.h>
 
 extern "C"
 {
@@ -79,6 +80,7 @@ vtkGRASSRasterImageWriterExecute(vtkGRASSRasterImageWriter *self, vtkImageData* 
         {
             for (x = 0; x < dims[0]; x++)
             {
+                //printf("z %i y %i x %i :: %g\n", z, y, x, (double) (ptr[z * dims[1] * dims[0] + y * dims[0] + x]));
                 row->SetTuple1(x, (double) (ptr[z * dims[1] * dims[0] + y * dims[0] + x]));
             }
             map->PutNextRow(row);
@@ -92,10 +94,12 @@ void
 vtkGRASSRasterImageWriter::SimpleExecute(vtkImageData* input, vtkImageData* output)
 {
 
-    void *ptr = input->GetScalarPointer();
+    void *ptr = input->GetPointData()->GetScalars()->GetVoidPointer(0);
     int dims[3];
 
     input->GetDimensions(dims);
+
+    input->Print(cout);
 
     VGB_CREATE(vtkGRASSRegion, region);
 
@@ -107,10 +111,6 @@ vtkGRASSRasterImageWriter::SimpleExecute(vtkImageData* input, vtkImageData* outp
     else if (this->RegionUsage == VTK_GRASS_REGION_DEFAULT)
     {
         region->ReadDefaultRegion();
-    }
-    else if (this->RegionUsage == VTK_GRASS_REGION_USER)
-    {
-        region->DeepCopy(this->RasterMap->GetRegion());
     }
 
     // We need to adjust the region to the image dimension
@@ -124,7 +124,6 @@ vtkGRASSRasterImageWriter::SimpleExecute(vtkImageData* input, vtkImageData* outp
     if(this->UseNullValue)
         this->RasterMap->UseNullValueOn();
 
-
     // Set the map data type
     if (input->GetScalarType() == VTK_CHAR ||
         input->GetScalarType() == VTK_UNSIGNED_CHAR ||
@@ -133,8 +132,12 @@ vtkGRASSRasterImageWriter::SimpleExecute(vtkImageData* input, vtkImageData* outp
         this->RasterMap->SetMapTypeToCELL();
     else if (input->GetScalarType() == VTK_FLOAT)
         this->RasterMap->SetMapTypeToFCELL();
+    else if (input->GetScalarType() == VTK_DOUBLE)
+        this->RasterMap->SetMapTypeToDCELL();
     else
         this->RasterMap->SetMapTypeToDCELL();
+
+    cout << input->GetScalarTypeAsString() << endl;
 
     // Now open the map
     if (!this->RasterMap->OpenMap(this->RasterName))
@@ -142,6 +145,8 @@ vtkGRASSRasterImageWriter::SimpleExecute(vtkImageData* input, vtkImageData* outp
         vtkErrorMacro( << "Error in vtkGRASSRasterMap: " << this->RasterMap->GetError());
         return;
     }
+
+    this->RasterMap->Print(cout);
 
     switch (input->GetScalarType()) {
         // This is simply a #define for a big case list. It handles all
