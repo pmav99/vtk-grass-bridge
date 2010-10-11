@@ -331,6 +331,8 @@ public:
     //!\brief Convert the grass feature type into a VTK cell id
     int GetVTKCellId();
 
+    //!\brief Deep copy the feature points
+    virtual bool DeepCopy(vtkGRASSVectorFeaturePoints *points);
 
 
 protected:

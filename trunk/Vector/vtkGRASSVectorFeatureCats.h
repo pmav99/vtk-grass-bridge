@@ -112,6 +112,9 @@ public:
        \return 0
      */
     virtual int Reset() {return Vect_reset_cats(this->cats);}
+    
+    //!\brief Return the number of categroies
+    virtual int GetNumberOfCats(){return this->cats->n_cats;}
 
     //BTX
     virtual struct line_cats *GetPointer() {
@@ -119,6 +122,9 @@ public:
     }
     //ETX
 
+    //!\brief Deep copy the feature categories
+    virtual bool DeepCopy(vtkGRASSVectorFeatureCats *cats);
+    
 protected:
     vtkGRASSVectorFeatureCats();
     ~vtkGRASSVectorFeatureCats();
