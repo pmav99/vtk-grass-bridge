@@ -42,9 +42,21 @@ vtkGRASSVectorFeaturePoints::vtkGRASSVectorFeaturePoints()
 
 vtkGRASSVectorFeaturePoints::~vtkGRASSVectorFeaturePoints()
 {
-
     if (this->points)
         Vect_destroy_line_struct(this->points);
+}
+
+//----------------------------------------------------------------------------
+
+bool vtkGRASSVectorFeaturePoints::DeepCopy(vtkGRASSVectorFeaturePoints *points)
+{
+    int i;
+    double *p;
+    this->Reset();
+    for(i = 0; i < points->GetNumberOfPoints(); i++) {
+        p = points->GetPoint(i);
+        this->AppendPoint(p[0], p[1], p[2]);
+    }
 }
 
 //----------------------------------------------------------------------------

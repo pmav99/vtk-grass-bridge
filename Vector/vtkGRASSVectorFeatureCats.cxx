@@ -46,6 +46,20 @@ vtkGRASSVectorFeatureCats::~vtkGRASSVectorFeatureCats()
 
 //----------------------------------------------------------------------------
 
+bool vtkGRASSVectorFeatureCats::DeepCopy(vtkGRASSVectorFeatureCats *cats)
+{
+    int i, field, cat;
+    this->Reset();
+    for(i = 0; i < cats->GetNumberOfCats(); i++)
+    {
+        field = cats->GetPointer()->field[i];
+        cat = cats->GetPointer()->cat[i];
+        this->AddCat(field, cat);
+    }
+}
+
+//----------------------------------------------------------------------------
+
 int
 vtkGRASSVectorFeatureCats::GetCat(int field)
 {
