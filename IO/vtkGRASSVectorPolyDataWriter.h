@@ -11,20 +11,15 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
 */
+
 /**
- * \brief This class reads a grass vector map without topology support from a valid location/mapset
- * and creates a vtkPolyData as output.
+ * \brief This class writes vtkPolyData as grass vector map into a valid location/mapset
  *
- * Areas and isles are not supported. The only data types which are supported are points and lines.
- * The category is saved as an integer cell data array and set to active. The points may be redundent.
- * Use a point merger to remove redundant points from the dataset.
+ * Points (vtkVertex), lines (vtkLine, vtkPolyLine), convex areas (vtlPolygon, vtkQuad) 
+ * and faces (vtkTriangle) are supported. Nested and overlapping areas are not supported.
+ * Centroids are computed for each area as center point.
  *
- * To use this class make sure you are in a grass session and vtkGRASSInit was called first.
- *
- * This class uses the vtkGRASSVecctorMapNoTopoReader to read the vector map.
- *
- * \TODO Implement Database support to write the dat from a database as cell data arrays.
- * \TODO Use vtkSmartPointer
+ * This class uses the vtkGRASSVecctorMapWriter to write the vector map.
  *
  * \author Soeren Gebbert
  * \author Berlin, Germany Sep. 2009
