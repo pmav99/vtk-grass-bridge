@@ -54,7 +54,7 @@ vtkGRASSVectorPolyDataWriter::vtkGRASSVectorPolyDataWriter()
     this->VectorName = NULL;
     this->CategoryArrayName = NULL;
     this->BuildTopoOff();
-    this->SetCategoryArrayName("cats");
+    this->SetCategoryArrayName("cat");
     this->SetNumberOfInputPorts(1);
     this->SetNumberOfOutputPorts(0);
 }
@@ -162,8 +162,7 @@ vtkGRASSVectorPolyDataWriter::RequestData(
                 feature->AppendPoint(point[0], point[1], point[2]);
             }
 
-            if (categories)
-                cats->AddCat(1, (int) categories->GetTuple1(i));
+            cats->AddCat(1, (int) categories->GetTuple1(i));
 
             // Only a subset of cells are supported
             if (cell->GetCellType() == VTK_VERTEX)
@@ -217,7 +216,7 @@ vtkGRASSVectorPolyDataWriter::RequestData(
     if(hasAreas) {
         // Clean the data, remove redundant points
         VGB_CREATE(vtkCleanPolyData, cleaner);
-        // Extract edges for poly data 
+        // Extract edges of polygons 
         VGB_CREATE(vtkExtractEdges, edges);
 
         cleaner->SetInput(input);
