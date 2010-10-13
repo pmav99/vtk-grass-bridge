@@ -17,14 +17,12 @@
  * It is specially designed to write nested, overlapping and non-convex areas as grass
  * vector data, so topology is consistent. 
  *
- * Two inputs are needed. The first input is vtkPolyData with vtkPolygons, 
- * vtkQuads or vtkTriangles which are converted into grass vector boundaries. The
+ * Two inputs are needed. The first input is vtkPolyData with vtkPolyLine or vtkLine, 
+ * which are written as grass vector boundaries. The
  * centroids must be specified as the second input. They will be attached to the
- * boundaries and reference the cell data of the first input.
- * 
- * Areas and centroids are identififed by there category. 
+ * boundaries and reference the cell data.
  *
- * This class uses the vtkGRASSVecctorMapWriter to write the vector map.
+ * This class uses the vtkGRASSVectorMapWriter to write the vector map.
  *
  * \author Soeren Gebbert
  * \author Berlin, Germany Sep. 2009
@@ -47,7 +45,12 @@ public:
   static vtkGRASSVectorPolyDataAreaWriter* New();
   vtkTypeRevisionMacro(vtkGRASSVectorPolyDataAreaWriter,vtkGRASSVectorPolyDataWriter);
   void PrintSelf(ostream& os, vtkIndent indent);
-
+  
+    //!\brief Set the boundaries
+  virtual void SetBoundaries(vtkDataObject *in) { this->SetInput(0,in); }
+  
+    //!\brief Set the centroids
+  virtual void SetCentroids(vtkDataObject *in) { this->SetInput(1,in); }
 
 protected:
   vtkGRASSVectorPolyDataAreaWriter();
