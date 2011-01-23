@@ -63,7 +63,7 @@ bool vtkGRASSFileLister::Refresh(){
   if(this->MapsetName == NULL)
     this->SetMapsetName(G_mapset());
   // Create the full path to the directoy
-  G__file_name(path, this->Element, "", this->MapsetName);
+  G_file_name(path, this->Element, "", this->MapsetName);
   if (access(path, 0) != 0) {
         G_snprintf(buff, 1024, "class: %s line: %i Unable to access path %s",
                     this->GetClassName(), __LINE__, path);

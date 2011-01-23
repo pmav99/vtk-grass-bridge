@@ -11,6 +11,8 @@
 #  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 #  GNU General Public License for more details.
 
+#TODO Validate the result of topo test 3 and 4. Removing of features does not work correctly.
+
 import unittest
 import subprocess
 from libvtkCommonPython import *
