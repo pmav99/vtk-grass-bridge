@@ -6,6 +6,7 @@ INCLUDE (${CMAKE_ROOT}/Modules/FindVTK.cmake)
 INCLUDE (CMake/FindGRASS.cmake)
 INCLUDE (CMake/FindGEOS.cmake)
 INCLUDE (${CMAKE_ROOT}/Modules/FindGDAL.cmake)
+INCLUDE (${CMAKE_ROOT}/Modules/FindPythonLibs.cmake)
 
 IF (USE_VTK_FILE)
   INCLUDE (${USE_VTK_FILE})

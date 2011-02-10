@@ -1,0 +1,76 @@
+/* 
+ * Program: vtkGRASSBridge
+ * COPYRIGHT: (C) 2009 by Soeren Gebbert, soerengebbert@googlemail.com
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; version 2 of the License.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+*/
+
+/**
+ *\class vtkTemporalDataSetSource
+ *
+ * 
+ */  
+
+
+#ifndef __vtkTemporalDataSetSource_h
+#define __vtkTemporalDataSetSource_h
+
+#include <vtkTemporalDataSetAlgorithm.h>
+#include <vtkDoubleArray.h>
+#include "vtkGRASSBridgeFilteringWin32Header.h"
+
+class VTK_GRASS_BRIDGE_FILTERING_EXPORT vtkTemporalDataSetSource : public vtkTemporalDataSetAlgorithm
+{
+public:
+  vtkTypeRevisionMacro(vtkTemporalDataSetSource,vtkTemporalDataSetAlgorithm);
+  void PrintSelf(ostream& os, vtkIndent indent);
+  static vtkTemporalDataSetSource *New();
+
+  //!\brief Set the time range and the time steps for each input connection. The id of
+  //! the time step in the double array is related to the input port of the input data set
+  //! IMPORTANT! This Method must be set before any SetInput method is called, because
+  //! the number of input ports is computed based on this value.
+  virtual bool SetTimeRange(double min, double max, vtkDoubleArray *timeSteps);
+  //!\brief Get the time range [min, max]
+  vtkGetVectorMacro(TimeRange, double, 2);
+  //!\brief Get the time steps double array
+  vtkGetObjectMacro(TimeSteps, vtkDoubleArray);
+  //!\brief Get the number of diskrete time steps
+  vtkGetMacro(DiscreteTimeSteps, int);
+  
+protected:
+  vtkTemporalDataSetSource();
+  ~vtkTemporalDataSetSource();
+  
+  vtkSetMacro(DiscreteTimeSteps, int);
+  
+  //!\brief Populate the time range and time steps in pipeline 
+  virtual int RequestInformation (vtkInformation *, 
+                                  vtkInformationVector **, 
+                                  vtkInformationVector *);
+
+  //!\brief Combine the inputs and the time steps to a vtkTemporalDataSet
+  virtual int RequestData(vtkInformation *request,
+                          vtkInformationVector** inputVector,
+                          vtkInformationVector* outputVector);
+
+  //!\brief We accept only vtkDataSets as inputs
+  virtual int FillInputPortInformation(int port, vtkInformation* info);
+
+  double TimeRange[2];
+  vtkDoubleArray *TimeSteps;
+  int DiscreteTimeSteps;
+  
+private:
+  vtkTemporalDataSetSource(const vtkTemporalDataSetSource&);  // Not implemented.
+  void operator=(const vtkTemporalDataSetSource&);  // Not implemented.
+};
+
+#endif
