@@ -36,7 +36,7 @@ public:
   //!\brief Set the time range and the time steps for each input connection. The id of
   //! the time step in the double array is related to the input port of the input data set
   //! IMPORTANT! This Method must be set before any SetInput method is called, because
-  //! the number of input ports is computed based on this value.
+  //! the number of input ports is computed based on these values.
   virtual bool SetTimeRange(double min, double max, vtkDoubleArray *timeSteps);
   //!\brief Get the time range [min, max]
   vtkGetVectorMacro(TimeRange, double, 2);
