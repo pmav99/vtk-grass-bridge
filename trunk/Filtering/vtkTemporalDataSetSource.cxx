@@ -85,7 +85,7 @@ bool vtkTemporalDataSetSource::SetTimeRange(double min, double max, vtkDoubleArr
   
   this->TimeSteps->DeepCopy(timeSteps);
   
-  cout << "Number of time steps " << this->DiscreteTimeSteps << endl;
+  cerr << "Number of time steps " << this->DiscreteTimeSteps << endl;
   
   return true;
 }
@@ -149,6 +149,6 @@ int vtkTemporalDataSetSource::FillInputPortInformation(int vtkNotUsed(port), vtk
 void vtkTemporalDataSetSource::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
-  os << indent << "Number of diskrete time steps: " << this->DiscreteTimeSteps << endl;
+  os << indent << "Number of discrete time steps: " << this->DiscreteTimeSteps << endl;
   os << indent << "Time range min: " << this->TimeRange[0] << " max: " << this->TimeRange[1] << endl;
 }

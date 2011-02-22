@@ -18,10 +18,13 @@ from vtk import *
 from libvtkGRASSBridgeFilteringPython import *
 from libvtkGRASSBridgeCommonPython import *
 
-class vtkTemporalDataSetSourceTest(unittest.TestCase):
+class vtkDataSetToRdataFrameTest(unittest.TestCase):
     
     def setUp(self):
-                
+        
+        # Set up the temporal dataset
+        self.tds = vtkTemporalDataSet()
+        
         data = vtkDoubleArray()
         data.SetNumberOfTuples(25)
         data.SetName("data")
@@ -47,25 +50,29 @@ class vtkTemporalDataSetSourceTest(unittest.TestCase):
         
     def test1(self):
         
-        # We need to set the pipeline structure to composite rather then demand driven
-        prototype = vtkCompositeDataPipeline()
-        vtkAlgorithm.SetDefaultExecutivePrototype(prototype)
+        riface = vtkRInterface()
+        for i in range(self.ds1.GetPointData().GetNumberOfArrays()):
+            array = self.ds1.GetPointData().GetArray(i)
+            riface.AssignVTKDataArrayToRVariable(array, array.GetName())
+            print "Added variable " + array.GetName() + " to R"
+            
+        riface.EvalRscript("ls()", True)
+        riface.EvalRscript("x <- c(1,2,3,4,5,6,7,8)", True)
         
-	timesteps = vtkDoubleArray()
-	timesteps.SetNumberOfTuples(2)
-	timesteps.SetNumberOfComponents(1)
-	timesteps.SetValue(0, 0.5)
-	timesteps.SetValue(1, 1.5)
-
-	timesource = vtkTemporalDataSetSource()
-	timesource.SetTimeRange(0, 2, timesteps)
-	timesource.SetInput(0, self.ds1)
-	timesource.SetInput(1, self.ds2)
-	timesource.Update()
-
-        print timesource
-        print timesource.GetOutput()
+    def test2(self):
+        
+        riface = vtkRInterface()
+        ia = riface.AssignRVariableToVTKDataArray("x")
+        print ia         
+                        
+    def test3(self):
+        
+        riface = vtkRInterface()
+        riface.EvalRscript("x = runif(100, -0.5, 0.5)", True)
+        ia = riface.AssignRVariableToVTKDataArray("x")
+        print ia    
+  
         
 if __name__ == '__main__':
-    suite1 = unittest.TestLoader().loadTestsFromTestCase(vtkTemporalDataSetSourceTest)
+    suite1 = unittest.TestLoader().loadTestsFromTestCase(vtkDataSetToRdataFrameTest)
     unittest.TextTestRunner(verbosity=2).run(suite1) 
