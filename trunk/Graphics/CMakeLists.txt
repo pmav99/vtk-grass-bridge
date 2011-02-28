@@ -5,10 +5,12 @@
 #
 
 SET (Graphics_SRCS
+  vtkRInterfaceSpatial.cxx
 )
 
 SET (Graphics_H
-vtkGRASSBridgeGraphicsWin32Header.h
+  vtkGRASSBridgeGraphicsWin32Header.h
+  vtkRInterfaceSpatial.h
 )
 # --------------------------------------------------------------------------
 # You probably do not need to modify anything below this line
@@ -16,6 +18,27 @@ vtkGRASSBridgeGraphicsWin32Header.h
 # Create the vtkGRASSBridgeGraphics C++ library.
 ADD_LIBRARY (vtkGRASSBridgeGraphics ${Graphics_SRCS} ${Graphics_H})
 TARGET_LINK_LIBRARIES(vtkGRASSBridgeGraphics vtkGRASSBridgeCommon vtkFiltering vtkGraphics)
+
+# Create the vtkGRASSBridgeGraphics Java library.
+IF (VTK_WRAP_JAVA AND VTK_GRASS_BRIDGE_WRAP_JAVA)
+  VTK_WRAP_JAVA3 (vtkGRASSBridgeGraphicsJava GraphicsJava_SRCS "${Graphics_SRCS}")
+  ADD_LIBRARY (vtkGRASSBridgeGraphicsJava SHARED ${GraphicsJava_SRCS})
+  TARGET_LINK_LIBRARIES (vtkGRASSBridgeGraphicsJava vtkGRASSBridgeGraphics vtkGraphicsJava vtkCommonJava)
+
+  INSTALL_TARGETS(/lib vtkGRASSBridgeGraphicsJava)
+ENDIF (VTK_WRAP_JAVA AND VTK_GRASS_BRIDGE_WRAP_JAVA)
+
+# Create the vtkGRASSBridgeGraphics Python library.
+IF (VTK_WRAP_PYTHON AND VTK_GRASS_BRIDGE_WRAP_PYTHON)
+  VTK_WRAP_PYTHON3 (vtkGRASSBridgeGraphicsPython GraphicsPython_SRCS "${Graphics_SRCS}")
+  ADD_LIBRARY (vtkGRASSBridgeGraphicsPythonD ${GraphicsPython_SRCS})
+  ADD_LIBRARY (vtkGRASSBridgeGraphicsPython MODULE vtkGRASSBridgeGraphicsPythonInit.cxx)
+  TARGET_LINK_LIBRARIES(vtkGRASSBridgeGraphicsPythonD vtkGRASSBridgeGraphics vtkGraphicsPythonD vtkCommonPythonD)
+  TARGET_LINK_LIBRARIES(vtkGRASSBridgeGraphicsPython vtkGRASSBridgeGraphicsPythonD)
+
+
+  INSTALL_TARGETS(/lib vtkGRASSBridgeGraphicsPython vtkGRASSBridgeGraphicsPythonD)
+ENDIF (VTK_WRAP_PYTHON AND VTK_GRASS_BRIDGE_WRAP_PYTHON)
 
 IF (VTK_USE_HYBRID)
   TARGET_LINK_LIBRARIES (vtkGRASSBridgeGraphics vtkHybrid)

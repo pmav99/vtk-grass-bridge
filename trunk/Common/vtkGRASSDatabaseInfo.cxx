@@ -33,6 +33,7 @@ vtkGRASSDatabaseInfo::vtkGRASSDatabaseInfo() {
     this->CurrentLocationTitle = NULL;
     this->CurrentMapsetName = NULL;
     this->GisBasePath = NULL;
+    this->Proj4String = NULL;
     this->Projection = 0;
 
     this->AvailableMapSets = vtkStringArray::New();
@@ -63,6 +64,9 @@ vtkGRASSDatabaseInfo::~vtkGRASSDatabaseInfo() {
 
 bool vtkGRASSDatabaseInfo::Refresh(){
 
+  char *buff = NULL;
+  size_t n;
+  
   TRY
   this->AvailableMapSets->Initialize();
 
@@ -72,6 +76,15 @@ bool vtkGRASSDatabaseInfo::Refresh(){
   this->SetGisBasePath(G_gisbase());
   this->SetCurrentLocationPath(G_location_path());
   this->SetProjection(G_projection());
+  
+  // TODO: Check if this works on windows too
+  // Get the projection string
+  FILE *out = popen("g.proj -jf", "r");
+  // Read the first line
+  getline(&buff, &n, out);
+  // Set the proj4 string
+  if(buff)
+    this->SetProj4String(buff);
 
   char ** mapsets = G_available_mapsets();
   
@@ -97,6 +110,7 @@ void vtkGRASSDatabaseInfo::PrintSelf(ostream& os, vtkIndent indent) {
     os << indent << "CurrentLocationTitle: " << (this->CurrentLocationTitle?this->CurrentLocationTitle : "none") << endl;
     os << indent << "CurrentMapsetName: " << (this->CurrentMapsetName?this->CurrentMapsetName : "none") << endl;
     os << indent << "GisBasePath: " << (this->GisBasePath?this->GisBasePath : "none") << endl;
+    os << indent << "Proj4 string: " << (this->Proj4String) << endl;
     os << indent << "Projection: " << (this->Projection) << endl;
 
     os << indent << "Available Mapsets: " << endl;

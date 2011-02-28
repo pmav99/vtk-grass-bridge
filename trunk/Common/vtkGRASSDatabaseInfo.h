@@ -41,6 +41,7 @@ public:
   vtkGetStringMacro(CurrentLocationTitle);
   vtkGetStringMacro(GisBasePath);
   vtkGetStringMacro(CurrentLocationPath);
+  vtkGetStringMacro(Proj4String);
   vtkGetMacro(Projection, int);
 
   vtkGetObjectMacro(AvailableMapSets, vtkStringArray);
@@ -56,6 +57,7 @@ protected:
   vtkSetStringMacro(CurrentLocationTitle);
   vtkSetStringMacro(GisBasePath);
   vtkSetStringMacro(CurrentLocationPath);
+  vtkSetStringMacro(Proj4String);
   vtkSetMacro(Projection, int);
 
   char *CurrentLocationName;
@@ -63,6 +65,7 @@ protected:
   char *CurrentLocationTitle;
   char *GisBasePath;
   char *CurrentLocationPath;
+  char *Proj4String;
   int Projection;
   vtkStringArray *AvailableMapSets;
 
