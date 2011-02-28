@@ -14,12 +14,7 @@
 import unittest
 import os
 import subprocess
-from libvtkCommonPython import *
-from libvtkFilteringPython import *
-from libvtkGraphicsPython import *
-from libvtkRenderingPython import *
-from libvtkIOPython import *
-from libvtkImagingPython import *
+from vtk import *
 from libvtkGRASSBridgeIOPython import *
 from libvtkGRASSBridgeRasterPython import *
 from libvtkGRASSBridgeVectorPython import *

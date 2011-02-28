@@ -13,7 +13,7 @@
 
 import unittest
 import subprocess
-from libvtkCommonPython import *
+from vtk import *
 from libvtkGRASSBridgeCommonPython import *
 from libvtkGRASSBridgeVectorPython import *
 from libvtkGRASSBridgeDbmiPython import *

@@ -161,9 +161,9 @@ vtkGRASSVectorMapBase::GetTotalNumberOfPoints()
 
     VGB_CREATE(vtkGRASSVectorFeaturePoints, points);
     VGB_CREATE(vtkGRASSVectorFeatureCats, cats);
-    //vtkGRASSVectorFeaturePoints *points = vtkGRASSVectorFeaturePoints::New();
-    //vtkGRASSVectorFeatureCats *cats = vtkGRASSVectorFeatureCats::New();
 
+    this->TotalNumberOfPoints = 0;
+    
     if (!setjmp(vgb_stack_buffer))
     {
         while (0 < this->ReadNextFeature(points, cats))
@@ -173,8 +173,6 @@ vtkGRASSVectorMapBase::GetTotalNumberOfPoints()
     }
     else
     {
-        points->Delete();
-        cats->Delete();
         return -1;
     }
 
@@ -182,8 +180,6 @@ vtkGRASSVectorMapBase::GetTotalNumberOfPoints()
 
     this->Initiated = true;
 
-    points->Delete();
-    cats->Delete();
     return this->TotalNumberOfPoints;
 }
 

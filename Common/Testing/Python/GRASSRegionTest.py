@@ -15,7 +15,7 @@
 
 import unittest
 import os
-from libvtkCommonPython import *
+from vtk import *
 from libvtkGRASSBridgeCommonPython import *
 
 

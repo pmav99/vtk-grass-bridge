@@ -16,6 +16,8 @@
  * \brief This is the base class to list database files located in a mapset
  *
  * The list of files is stored in a vtkStringArray.
+ * 
+ * \TODO: The grass7 api for file access changed and must be implemented 
  *
  * \author Soeren Gebbert
  * \author Berlin, Germany Aug. 2009

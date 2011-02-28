@@ -1,20 +1,17 @@
-/*=========================================================================
+/* 
+ * Program: vtkGRASSBridge
+ * COPYRIGHT: (C) 2009 by Soeren Gebbert, soerengebbert@googlemail.com
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; version 2 of the License.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+*/
 
- Program:   Visualization Toolkit
- Module:    $RCSfile: vtkTemporalDataSetSource.cxx,v $
-
- Copyright (c) Ken Martin, Will Schroeder, Bill Lorensen
- All rights reserved.
- See Copyright.txt or http://www.kitware.com/Copyright.htm for details.
-
- This software is distributed WITHOUT ANY WARRANTY; without even
- the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
- PURPOSE.  See the above copyright notice for more information.
-     
-  Modified for better polydata support by Soeren Gebbert
-  soerengebbert (at) googlemail (dot) com
-     
- =========================================================================*/
 #include "vtkTemporalDataSetSource.h"
 
 #include <vtkBitArray.h>
@@ -48,12 +45,14 @@ vtkTemporalDataSetSource::vtkTemporalDataSetSource()
 }
 
 //-----------------------------------------------------------------------
+
 vtkTemporalDataSetSource::~vtkTemporalDataSetSource()
 {
   this->TimeSteps->Delete();
 }
 
 //-----------------------------------------------------------------------
+
 bool vtkTemporalDataSetSource::SetTimeRange(double min, double max, vtkDoubleArray *timeSteps)
 {
   if(min < 0.0 || min > max)
@@ -91,12 +90,13 @@ bool vtkTemporalDataSetSource::SetTimeRange(double min, double max, vtkDoubleArr
 }
 
 //-----------------------------------------------------------------------
+
 int vtkTemporalDataSetSource::RequestInformation(
   vtkInformation *vtkNotUsed(request),
   vtkInformationVector **vtkNotUsed(inputVector),
   vtkInformationVector *outputVector)
 {
-  vtkInformation *info=outputVector->GetInformationObject(0);
+  vtkInformation *info = outputVector->GetInformationObject(0);
 
   // Set the time steps
   if (this->DiscreteTimeSteps)
@@ -116,6 +116,7 @@ int vtkTemporalDataSetSource::RequestInformation(
 }
 
 //-----------------------------------------------------------------------
+
 int vtkTemporalDataSetSource::RequestData(vtkInformation* vtkNotUsed( request ), vtkInformationVector** inputVector,
                                           vtkInformationVector* outputVector)
 {
@@ -139,6 +140,7 @@ int vtkTemporalDataSetSource::RequestData(vtkInformation* vtkNotUsed( request ),
 }
 
 //-----------------------------------------------------------------------
+
 int vtkTemporalDataSetSource::FillInputPortInformation(int vtkNotUsed(port), vtkInformation* info)
 {
   info->Set(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkDataSet");
@@ -146,6 +148,7 @@ int vtkTemporalDataSetSource::FillInputPortInformation(int vtkNotUsed(port), vtk
 }
 
 //-----------------------------------------------------------------------
+
 void vtkTemporalDataSetSource::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
