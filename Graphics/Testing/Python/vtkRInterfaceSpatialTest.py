@@ -26,7 +26,7 @@ firstCheck = False
 class vtkRInterfaceSpatialTest(unittest.TestCase):
     
     def setUp(self):    
-        # Start hte interface
+        # Start the interface
         self.riface = vtkRInterfaceSpatial()
             
         global firstCheck
@@ -120,7 +120,7 @@ class vtkRInterfaceSpatialTest(unittest.TestCase):
         grassdb = vtkGRASSDatabaseInfo()
         proj4string = grassdb.GetProj4String()
         
-        #self.riface.SetProj4String(proj4string)
+        self.riface.SetProj4String(proj4string)
         self.riface.AssignVTKPointSetToRSpatialPointsDataFrame(ctop.GetOutput(), "spdf")
         
         # Save the workspace for testing
@@ -133,17 +133,15 @@ class vtkRInterfaceSpatialTest(unittest.TestCase):
     def test3SpatialGridDataFrame(self):
         
         init = vtkGRASSInit()
-        init.Init("test2SpatialPointsDataFrame")
+        init.Init("test3SpatialGridDataFrame")
         init.ExitOnErrorOn()
         
         rs = vtkGRASSRasterImageReader()
         rs.SetRasterName("random_cells")
         rs.Update()
         
-#        ctop = vtkCellDataToPointData()
-#        ctop.SetInputConnection(rs.GetOutputPort())
-#        ctop.Update()
-                
+        print rs.GetOutput()
+                                
         grassdb = vtkGRASSDatabaseInfo()
         proj4string = grassdb.GetProj4String()
         

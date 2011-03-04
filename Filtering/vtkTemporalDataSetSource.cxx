@@ -84,7 +84,7 @@ bool vtkTemporalDataSetSource::SetTimeRange(double min, double max, vtkDoubleArr
   
   this->TimeSteps->DeepCopy(timeSteps);
   
-  cerr << "Number of time steps " << this->DiscreteTimeSteps << endl;
+  //cerr << "Number of time steps " << this->DiscreteTimeSteps << endl;
   
   return true;
 }

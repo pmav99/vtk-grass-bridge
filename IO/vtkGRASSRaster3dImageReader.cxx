@@ -131,12 +131,9 @@ vtkGRASSRaster3dImageReader::RequestInformation(
     this->DataSpacing[2] = this->Raster3dMap->GetRegion()->GetTopBottomResolution();
     // The Scalars are point data. So the points are located in the center of the grass pixel
     // so we have to adjust the origin.
-    this->DataOrigin[0] = this->Raster3dMap->GetRegion()->GetWesternEdge() +
-        this->Raster3dMap->GetRegion()->GetEastWestResolution() / 2.0;
-    this->DataOrigin[1] = this->Raster3dMap->GetRegion()->GetSouthernEdge() +
-        this->Raster3dMap->GetRegion()->GetNorthSouthResolution() / 2.0;
-    this->DataOrigin[2] = this->Raster3dMap->GetRegion()->GetBottom() +
-        this->Raster3dMap->GetRegion()->GetTopBottomResolution() / 2.0;
+    this->DataOrigin[0] = this->Raster3dMap->GetRegion()->GetWesternEdge();
+    this->DataOrigin[1] = this->Raster3dMap->GetRegion()->GetSouthernEdge();
+    this->DataOrigin[2] = this->Raster3dMap->GetRegion()->GetBottom();
 
     // get the info objects
     vtkInformation* outInfo = outputVector->GetInformationObject(0);

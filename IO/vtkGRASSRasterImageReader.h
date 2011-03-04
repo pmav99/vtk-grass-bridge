@@ -100,6 +100,15 @@ public:
     void ReadMapAsFloat(){this->SetMapTypeConversion(2);}
     //! \brief Create a vtkImagedata with scalar type double and convert the raster map type
     void ReadMapAsDouble(){this->SetMapTypeConversion(3);}
+    
+    //! \brief Read the GRASS raster image values as cell data rather then point data which is the default.
+    //! Is set true the layout of the image will change (number of raster pixels are now number of cells)
+    vtkSetMacro(AsCellData, int);
+    //! \brief Read the GRASS raster image values as cell data rather then point data which is the default
+    vtkGetMacro(AsCellData, int);
+    //! \brief Read the GRASS raster image values as cell data rather then point data which is the default.
+    //! Is set true the layout of the image will change (number of raster pixels are now number of cells)
+    vtkBooleanMacro(AsCellData, int);
 
 protected:
   vtkGRASSRasterImageReader();
@@ -111,6 +120,8 @@ protected:
   int RegionUsage;
   double NullValue;
   int UseNullValue;
+  
+  int AsCellData;
 
   int MapTypeConversion; // 0 == same as map, 1 == int, 2 == float, 3 == double
 
