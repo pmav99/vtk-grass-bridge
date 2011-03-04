@@ -13,6 +13,7 @@
 
 import unittest
 import os
+import subprocess
 from vtk import *
 from libvtkGRASSBridgeIOPython import *
 from libvtkGRASSBridgeCommonPython import *
@@ -21,33 +22,43 @@ firstCheck = False
 
 class GRASSRasterSourceTest(unittest.TestCase):
     def setUp(self):
+        global firstCheck
+        if firstCheck == False:
+            init = vtkGRASSInit()
+            init.Init("GRASSRasterSourceTest")
+            init.ExitOnErrorOn()
 
-        init = vtkGRASSInit()
-        init.Init("GRASSRasterSourceTest")
-        init.ExitOnErrorOn()
-
+            inputlist = ["g.region", "-d"]
+            proc = subprocess.Popen(args=inputlist)
+            proc.communicate()
+            
+            inputlist = ["r.random.cells", "--o", "output=random_cells", "distance=10.0"]
+            proc = subprocess.Popen(args=inputlist)
+            proc.communicate()
+            firstCheck = True  
+            
     def testRegion(self):
 
         rs = vtkGRASSRasterImageReader()
-        rs.SetRasterName("lsat7_2002_80")
+        rs.SetRasterName("random_cells")
         rs.UseCurrentRegion()
 	rs.Update()
         print rs.GetOutput()
 
         rs = vtkGRASSRasterImageReader()
-        rs.SetRasterName("lsat7_2002_80")
+        rs.SetRasterName("random_cells")
         rs.UseDefaultRegion()
 	rs.Update()
         print rs.GetOutput()
         
         rs = vtkGRASSRasterImageReader()
-        rs.SetRasterName("lsat7_2002_80")
+        rs.SetRasterName("random_cells")
         rs.UseRasterRegion()
 	rs.Update()
         print rs.GetOutput()
         
         rs = vtkGRASSRasterImageReader()
-        rs.SetRasterName("lsat7_2002_80")
+        rs.SetRasterName("random_cells")
         rs.UseDefaultRegion()
 	rs.Update()
         print rs.GetOutput()
@@ -55,56 +66,63 @@ class GRASSRasterSourceTest(unittest.TestCase):
     def testReadWrite(self):
 
         reader = vtkGRASSRasterImageReader()
-        reader.SetRasterName("lsat7_2002_80")
+        reader.SetRasterName("random_cells")
         reader.UseRasterRegion()
 	reader.Update()
         print reader.GetOutput()
 
         writer = vtkGRASSRasterImageWriter()
-        writer.SetRasterName("test_lsat7")
+        writer.SetRasterName("test_random_cells")
         writer.SetRegion(reader.GetRegion())
         writer.UseUserDefinedRegion()
         writer.SetInputConnection(reader.GetOutputPort())
 	writer.Update()
         print writer.GetOutput()
 
-    def testSmoke(self):
+    def testSmokePoint(self):
 
         rs = vtkGRASSRasterImageReader()
-        rs.SetRasterName("lsat7_2002_80")
+        rs.SetRasterName("random_cells")
         rs.UseRasterRegion()
 	rs.Update()
-        print rs.GetRegion()
-        print rs.GetOutput()
+        #print rs.GetRegion()
+        #print rs.GetOutput()
 
-        #filter = vtkImageGradient()
-        #filter = vtkImageIslandRemoval2D()
-        #filter = vtkImageLaplacian()
-        #filter = vtkImageMagnitude()
-        #filter = vtkImageNormalize()
-        #filter = vtkImageSobel2D()
-        filter = vtkImageGaussianSmooth()
-        filter.SetInputConnection(rs.GetOutputPort())
+        viewInt = vtkRenderWindowInteractor()
 
-        viewInt1 = vtkRenderWindowInteractor()
+        viewer = vtkImageViewer()
+        viewer.SetInputConnection(rs.GetOutputPort())
+        viewer.SetColorWindow(255)
+        viewer.SetupInteractor(viewInt)
+        viewer.Render()
 
-        viewer1 = vtkImageViewer2()
-        viewer1.SetInputConnection(filter.GetOutputPort())
-        viewer1.SetColorWindow(255)
-        viewer1.SetupInteractor(viewInt1)
-        viewer1.Render()
+        viewInt.Start()
 
-        viewInt2 = vtkRenderWindowInteractor()
 
-        viewer2 = vtkImageViewer2()
-        viewer2.SetInputConnection(rs.GetOutputPort())
-        viewer2.SetColorWindow(255)
-        viewer2.SetupInteractor(viewInt2)
-        viewer2.Render()
+    def testSmokeCell(self):
 
-        viewInt1.Start()
-        viewInt2.Start()
+        rs = vtkGRASSRasterImageReader()
+        rs.SetRasterName("random_cells")
+        rs.AsCellDataOn()
+        rs.UseRasterRegion()
+	rs.Update()
+        #print rs.GetRegion()
+        #print rs.GetOutput()
+        
+        writer = vtkStructuredPointsWriter()
+        writer.SetInputConnection(rs.GetOutputPort())
+        writer.SetFileName("/tmp/test.vtk")
+        writer.Write()
 
+        viewInt = vtkRenderWindowInteractor()
+        viewer = vtkImageViewer()
+        viewer.SetInputConnection(rs.GetOutputPort())
+        viewer.SetColorWindow(255)
+        viewer.SetupInteractor(viewInt)
+        viewer.Render()
+
+        viewInt.Start()
+        
 if __name__ == '__main__':
     suite = unittest.TestLoader().loadTestsFromTestCase(GRASSRasterSourceTest)
     unittest.TextTestRunner(verbosity=2).run(suite)

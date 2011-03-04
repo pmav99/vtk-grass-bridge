@@ -21,7 +21,9 @@
 #include <vtkStreamingDemandDrivenPipeline.h>
 #include "vtkGRASSRegion.h"
 #include "vtkGRASSRasterMapReader.h"
-#include "vtkDataArray.h"
+#include <vtkDataArray.h>
+#include <vtkPointData.h>
+#include <vtkCellData.h>
 
 extern "C"
 {
@@ -61,8 +63,8 @@ vtkGRASSRasterImageReader::vtkGRASSRasterImageReader()
 
     this->NullValue = this->RasterMap->GetNullValue();
     this->UseNullValue = 1;
-
-    //G_gisinit("vtkGRASSRasterImageReader");
+    
+    this->AsCellDataOff();
 }
 
 //----------------------------------------------------------------------------
@@ -142,21 +144,25 @@ vtkGRASSRasterImageReader::RequestInformation(
 
     // Init the image extent with the grass region settings
     this->DataExtent[0] = 0;
-    this->DataExtent[1] = this->RasterMap->GetNumberOfCols() - 1;
     this->DataExtent[2] = 0;
-    this->DataExtent[3] = this->RasterMap->GetNumberOfRows() - 1;
     this->DataExtent[4] = 0;
     this->DataExtent[5] = 0;
 
     this->DataSpacing[0] = this->RasterMap->GetRegion()->GetEastWestResolution();
     this->DataSpacing[1] = this->RasterMap->GetRegion()->GetNorthSouthResolution();
-    // The Scalars are point data. So the points are located in the center of the grass pixel
-    // so we have to adjust the origin.
-    this->DataOrigin[0] = this->RasterMap->GetRegion()->GetWesternEdge() +
-        this->RasterMap->GetRegion()->GetEastWestResolution() / 2.0;
-    this->DataOrigin[1] = this->RasterMap->GetRegion()->GetSouthernEdge() +
-        this->RasterMap->GetRegion()->GetNorthSouthResolution() / 2.0;
+    
+    this->DataOrigin[0] = this->RasterMap->GetRegion()->GetWesternEdge();
+    this->DataOrigin[1] = this->RasterMap->GetRegion()->GetSouthernEdge();
     this->DataOrigin[2] = 0;
+
+    // The grass raster cells can be represented as points or as pixel in the vtkImageData
+    if(this->AsCellData == 1) {
+      this->DataExtent[1] = this->RasterMap->GetNumberOfCols();
+      this->DataExtent[3] = this->RasterMap->GetNumberOfRows();
+    } else {
+      this->DataExtent[1] = this->RasterMap->GetNumberOfCols() - 1;
+      this->DataExtent[3] = this->RasterMap->GetNumberOfRows() - 1;
+    }
 
     // get the info objects
     vtkInformation* outInfo = outputVector->GetInformationObject(0);
@@ -215,16 +221,61 @@ vtkGRASSRasterImageReader::ExecuteData(vtkDataObject *output)
 
     vtkImageData *data = this->AllocateOutputData(output);
     int *outExt = data->GetExtent();
-    void *outPtr = data->GetScalarPointerForExtent(outExt);
+    void *outPtr = NULL;
+    
+    
+    if(this->AsCellData)
+    {
+      int row, col, rowcount;
+      
+      vtkDataArray *cellscalars;
+      cellscalars = vtkDataArray::CreateDataArray(this->GetDataScalarType());
+      cellscalars->SetNumberOfComponents(1);
+      cellscalars->SetNumberOfTuples((this->DataExtent[1] + 0)*(this->DataExtent[3] + 0));
+      cellscalars->SetName(this->RasterName);
+      
+      vtkDataArray *pointscalars;
+      pointscalars = vtkDataArray::CreateDataArray(this->GetDataScalarType());
+      pointscalars->SetNumberOfComponents(1);
+      pointscalars->SetNumberOfTuples((this->DataExtent[1] + 1)*(this->DataExtent[3] + 1));
+      pointscalars->SetName(this->RasterName);
+      pointscalars->FillComponent(0, 0.0);
+      
+      vtkGRASSRasterMapReader *map = this->GetRasterMap();
+      vtkDataArray *rasterrow;
 
+      // Read the data row by row. GRASS counts the rows from the top left corner,
+      // While VTK counts from bottom left
+      rowcount = 0;
+      for(row = 0; row < this->DataExtent[3]; row ++)
+      {
+        rasterrow = map->GetRow(row);
+                
+        for(col = 0; col < this->DataExtent[1]; col++)
+        {
+          cellscalars->SetTuple1(row*this->DataExtent[1] + col, rasterrow->GetTuple1(col));
+          //pointscalars->SetTuple1(row*(this->DataExtent[1] + 1) + col + 1, rasterrow->GetTuple1(col));
+        }
+      }
+            
+      data->GetCellData()->SetScalars(cellscalars);
+      data->GetPointData()->SetScalars(pointscalars);
+      cellscalars->Delete(); 
+      pointscalars->Delete();
+      
+    } else {
+      outPtr = data->GetScalarPointerForExtent(outExt);
 
-    // Call the correct templated function for the output
-    switch (this->GetDataScalarType()) {
-        vtkTemplateMacro(vtkGRASSRasterImageReaderExecute(this, data,
-                                                          static_cast<VTK_TT *> (outPtr),
-                                                          outExt));
-    default:
-        vtkErrorMacro( << "Execute: Unknown data type");
+      // Call the correct templated function for the output
+      switch (this->GetDataScalarType()) {
+          vtkTemplateMacro(vtkGRASSRasterImageReaderExecute(this, data,
+                                                            static_cast<VTK_TT *> (outPtr),
+                                                            outExt));
+      default:
+          vtkErrorMacro( << "Execute: Unknown data type");
+      }
+      // Set the name of the scalar array to the raster file name
+      data->GetPointData()->GetScalars()->SetName(this->RasterName);
     }
 
     // All work is done. now we can close the map
