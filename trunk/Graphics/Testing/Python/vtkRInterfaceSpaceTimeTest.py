@@ -113,7 +113,7 @@ class vtkRInterfaceSpaceTimeTest(unittest.TestCase):
         rs.SetRasterName("random_cells")
         rs.Update()
         
-        # We generate three time steps 0d, 1d, 2d, 3d, 4d
+        # We generate five time steps 0d, 1d, 2d, 3d, 4d
         timeSteps = vtkDoubleArray()
         timeSteps.InsertNextValue(0)
         timeSteps.InsertNextValue(3600*24)
