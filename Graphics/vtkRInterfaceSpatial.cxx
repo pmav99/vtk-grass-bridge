@@ -103,6 +103,15 @@ bool vtkRInterfaceSpatial::AssignVTKDataSetAttributesToRDataFrame(vtkDataSetAttr
 
 //----------------------------------------------------------------------------
 
+bool vtkRInterfaceSpatial::AssignVTKDataSetAttributesToRDataFrame(vtkDataSetAttributes *data, const char *dataframe)
+{
+  vtkStringArray *arrayNames = this->CreateArrayNamesArray(data);
+  
+  return this->AssignVTKDataSetAttributesToRDataFrame(data, dataframe, arrayNames);
+}
+
+//----------------------------------------------------------------------------
+
 bool vtkRInterfaceSpatial::AssignVTKPointSetToRSpatialPointsDataFrame(vtkPointSet *data, const char *name)
 {
   vtkStringArray *arrayNames = this->CreateArrayNamesArray(data->GetPointData());
@@ -153,11 +162,15 @@ bool vtkRInterfaceSpatial::AssignVTKPointSetToRSpatialPointsDataFrame(vtkPointSe
   
   this->AttachProjection(name);
   
-  arrayNames->Delete();
+  if(arrayNames)
+    arrayNames->Delete();
   
   // Remove unneeded data
   script.str(""); // Clear the script
-  script << "remove(" << orig_coords->GetName() <<  ",MyTempDataFrame)";
+  if(arrayNames)
+    script << "remove(" << orig_coords->GetName() <<  ",MyTempDataFrame)";
+  else
+    script << "remove(" << orig_coords->GetName() <<  ")";
   cout << script.str() << endl;
   this->EvalRscript(script.str().c_str(), true);
   
@@ -215,19 +228,23 @@ bool vtkRInterfaceSpatial::AssignVTKImageDataToRSpatialGridDataFrame(vtkImageDat
   } else {
     
     // Create the SpatialGrid
-    script << name << " = SpatialGrid(grid)";
+    script << name << " = SpatialGrid(MyTempGrid)";
   }
   
   cout << script.str() << endl;
   this->EvalRscript(script.str().c_str(), true);
   
   this->AttachProjection(name);
-  
-  arrayNames->Delete();
+ 
+  if(arrayNames)
+    arrayNames->Delete();
   
   // Remove unneeded data
   script.str(""); // Clear the script
-  script << "remove(MyTempDataFrame,MyTempGrid)";
+  if(arrayNames)
+    script << "remove(MyTempDataFrame,MyTempGrid)";
+  else
+    script << "remove(MyTempGrid)";
   cout << script.str() << endl;
   this->EvalRscript(script.str().c_str(), true);
   
