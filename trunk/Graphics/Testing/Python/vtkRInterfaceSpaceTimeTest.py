@@ -32,20 +32,24 @@ class vtkRInterfaceSpaceTimeTest(unittest.TestCase):
         global firstCheck
         if firstCheck == False:
             
-            # Start hte interface
+            # Start the interface
             self.riface = vtkRInterfaceSpaceTime()
         
             #Initiate grass
             init = vtkGRASSInit()
             init.Init("GRASSVectorMapBaseTest")
             init.ExitOnErrorOn()
-            # Create the input data
+            
+            # Create the input raster and vector data 
             inputlist = ["v.random", "--o", "n=20", "column=height", "zmin=-20", "zmax=2500", "output=random_points"]
             proc = subprocess.Popen(args=inputlist)
             proc.communicate()
+            
             inputlist = ["r.random.cells", "--o", "output=random_cells", "distance=10.0"]
             proc = subprocess.Popen(args=inputlist)
             proc.communicate()
+            
+            firstCheck = True
             
 
     def test1SpaceTimePointsDataFrame(self):
@@ -54,29 +58,40 @@ class vtkRInterfaceSpaceTimeTest(unittest.TestCase):
         init.Init("test1SpaceTimePointsDataFrame")
         init.ExitOnErrorOn()
         
+        # Read the vector points from GRASS GIS
         rs = vtkGRASSVectorPolyDataReader()
         rs.SetVectorName("random_points")
         rs.Update()
         
+        # The generated poly-data has only cell data attached
+        # so we need the VTK cell data to point data converter
         ctop = vtkCellDataToPointData()
         ctop.SetInputConnection(rs.GetOutputPort())
         ctop.Update()
         
+        # We generate three time steps 0d, 1d, 2d 
         timeSteps = vtkDoubleArray()
         timeSteps.InsertNextValue(0)
         timeSteps.InsertNextValue(3600*24)
         timeSteps.InsertNextValue(3600*48)
         
+        # The temporal data set source is used to create valid 
+        # and consistent temporal data sets
+        # Here we have three data sets attached for
+        # each time stept in the timeSteps array
         tds = vtkTemporalDataSetSource()
         tds.SetTimeRange(0, 3600*48, timeSteps)
         tds.SetInput(0, ctop.GetOutput())
         tds.SetInput(1, ctop.GetOutput())
         tds.SetInput(2, ctop.GetOutput())
         tds.Update()
-                
+        
+        # We need the projection string for R spatial objects
         grassdb = vtkGRASSDatabaseInfo()
         proj4string = grassdb.GetProj4String()
         
+        # Set the projection and convert the temporal data set into
+        # a spatio-temporal full data frame. Start date is 17. March 2011
         self.riface.SetProj4String(proj4string)
         self.riface.AssignVTKTemporalDataSetToRSpatialTemporalFGDataFrame(tds.GetOutput(), "stfdf1", timeSteps, "2011-03-17")
         
@@ -90,13 +105,15 @@ class vtkRInterfaceSpaceTimeTest(unittest.TestCase):
     def test2SpaceTimeGridDataFrame(self):
         
         init = vtkGRASSInit()
-        init.Init("test2SpaceTimePointsDataFrame")
+        init.Init("test2SpaceTimeGridDataFrame")
         init.ExitOnErrorOn()
         
+        # Read the generated raster map from GRASS GIS
         rs = vtkGRASSRasterImageReader()
         rs.SetRasterName("random_cells")
         rs.Update()
         
+        # We generate three time steps 0d, 1d, 2d, 3d, 4d
         timeSteps = vtkDoubleArray()
         timeSteps.InsertNextValue(0)
         timeSteps.InsertNextValue(3600*24)
@@ -104,6 +121,10 @@ class vtkRInterfaceSpaceTimeTest(unittest.TestCase):
         timeSteps.InsertNextValue(3600*72)
         timeSteps.InsertNextValue(3600*96)
         
+        # The temporal data set source is used to create valid 
+        # and consistent temporal data sets
+        # Here we have five data sets attached for
+        # each time stept in the timeSteps array        
         tds = vtkTemporalDataSetSource()
         tds.SetTimeRange(0, 3600*96, timeSteps)
         tds.SetInput(0, rs.GetOutput())
@@ -113,9 +134,12 @@ class vtkRInterfaceSpaceTimeTest(unittest.TestCase):
         tds.SetInput(4, rs.GetOutput())
         tds.Update()
                 
+        # We need the projection string for R spatial objects
         grassdb = vtkGRASSDatabaseInfo()
         proj4string = grassdb.GetProj4String()
         
+        # Set the projection and convert the temporal data set into
+        # a spatio-temporal full data frame. Start date is 17. March 2011
         self.riface.SetProj4String(proj4string)
         self.riface.AssignVTKTemporalDataSetToRSpatialTemporalFGDataFrame(tds.GetOutput(), "stfdf2", timeSteps, "2011-03-17")
         
