@@ -48,7 +48,7 @@ vtkGRASSVectorFeaturePoints::~vtkGRASSVectorFeaturePoints()
 
 //----------------------------------------------------------------------------
 
-bool vtkGRASSVectorFeaturePoints::DeepCopy(vtkGRASSVectorFeaturePoints *points)
+void vtkGRASSVectorFeaturePoints::DeepCopy(vtkGRASSVectorFeaturePoints *points)
 {
     int i;
     double *p;

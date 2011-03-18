@@ -332,7 +332,7 @@ public:
     int GetVTKCellId();
 
     //!\brief Deep copy the feature points
-    virtual bool DeepCopy(vtkGRASSVectorFeaturePoints *points);
+    virtual void DeepCopy(vtkGRASSVectorFeaturePoints *points);
 
 
 protected:

@@ -79,6 +79,9 @@ public:
   //! \brief Assign data arrays present in a dataset attribute to R using the array names as R variable names. Make sure correct and unique array names are used.
   virtual bool AssignVTKDataSetAttributesToRDataFrame(vtkDataSetAttributes *data, const char *dataframe, vtkStringArray *arraynames);
   
+  //! \brief Assign data arrays present in a dataset attribute to R using the array names as R variable names. Make sure correct and unique array names are used.
+  virtual bool AssignVTKDataSetAttributesToRDataFrame(vtkDataSetAttributes *data, const char *dataframe);
+  
   
   //!\brief Set the string which defines the coordiante reference system in proj4 format. This tring will be assigned
   //! to the created spatial objects in R.
@@ -86,7 +89,6 @@ public:
   //!\brief The string which defines the coordiante reference system in proj4 format
   vtkGetStringMacro(Proj4String);
 
-  //ETX
 protected:
   vtkRInterfaceSpatial();
   ~vtkRInterfaceSpatial() {};

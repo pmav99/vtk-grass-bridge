@@ -123,7 +123,7 @@ public:
     //ETX
 
     //!\brief Deep copy the feature categories
-    virtual bool DeepCopy(vtkGRASSVectorFeatureCats *cats);
+    virtual void DeepCopy(vtkGRASSVectorFeatureCats *cats);
     
 protected:
     vtkGRASSVectorFeatureCats();

@@ -46,7 +46,7 @@ vtkGRASSVectorFeatureCats::~vtkGRASSVectorFeatureCats()
 
 //----------------------------------------------------------------------------
 
-bool vtkGRASSVectorFeatureCats::DeepCopy(vtkGRASSVectorFeatureCats *cats)
+void vtkGRASSVectorFeatureCats::DeepCopy(vtkGRASSVectorFeatureCats *cats)
 {
     int i, field, cat;
     this->Reset();

@@ -6,11 +6,13 @@
 
 SET (Graphics_SRCS
   vtkRInterfaceSpatial.cxx
+  vtkRInterfaceSpaceTime.cxx
 )
 
 SET (Graphics_H
   vtkGRASSBridgeGraphicsWin32Header.h
   vtkRInterfaceSpatial.h
+  vtkRInterfaceSpaceTime.h
 )
 # --------------------------------------------------------------------------
 # You probably do not need to modify anything below this line
