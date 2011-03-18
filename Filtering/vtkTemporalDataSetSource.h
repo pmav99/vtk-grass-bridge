@@ -13,8 +13,21 @@
 */
 
 /**
- *\class vtkTemporalDataSetSource
+ *\class vtkTemporalDataSetSource 
+ * \brief This class is designed to act as a source for vtkTemporalDataSet's.
  *
+ * This class creates a vtkTemporalDataSet based on vtkDataSets which must be added
+ * using the SetInput or SetInputConnection method and a time steps array of type 
+ * vtkDoubleArray containing the time steps for each input. The number of inputs ports 
+ * is computed based on the number of entries in the time steps array. The port id of
+ * an input data set is used as id of the corresponding time step in the time steps array.
+ * Additionally a time range must be provided which can be different from the range
+ * of the time steps array. The time values of the time steps array must be within this range.
+ *
+ * The range and time steps array is used to generate the TIME_RANGE and TIME_STEPS information
+ * of the generated output vtkTemporalDataSet. 
+ *
+ * This source only provides data at diskrete time steps.
  * 
  */  
 
