@@ -1,6 +1,6 @@
 /*
  * Program: vtkGRASSBridge
- * COPYRIGHT: (C) 2009 by Soeren Gebbert, soerengebbert@googlemail.com
+ * COPYRIGHT: (C) 2011 by Soeren Gebbert, soerengebbert@googlemail.com
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -33,7 +33,7 @@ vtkStandardNewMacro(vtkRInterfaceSpaceTime);
 
 vtkRInterfaceSpaceTime::vtkRInterfaceSpaceTime()
 {
-  // The sp package is needed
+  // The spacetime package is needed
   this->EvalRscript("require(\"spacetime\")", true);
 }
 
@@ -51,10 +51,15 @@ bool vtkRInterfaceSpaceTime::AssignVTKTemporalDataSetToRSpatialTemporalFGDataFra
   std::ostringstream dataFrameName;
   std::ostringstream script;
 
-  // Create the spatial object and attach point data for each time step 
+  // Create the spatial object at the first time step
+  // and attach point data for each time step 
+  // It is assumed that the number of points and cells as 
+  // well as the number and names of the arrays in each time step
+  // do not change.
   for (timestep = 0; timestep < temporalData->GetNumberOfTimeSteps(); timestep++) {
     vtkDataSet *data = vtkDataSet::SafeDownCast(temporalData->GetTimeStep(timestep));
 
+    // Check if the data changes over the time
     if (timestep == 0) {
       numberOfPoints = data->GetNumberOfPoints();
       numberOfCells = data->GetNumberOfCells();
@@ -92,19 +97,23 @@ bool vtkRInterfaceSpaceTime::AssignVTKTemporalDataSetToRSpatialTemporalFGDataFra
       }
     }
 
+    // Data set types should not mixed
     if (imageData > 0 && polyData > 0) {
       vtkErrorMacro( << "Mixed data set types are unsupported");
       return false;
     }
 
+    // Only point data is supported, use vtkCellDataToPointData 
+    // to for conversion of cell data
     vtkDataSetAttributes *pointData = data->GetPointData();
 
     dataFrameName.str("");
     dataFrameName << "dataFrame_" << timestep;
 
-    // Attach a single data frame with data for a single time step
+    // Create a R data frame with data for a single time step
     this->AssignVTKDataSetAttributesToRDataFrame(pointData, dataFrameName.str().c_str());
 
+    // Safe the names for each created data frame
     if (timestep == 0)
       dataFrameNames << dataFrameName.str();
     else
@@ -114,13 +123,13 @@ bool vtkRInterfaceSpaceTime::AssignVTKTemporalDataSetToRSpatialTemporalFGDataFra
   // Create the time steps
   this->AssignVTKDataArrayToRVariable(timesteps, "timeSteps");
   
-  // Create the R time for spacetime
+  // Create the time value vector for spacetime object
   script << "time = xts(1:" << timesteps->GetNumberOfTuples() << ", as.POSIXct(\"" 
          << startDate << "\") + "<< "timeSteps)";
   cout << script.str() << endl;
   this->EvalRscript(script.str().c_str(), true);
   
-  // Append the data frames
+  // Connect the data frames of each time step
   script.str("");
   script << "bind_data = rbind(" << dataFrameNames.str().c_str() << ")";
   cout << script.str() << endl;
@@ -132,7 +141,7 @@ bool vtkRInterfaceSpaceTime::AssignVTKTemporalDataSetToRSpatialTemporalFGDataFra
   cout << script.str() << endl;
   this->EvalRscript(script.str().c_str(), true);
   
-  // Remove unneeded data
+  // Remove obsolete data
   script.str(""); // Clear the script
   script << "remove(DataSet, time, timeSteps, bind_data, " 
          << dataFrameNames.str().c_str() << ")";
