@@ -93,7 +93,7 @@ class vtkRInterfaceSpaceTimeTest(unittest.TestCase):
         # Set the projection and convert the temporal data set into
         # a spatio-temporal full data frame. Start date is 17. March 2011
         self.riface.SetProj4String(proj4string)
-        self.riface.AssignVTKTemporalDataSetToRSpatialTemporalFGDataFrame(tds.GetOutput(), "stfdf1", timeSteps, "2011-03-17")
+        self.riface.AssignVTKTemporalDataSetToRSTFDF(tds.GetOutput(), "stfdf1", timeSteps, "2011-03-17")
         
         # Save the workspace for testing
         script = "save(list = ls(all=TRUE), file = \"/home/soeren/vtkRSpacetimeImage1\")"
@@ -141,7 +141,7 @@ class vtkRInterfaceSpaceTimeTest(unittest.TestCase):
         # Set the projection and convert the temporal data set into
         # a spatio-temporal full data frame. Start date is 17. March 2011
         self.riface.SetProj4String(proj4string)
-        self.riface.AssignVTKTemporalDataSetToRSpatialTemporalFGDataFrame(tds.GetOutput(), "stfdf2", timeSteps, "2011-03-17")
+        self.riface.AssignVTKTemporalDataSetToRSTFDF(tds.GetOutput(), "stfdf2", timeSteps, "2011-03-17")
         
         # Save the workspace for testing
         script = "save(list = ls(all=TRUE), file = \"/home/soeren/vtkRSpacetimeImage2\")"
