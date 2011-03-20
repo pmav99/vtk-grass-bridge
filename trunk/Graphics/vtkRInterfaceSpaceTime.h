@@ -39,7 +39,7 @@ public:
   vtkTypeRevisionMacro(vtkRInterfaceSpaceTime, vtkRInterface);
   
   //! \brief Assign data arrays present in a dataset attribute to R using the array names as R variable names. Make sure correct and unique array names are used.
-  virtual bool AssignVTKTemporalDataSetToRSpatialTemporalFGDataFrame(vtkTemporalDataSet *data, const char *RVariable, vtkDataArray *timesteps, const char *startDate);
+  virtual bool AssignVTKTemporalDataSetToRSTFDF(vtkTemporalDataSet *data, const char *RVariable, vtkDataArray *timesteps, const char *startDate);
 
 protected:
   vtkRInterfaceSpaceTime();

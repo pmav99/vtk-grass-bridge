@@ -39,7 +39,7 @@ vtkRInterfaceSpaceTime::vtkRInterfaceSpaceTime()
 
 //----------------------------------------------------------------------------
 
-bool vtkRInterfaceSpaceTime::AssignVTKTemporalDataSetToRSpatialTemporalFGDataFrame(vtkTemporalDataSet *temporalData, const char *RVariable, vtkDataArray *timesteps, const char *startDate)
+bool vtkRInterfaceSpaceTime::AssignVTKTemporalDataSetToRSTFDF(vtkTemporalDataSet *temporalData, const char *RVariable, vtkDataArray *timesteps, const char *startDate)
 {
   unsigned int timestep;
   bool topoCreated = false;
