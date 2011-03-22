@@ -120,6 +120,11 @@ bool vtkRInterfaceSpaceTime::AssignVTKTemporalDataSetToRSTFDF(vtkTemporalDataSet
       dataFrameNames << "," << dataFrameName.str();
   }
   
+  if(topoCreated == false) {
+    vtkErrorMacro("Unsupported data set type");
+    return false;
+  }
+  
   // Create the time steps
   this->AssignVTKDataArrayToRVariable(timesteps, "timeSteps");
   

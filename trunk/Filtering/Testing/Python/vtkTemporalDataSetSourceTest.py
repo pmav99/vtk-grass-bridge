@@ -21,50 +21,54 @@ from libvtkGRASSBridgeCommonPython import *
 class vtkTemporalDataSetSourceTest(unittest.TestCase):
     
     def setUp(self):
+        
+        xext = 250
+        yext = 350
+        num = xext*yext
                 
         data = vtkDoubleArray()
-        data.SetNumberOfTuples(25)
+        data.SetNumberOfTuples(num)
         data.SetName("data")
-        data.FillComponent(0,3)
-
-        self.ds1 = vtkPolyData()
-        self.ds1.Allocate(5,5)
-        self.ds1.GetPointData().SetScalars(data)
         
-        self.ds2 = vtkPolyData()
-        self.ds2.Allocate(5,5)
-        self.ds2.GetPointData().SetScalars(data)
+        ids = vtkIdList()
 
         self.points = vtkPoints()
         
         count = 0
-        for i in range(5):
-            for j in range(5):
+        for i in range(xext):
+            for j in range(yext):
                 self.points.InsertNextPoint(i, j, 0)
+                data.SetValue(count, i*j)
+                ids.InsertNextId(count)
+                count += 1
 
-        self.ds1.SetPoints(self.points)    
-        self.ds2.SetPoints(self.points)     
+        self.ds = vtkPolyData()
+        self.ds.Allocate(xext,yext)
+        self.ds.GetPointData().SetScalars(data)
+        self.ds.SetPoints(self.points)    
+        self.ds.InsertNextCell(vtk.VTK_POLY_VERTEX, ids)
+        
         
     def test1(self):
         
-        # We need to set the pipeline structure to composite rather then demand driven
-        prototype = vtkCompositeDataPipeline()
-        vtkAlgorithm.SetDefaultExecutivePrototype(prototype)
+        # We have 1000 time steps!
+        time = 1000
         
-	timesteps = vtkDoubleArray()
-	timesteps.SetNumberOfTuples(2)
-	timesteps.SetNumberOfComponents(1)
-	timesteps.SetValue(0, 0.5)
-	timesteps.SetValue(1, 1.5)
+        # Generate the time steps for 1000 days
+        timesteps = vtkDoubleArray()
+        timesteps.SetNumberOfTuples(time)
+        timesteps.SetNumberOfComponents(1)
+        for i in range(time):
+            timesteps.SetValue(i, 3600*24*i)
 
-	timesource = vtkTemporalDataSetSource()
-	timesource.SetTimeRange(0, 2, timesteps)
-	timesource.SetInput(0, self.ds1)
-	timesource.SetInput(1, self.ds2)
-	timesource.Update()
+        # Create the spatio-temporal source
+        timesource = vtkTemporalDataSetSource()
+        timesource.SetTimeRange(0, 3600*24*time, timesteps)
+        for i in range(time):
+            timesource.SetInput(i, self.ds)
+        timesource.Update()
 
         print timesource
-        print timesource.GetOutput()
         
 if __name__ == '__main__':
     suite1 = unittest.TestLoader().loadTestsFromTestCase(vtkTemporalDataSetSourceTest)
