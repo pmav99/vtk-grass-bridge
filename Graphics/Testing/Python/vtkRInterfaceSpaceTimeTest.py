@@ -41,7 +41,7 @@ class vtkRInterfaceSpaceTimeTest(unittest.TestCase):
             init.ExitOnErrorOn()
             
             # Create the input raster and vector data 
-            inputlist = ["v.random", "--o", "n=20", "column=height", "zmin=-20", "zmax=2500", "output=random_points"]
+            inputlist = ["v.random", "--o", "n=2000", "column=height", "zmin=-20", "zmax=2500", "output=random_points"]
             proc = subprocess.Popen(args=inputlist)
             proc.communicate()
             
@@ -58,6 +58,8 @@ class vtkRInterfaceSpaceTimeTest(unittest.TestCase):
         init.Init("test1SpaceTimePointsDataFrame")
         init.ExitOnErrorOn()
         
+        time = 20 # 20 days
+        
         # Read the vector points from GRASS GIS
         rs = vtkGRASSVectorPolyDataReader()
         rs.SetVectorName("random_points")
@@ -68,22 +70,20 @@ class vtkRInterfaceSpaceTimeTest(unittest.TestCase):
         ctop = vtkCellDataToPointData()
         ctop.SetInputConnection(rs.GetOutputPort())
         ctop.Update()
-        
-        # We generate three time steps 0d, 1d, 2d 
+
+        # We generate several time steps
         timeSteps = vtkDoubleArray()
-        timeSteps.InsertNextValue(0)
-        timeSteps.InsertNextValue(3600*24)
-        timeSteps.InsertNextValue(3600*48)
+        for i in range(time):
+            timeSteps.InsertNextValue(3600*24*i)
         
         # The temporal data set source is used to create valid 
         # and consistent temporal data sets
-        # Here we have three data sets attached for
+        # Here we have several data sets attached for
         # each time stept in the timeSteps array
         tds = vtkTemporalDataSetSource()
-        tds.SetTimeRange(0, 3600*48, timeSteps)
-        tds.SetInput(0, ctop.GetOutput())
-        tds.SetInput(1, ctop.GetOutput())
-        tds.SetInput(2, ctop.GetOutput())
+        tds.SetTimeRange(0, 3600*24*time, timeSteps)
+        for i in range(time):
+            tds.SetInput(i, ctop.GetOutput())
         tds.Update()
         
         # We need the projection string for R spatial objects
@@ -108,30 +108,26 @@ class vtkRInterfaceSpaceTimeTest(unittest.TestCase):
         init.Init("test2SpaceTimeGridDataFrame")
         init.ExitOnErrorOn()
         
+        time = 4 # 20 days
+        
         # Read the generated raster map from GRASS GIS
         rs = vtkGRASSRasterImageReader()
         rs.SetRasterName("random_cells")
         rs.Update()
         
-        # We generate five time steps 0d, 1d, 2d, 3d, 4d
+        # We generate several time steps
         timeSteps = vtkDoubleArray()
-        timeSteps.InsertNextValue(0)
-        timeSteps.InsertNextValue(3600*24)
-        timeSteps.InsertNextValue(3600*48)
-        timeSteps.InsertNextValue(3600*72)
-        timeSteps.InsertNextValue(3600*96)
-        
+        for i in range(time):
+            timeSteps.InsertNextValue(3600*24*i)
+            
         # The temporal data set source is used to create valid 
         # and consistent temporal data sets
-        # Here we have five data sets attached for
+        # Here we have several data sets attached for
         # each time stept in the timeSteps array        
         tds = vtkTemporalDataSetSource()
-        tds.SetTimeRange(0, 3600*96, timeSteps)
-        tds.SetInput(0, rs.GetOutput())
-        tds.SetInput(1, rs.GetOutput())
-        tds.SetInput(2, rs.GetOutput())
-        tds.SetInput(3, rs.GetOutput())
-        tds.SetInput(4, rs.GetOutput())
+        tds.SetTimeRange(0, 3600*24*time, timeSteps)
+        for i in range(time):
+            tds.SetInput(i, rs.GetOutput())
         tds.Update()
                 
         # We need the projection string for R spatial objects

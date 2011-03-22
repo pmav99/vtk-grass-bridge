@@ -40,16 +40,10 @@ class vtkRInterfaceSpatialTest(unittest.TestCase):
             init.Init("GRASSVectorMapBaseTest")
             init.ExitOnErrorOn()
             # Create the input data
-            inputlist = ["v.random", "--o", "n=20", "column=height", "zmin=-20", "zmax=2500", "output=random_points"]
+            inputlist = ["v.random", "--o", "n=20000", "column=height", "zmin=-20", "zmax=2500", "output=random_points"]
             proc = subprocess.Popen(args=inputlist)
             proc.communicate()
             inputlist = ["r.random.cells", "--o", "output=random_cells", "distance=10.0"]
-            proc = subprocess.Popen(args=inputlist)
-            proc.communicate()
-            inputlist = ["v.voronoi", "--o", "-l", "input=random_points", "output=random_lines"]
-            proc = subprocess.Popen(args=inputlist)
-            proc.communicate()
-            inputlist = ["v.voronoi", "--o", "input=random_points", "output=random_areas"]
             proc = subprocess.Popen(args=inputlist)
             proc.communicate()
             firstCheck = True  
@@ -130,7 +124,30 @@ class vtkRInterfaceSpatialTest(unittest.TestCase):
         
         return
 
-    def test3SpatialGridDataFrame(self):
+    def test3SpatialPoints(self):
+        
+        init = vtkGRASSInit()
+        init.Init("test3SpatialPoints")
+        init.ExitOnErrorOn()
+        
+        rs = vtkGRASSVectorPolyDataReader()
+        rs.SetVectorName("random_points")
+        rs.Update()
+                        
+        grassdb = vtkGRASSDatabaseInfo()
+        proj4string = grassdb.GetProj4String()
+        
+        self.riface.SetProj4String(proj4string)
+        self.riface.AssignVTKPointSetToRSpatialPoints(rs.GetOutput(), "sp1")
+        
+        # Save the workspace for testing
+        script = "save(list = ls(all=TRUE), file = \"/home/soeren/vtkRImage3\")"
+        print script
+        self.riface.EvalRscript(script, True)
+        
+        return
+
+    def test4SpatialGridDataFrame(self):
         
         init = vtkGRASSInit()
         init.Init("test3SpatialGridDataFrame")
@@ -139,9 +156,7 @@ class vtkRInterfaceSpatialTest(unittest.TestCase):
         rs = vtkGRASSRasterImageReader()
         rs.SetRasterName("random_cells")
         rs.Update()
-        
-        print rs.GetOutput()
-                                
+           
         grassdb = vtkGRASSDatabaseInfo()
         proj4string = grassdb.GetProj4String()
         
@@ -149,12 +164,35 @@ class vtkRInterfaceSpatialTest(unittest.TestCase):
         self.riface.AssignVTKImageDataToRSpatialGridDataFrame(rs.GetOutput(), "sgdf")
         
         # Save the workspace for testing
-        script = "save(list = ls(all=TRUE), file = \"/home/soeren/vtkRImage3\")"
+        script = "save(list = ls(all=TRUE), file = \"/home/soeren/vtkRImage4\")"
         print script
         self.riface.EvalRscript(script, True)
         
         return
         
+    def test5SpatialGrid(self):
+        
+        init = vtkGRASSInit()
+        init.Init("test5SpatialGrid")
+        init.ExitOnErrorOn()
+        
+        rs = vtkGRASSRasterImageReader()
+        rs.SetRasterName("random_cells")
+        rs.Update()
+          
+        grassdb = vtkGRASSDatabaseInfo()
+        proj4string = grassdb.GetProj4String()
+        
+        self.riface.SetProj4String(proj4string)
+        self.riface.AssignVTKImageDataToRSpatialGrid(rs.GetOutput(), "sg1")
+        
+        # Save the workspace for testing
+        script = "save(list = ls(all=TRUE), file = \"/home/soeren/vtkRImage5\")"
+        print script
+        self.riface.EvalRscript(script, True)
+        
+        return
+    
 if __name__ == '__main__':
     suite1 = unittest.TestLoader().loadTestsFromTestCase(vtkRInterfaceSpatialTest)
     unittest.TextTestRunner(verbosity=2).run(suite1) 
