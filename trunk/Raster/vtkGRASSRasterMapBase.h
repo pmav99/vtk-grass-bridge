@@ -17,6 +17,9 @@
  *
  * It provides function to allocate the raster buffer, to set and get the
  * vtkGRASSRegion and the vtkGRASSHistory.
+ * 
+ * \TODO Use the grass raster row instead of the vtkDoubleArray for row processing
+ * \TODO Implement better NULL support
  *
  * \author Soeren Gebbert
  * \author Berlin, Germany Aug. 2009

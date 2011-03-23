@@ -7,7 +7,7 @@ It uses the VTK wrapper to support Python and Java.
 The support is currently limited to the basic gis, raster and vector map functions of libgrass_gis,
 libgrass_vector and libgrass_raster.
 
-The library was successfully tested with VTK 5.2 and 5.4 and grass7.
+The library works only with VTK 5.9 and the altest grass7 svn version.
 
 \author Soeren Gebbert
 \author Berlin, Germany Aug. 2009

@@ -24,7 +24,11 @@
  * to select single values or an array of values
  * from a table column. The selection can be modified using where statements.
  *
- * 
+ * \TODO Rewrite this class to be independent from an existing vecor map. So it can
+ *       be used to access SQL databases without the need of a vector map.
+ * \TODO Use the field_info structure internally to identify the database, driver,
+ *       key and table. Use a vector map to set these values or create a ability to 
+ *       do this by hand.
  *
  * \author Soeren Gebbert
  * \author Berlin, Germany Oct. 2009
