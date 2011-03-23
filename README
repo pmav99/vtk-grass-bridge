@@ -5,7 +5,7 @@ A bridge between the GRASS GIS library and VTK.
 The support is currently limited to the basic gis, raster and vector map functions of libgrass_gis,
 libgrass_vector and libgrass_raster.
 
-The library was successfully tested with VTK 5.2, 5.4, 5.6 and grass7.
+The library works only with VTK 5.9 and grass7.
 Because of supporting grass7, this code is not compatible with grass6.
 
 The GRASS shared libraries as well as the VTK and vtkGRASSBridge
