@@ -14,12 +14,14 @@
 
 
 /**
- * \brief This class helps to converts vtkPointData and vtkImageData into R spatial objects 
+ * \brief This class allows the conversion of vtkPointData and vtkImageData into R spatial objects 
  * 
  * Only Point coordiantes and point data are currently supported. Use the VTK class vtkCellDataToPointData
  * to convert cell data into point data. Make sure correct and unique array names are used.
  * The spatial objects can be accessed in the VTK R instance by an identifier which must
  * be specified. 
+ *
+ * \TODO Implement support for all poly data cell types: lines, poly lines, triangles and polygons
  * 
  * */
 
