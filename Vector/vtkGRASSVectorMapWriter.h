@@ -17,8 +17,6 @@
  *
  * This class provides an interface to write grass vector maps.
  *
- * \TODO Implement database support
- *
  * \author Soeren Gebbert
  * \author Berlin, Germany Sep. 2009
  * \author soerengebbert@googlemail.com

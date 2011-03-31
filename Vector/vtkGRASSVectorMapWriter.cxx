@@ -126,7 +126,7 @@ vtkGRASSVectorMapWriter::CloseMap(int build_topo)
     }
 
     Vect_set_category_index_update(&this->map);
-    Vect_set_release_support(&this->map);
+//    Vect_set_release_support(&this->map); // This is buggy and result in a segfault in in RTreeDestroyNode (n=0x13, nodes=18) at node.c:256
 
     if (!setjmp(vgb_stack_buffer))
     {

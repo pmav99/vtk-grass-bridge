@@ -63,6 +63,7 @@ class vtkGRASSDbmiInterfaceReaderTest(unittest.TestCase):
                 print i + 1, "Unknown datatype at row ", i
 
         db.DisconnectDB()
+        map.CloseMap()
 
 
     def test2(self):
@@ -122,6 +123,7 @@ class vtkGRASSDbmiInterfaceReaderTest(unittest.TestCase):
 #        print table
 
         db.DisconnectDB()
+        map.CloseMap()
 
 
 if __name__ == '__main__':

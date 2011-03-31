@@ -98,7 +98,7 @@ class GRASSVectorPolyDataReaderTest(unittest.TestCase):
         init.Init("GRASSVectorPolyDataReaderTest")
         init.ExitOnErrorOn()
         rs = vtkGRASSVectorTopoPolyDataReader()
-        rs.SetFeatureTypeToLines()
+        rs.SetFeatureTypeToLine()
         rs.SetVectorName("random_lines")
         rs.Update()
 
@@ -146,7 +146,7 @@ class GRASSVectorPolyDataReaderTest(unittest.TestCase):
         init.Init("GRASSVectorPolyDataReaderTest")
         init.ExitOnErrorOn()
         rs = vtkGRASSVectorTopoPolyDataReader()
-        rs.SetFeatureTypeToPoints()
+        rs.SetFeatureTypeToPoint()
         rs.SetVectorName("random_points")
         rs.Update()
 

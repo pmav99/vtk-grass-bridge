@@ -137,7 +137,7 @@ vtkGRASSRasterImageWriter::SimpleExecute(vtkImageData* input, vtkImageData* outp
     else
         this->RasterMap->SetMapTypeToDCELL();
 
-    cout << input->GetScalarTypeAsString() << endl;
+    // cout << input->GetScalarTypeAsString() << endl;
 
     // Now open the map
     if (!this->RasterMap->OpenMap(this->RasterName))
@@ -146,7 +146,7 @@ vtkGRASSRasterImageWriter::SimpleExecute(vtkImageData* input, vtkImageData* outp
         return;
     }
 
-    this->RasterMap->Print(cout);
+    // this->RasterMap->Print(cout);
 
     switch (input->GetScalarType()) {
         // This is simply a #define for a big case list. It handles all
