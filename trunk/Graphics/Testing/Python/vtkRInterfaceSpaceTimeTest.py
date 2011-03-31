@@ -25,10 +25,7 @@ firstCheck = False
 
 class vtkRInterfaceSpaceTimeTest(unittest.TestCase):
     
-    def setUp(self):    
-        # Start the interface
-        self.riface = vtkRInterfaceSpaceTime()
-            
+    def setUp(self): 
         global firstCheck
         if firstCheck == False:
             
@@ -37,10 +34,10 @@ class vtkRInterfaceSpaceTimeTest(unittest.TestCase):
         
             #Initiate grass
             init = vtkGRASSInit()
-            init.Init("GRASSVectorMapBaseTest")
+            init.Init("vtkRInterfaceSpaceTimeTest")
             init.ExitOnErrorOn()
             
-            # Create the input raster and vector data 
+            # Generate the input raster and vector data 
             inputlist = ["v.random", "--o", "n=2000", "column=height", "zmin=-20", "zmax=2500", "output=random_points"]
             proc = subprocess.Popen(args=inputlist)
             proc.communicate()
@@ -108,7 +105,7 @@ class vtkRInterfaceSpaceTimeTest(unittest.TestCase):
         init.Init("test2SpaceTimeGridDataFrame")
         init.ExitOnErrorOn()
         
-        time = 4 # 20 days
+        time = 4 # 4 days
         
         # Read the generated raster map from GRASS GIS
         rs = vtkGRASSRasterImageReader()
