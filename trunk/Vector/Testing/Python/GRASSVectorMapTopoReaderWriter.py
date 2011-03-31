@@ -60,7 +60,7 @@ class GRASSVectorMapReaderWriterTest(unittest.TestCase):
         print writer
         writer.CloseMap(0)
 
-    def otest2TopoWriter(self):
+    def test2TopoWriter(self):
         reader = vtkGRASSVectorMapTopoReader()
         reader.OpenMap("random_areas")
 
@@ -89,7 +89,7 @@ class GRASSVectorMapReaderWriterTest(unittest.TestCase):
         print writer
         writer.CloseMap(0)
 
-    def otest3TopoUpdate(self):
+    def test3TopoUpdate(self):
         reader = vtkGRASSVectorMapTopoReader()
         reader.OpenMap("random_areas")
 
@@ -142,7 +142,7 @@ class GRASSVectorMapReaderWriterTest(unittest.TestCase):
         print updater
         updater.CloseMap(1)
 
-    def otest4TopoUpdate(self):
+    def test4TopoUpdate(self):
         reader = vtkGRASSVectorMapTopoReader()
         reader.OpenMap("random_areas")
 
