@@ -15,11 +15,7 @@
 #############################################################################
 
 #include the grass, VTK and vtkGRASSBridge Python libraries
-from libvtkFilteringPython import *
-from libvtkRenderingPython import *
-from libvtkGraphicsPython import *
-from libvtkIOPython import *
-from libvtkImagingPython import *
+from vtk import *
 from libvtkGRASSBridgeIOPython import *
 from libvtkGRASSBridgeCommonPython import *
 

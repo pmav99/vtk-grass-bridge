@@ -13,13 +13,9 @@
 #  GNU General Public License for more details.
 
 #include the VTK and vtkGRASSBridge Python libraries
-from libvtkCommonPython import *
-from libvtkFilteringPython import *
-from libvtkGraphicsPython import *
-from libvtkRenderingPython import *
-from libvtkIOPython import *
-from libvtkImagingPython import *
+from vtk import *
 from libvtkGRASSBridgeIOPython import *
+from libvtkGRASSBridgeRasterPython import *
 from libvtkGRASSBridgeCommonPython import *
 
 #Initiate grass
@@ -33,7 +29,7 @@ region = vtkGRASSRegion()
 region.ReadCurrentRegion()
 region.SetCols(10)
 region.SetRows(10)
-region.AdjustRegion()
+region.AdjustRegionResolution()
 
 #Create a new map and write some data into it
 writer = vtkGRASSRasterMapWriter()

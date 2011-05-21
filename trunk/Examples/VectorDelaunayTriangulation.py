@@ -17,11 +17,7 @@
 # into the VTK poly data format and processing that map with vtkDelaunay2D.
 # The processed data is written as VTK XML file to the file system
 
-from libvtkCommonPython import *
-from libvtkFilteringPython import *
-from libvtkGraphicsPython import *
-from libvtkIOPython import *
-from libvtkImagingPython import *
+from vtk import *
 from libvtkGRASSBridgeIOPython import *
 from libvtkGRASSBridgeVectorPython import *
 from libvtkGRASSBridgeCommonPython import *
@@ -40,7 +36,7 @@ delaunay = vtkDelaunay2D()
 delaunay.SetInputConnection(reader.GetOutputPort())
 # write the data as XML with base64 encoding
 writer = vtkXMLPolyDataWriter()
-writer.SetFileName("/tmp/test.vtk")
+writer.SetFileName("/tmp/test.vtp")
 writer.SetInputConnection(delaunay.GetOutputPort())
 writer.Write()
 

@@ -112,12 +112,8 @@
 #%End
 
 #include the grass, VTK and vtkGRASSBridge Python libraries
-from libvtkFilteringPython import *
-from libvtkGraphicsPython import *
-from libvtkHybridPython import *
-from libvtkImagingPython import *
-from libvtkIOPython import *
-from libvtkRenderingPython import *
+
+from vtk import *
 from libvtkGRASSBridgeIOPython import *
 from libvtkGRASSBridgeCommonPython import *
 from vtkGRASSBridgeModuleBase import *
