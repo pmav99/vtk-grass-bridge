@@ -13,12 +13,8 @@
 #  GNU General Public License for more details.
 
 #include the VTK and vtkGRASSBridge Python libraries
-from libvtkCommonPython import *
-from libvtkFilteringPython import *
-from libvtkGraphicsPython import *
-from libvtkRenderingPython import *
-from libvtkIOPython import *
-from libvtkImagingPython import *
+from vtk import *
+from libvtkGRASSBridgeRasterPython import *
 from libvtkGRASSBridgeIOPython import *
 from libvtkGRASSBridgeCommonPython import *
 
