@@ -56,7 +56,7 @@ public:
   bool HasWarnings();
 
   //! \brief Removes all Errors and Warnings from the list and set the counter to zero
-  void Reset();
+  void ResetErrors();
 
 
 protected:

@@ -15,6 +15,18 @@ ELSE (USE_VTK_FILE)
 ENDIF (USE_VTK_FILE)
 
 
+# Make the R support optional
+OPTION(USE_VTK_R_SUPPORT
+       "Use VTK's R support classes."
+       OFF)
+MARK_AS_ADVANCED (USE_VTK_R_SUPPORT)
+
+# Make the temporal dependency (VTK 5.9) optional
+OPTION(USE_VTK_TEMPORAL_SUPPORT
+       "Use VTK's R support classes."
+       OFF)
+MARK_AS_ADVANCED (USE_VTK_TEMPORAL_SUPPORT)
+
 #
 # Defaults to the same VTK setting.
 #

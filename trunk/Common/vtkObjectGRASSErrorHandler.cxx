@@ -56,7 +56,7 @@ vtkObjectGRASSErrorHandler::~vtkObjectGRASSErrorHandler()
 //----------------------------------------------------------------------------
 
 void
-vtkObjectGRASSErrorHandler::Reset()
+vtkObjectGRASSErrorHandler::ResetErrors()
 {
 
     this->NumberOfErrors = 0;

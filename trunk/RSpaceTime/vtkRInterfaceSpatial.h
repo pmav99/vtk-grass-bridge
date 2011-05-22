@@ -29,14 +29,14 @@
 #define __vtkRInterfaceSpatial_h
 
 #include <vtkRInterface.h>
-#include "vtkGRASSBridgeGraphicsWin32Header.h"
+#include "vtkGRASSBridgeRSpaceTimeWin32Header.h"
 
 class vtkPointSet;
 class vtkImageData;
 class vtkStringArray;
 class vtkDataSetAttributes;
 
-class VTK_GRASS_BRIDGE_GRAPHICS_EXPORT vtkRInterfaceSpatial : public vtkRInterface
+class VTK_GRASS_BRIDGE_RSPACETIME_EXPORT vtkRInterfaceSpatial : public vtkRInterface
 {
 public:
   static  vtkRInterfaceSpatial *New();

@@ -37,9 +37,9 @@
 
 #include <vtkTemporalDataSetAlgorithm.h>
 #include <vtkDoubleArray.h>
-#include "vtkGRASSBridgeFilteringWin32Header.h"
+#include "vtkGRASSBridgeTemporalWin32Header.h"
 
-class VTK_GRASS_BRIDGE_FILTERING_EXPORT vtkTemporalDataSetSource : public vtkTemporalDataSetAlgorithm
+class VTK_GRASS_BRIDGE_TEMPORAL_EXPORT vtkTemporalDataSetSource : public vtkTemporalDataSetAlgorithm
 {
 public:
   vtkTypeRevisionMacro(vtkTemporalDataSetSource,vtkTemporalDataSetAlgorithm);

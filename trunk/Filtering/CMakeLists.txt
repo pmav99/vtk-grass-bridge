@@ -8,13 +8,11 @@
 
 SET (Filtering_SRCS
 vtkGRASSBridgeVoxelModeller.cxx
-vtkTemporalDataSetSource.cxx
 )
 
 SET (Filtering_H
 vtkGRASSBridgeVoxelModeller.h
 vtkGRASSBridgeFilteringWin32Header.h
-vtkTemporalDataSetSource.h
 )
 # --------------------------------------------------------------------------
 # You probably do not need to modify anything below this line

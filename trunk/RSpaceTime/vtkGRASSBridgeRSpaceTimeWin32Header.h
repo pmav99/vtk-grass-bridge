@@ -13,19 +13,19 @@
 */
 
 
-#ifndef __vtkGRASSBridgeGraphicsWin32Header_h
-#define __vtkGRASSBridgeGraphicsWin32Header_h
+#ifndef __vtkGRASSBridgeRSpaceTimeWin32Header_h
+#define __vtkGRASSBridgeRSpaceTimeWin32Header_h
 
 #include <vtkGRASSBridgeConfigure.h>
 
 #if defined(WIN32) && !defined(VTK_GRASS_BRIDGE_STATIC)
-#if defined(vtkGRASSBridgeGraphics_EXPORTS)
-#define VTK_GRASS_BRIDGE_GRAPHICS_EXPORT __declspec( dllexport ) 
+#if defined(vtkGRASSBridgeRSpaceTime_EXPORTS)
+#define VTK_GRASS_BRIDGE_RSPACETIME_EXPORT __declspec( dllexport )
 #else
-#define VTK_GRASS_BRIDGE_GRAPHICS_EXPORT __declspec( dllimport ) 
+#define VTK_GRASS_BRIDGE_RSPACETIME_EXPORT __declspec( dllimport )
 #endif
 #else
-#define VTK_GRASS_BRIDGE_GRAPHICS_EXPORT
+#define VTK_GRASS_BRIDGE_RSPACETIME_EXPORT
 #endif
 
 #endif
