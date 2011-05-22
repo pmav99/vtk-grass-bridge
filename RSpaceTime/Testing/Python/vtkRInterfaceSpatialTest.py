@@ -16,7 +16,8 @@
 import unittest
 import subprocess
 from vtk import *
-from libvtkGRASSBridgeFilteringPython import *
+from libvtkGRASSBridgeTemporalPython import *
+from libvtkGRASSBridgeRSpaceTimePython import *
 from libvtkGRASSBridgeIOPython import *
 from libvtkGRASSBridgeCommonPython import *
 from libvtkGRASSBridgeGraphicsPython import *

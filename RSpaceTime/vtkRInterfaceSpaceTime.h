@@ -27,12 +27,12 @@
 #define __vtkRInterfaceSpaceTime_h
 
 #include <vtkRInterfaceSpatial.h>
-#include "vtkGRASSBridgeGraphicsWin32Header.h"
+#include "vtkGRASSBridgeRSpaceTimeWin32Header.h"
 
 class vtkDoubleArray;
 class vtkTemporalDataSet;
 
-class VTK_GRASS_BRIDGE_GRAPHICS_EXPORT vtkRInterfaceSpaceTime : public vtkRInterfaceSpatial
+class VTK_GRASS_BRIDGE_RSPACETIME_EXPORT vtkRInterfaceSpaceTime : public vtkRInterfaceSpatial
 {
 public:
   static  vtkRInterfaceSpaceTime *New();

@@ -15,7 +15,7 @@
 #include the VTK and vtkGRASSBridge Python libraries
 import unittest
 from vtk import *
-from libvtkGRASSBridgeFilteringPython import *
+from libvtkGRASSBridgeTemporalPython import *
 from libvtkGRASSBridgeCommonPython import *
 
 class vtkTemporalDataSetSourceTest(unittest.TestCase):
