@@ -29,7 +29,7 @@ public class RasterImageReader {
     public static void main(String[] args) {
 
         // Initiate grass
-        vtk.vtkGRASSInit init = new vtk.vtkGRASSInit();
+        vtkGRASSInit init = new vtkGRASSInit();
         init.Init("RasterImageReader");
         init.ExitOnErrorOn();
         // List all raster maps
