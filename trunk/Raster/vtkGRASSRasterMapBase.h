@@ -79,6 +79,14 @@ public:
   //! \brief Read a row of the map and return the content as vtkDataArray
   virtual vtkDataArray *GetRow(int idx);
   virtual vtkCharArray *GetNullRow(int idx);
+  
+  virtual bool GetNearestSampleValue(double x, double y, double &value);
+  virtual bool GetBilinearSampleValue(double x, double y, double &value);
+  virtual bool GetBicubicSampleValue(double x, double y, double &value);
+  
+  static bool IsDoubleNullValue(double value);
+  static bool IsFloatNullValue(float value);
+  static bool IsIntegerNullValue(int value);
 
   vtkGetMacro(MapType, int);
   vtkGetMacro(NumberOfRows, int);
@@ -89,24 +97,25 @@ public:
   virtual bool IsOpen() {return this->Open;}
 
   //! \brief Null value which should replace the default grass null value for CELL, FCELL andDCELL maps
-  //! to enable the NullValue, set the this->UseNullValueOff()
+  //! to enable the NullValue, set the this->UseNullValueOn()
   vtkSetMacro(NullValue, double);
   //! \brief Null value which should replace the default grass null value for CELL, FCELL andDCELL maps
   //! to enable the NullValue, set the this->UseNullValueOff()
   vtkGetMacro(NullValue, double);
 
 
-  //! \brief Use a user defined NULL value to be stored in the vtkDataArray, otherwise a grass NULL value is used (not recomended)
+  //! \brief Use a user defined NULL value to be stored in the vtkDataArray, otherwise a grass NULL value is used
   vtkGetMacro(UseNullValue, int);
-  //! \brief Use a user defined  NULL value to be stored in the vtkDataArray, otherwise a grass NULL value is used (not recomended)
+  //! \brief Use a user defined  NULL value to be stored in the vtkDataArray, otherwise a grass NULL value is used
   vtkBooleanMacro(UseNullValue, int);
 
 protected:
   vtkGRASSRasterMapBase();
   ~vtkGRASSRasterMapBase();
 
-
   vtkSetMacro(UseNullValue, int);
+  
+  virtual bool GetSampleValue(double x, double y, double &value, int type);
 
   int RegionUsage;
   bool Open; // True if the raster file was opened

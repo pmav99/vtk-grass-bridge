@@ -1,2 +1,2 @@
-vtkGRASSVectorFeaturePoints                          GetPoint                         307  3
-vtkGRASSVectorBBox                                GetBoxAsArray                    307  6
+vtkGRASSVectorFeaturePoints               GetPoint                        307  3
+vtkGRASSVectorBBox                        GetBoxAsArray                   307  6
