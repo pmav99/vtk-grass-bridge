@@ -226,6 +226,61 @@ class GRASSRasterMapReaderWriterTest(unittest.TestCase):
 
         reader.CloseMap()
         
+        
+    def testRasterSampling(self):
+            
+        region = vtkGRASSRegion()
+        region.ReadCurrentRegion()
+        region.SetCols(10)
+        region.SetRows(10)
+        region.SetNorthernEdge(10)
+        region.SetSouthernEdge(0)
+        region.SetEasternEdge(10)
+        region.SetWesternEdge(0)
+        region.AdjustRegionResolution()
+
+        writer = vtkGRASSRasterMapWriter()
+        writer.SetMapTypeToDCELL()
+        writer.SetRegion(region)
+        writer.UseUserDefinedRegion()
+        writer.OpenMap("test_sample_dcell")
+
+        data = vtkDoubleArray()
+        data.SetNumberOfTuples(writer.GetNumberOfCols())
+
+        for i in range(writer.GetNumberOfRows()):
+            for j in range(writer.GetNumberOfCols()):
+                val = i * (writer.GetNumberOfCols())  +  j
+                data.SetTuple1(j, val)
+                print val,
+            writer.PutNextRow(data)
+            print " "
+        print " "
+
+        writer.CloseMap()
+
+        reader = vtkGRASSRasterMapReader()
+        reader.UseRasterRegion()
+        reader.OpenMap("test_sample_dcell")
+                
+        for i in range(reader.GetNumberOfRows()):
+            for j in range(reader.GetNumberOfCols()): 
+                
+                row = reader.GetNumberOfRows() - 1 - i
+                value = vtk.mutable(1)
+                check = i * (reader.GetNumberOfCols())  +  j
+                if reader.GetNearestSampleValue(row + 0.5, j + 0.5, value):
+                    print "Nearest ", value
+                    self.assertEqual(value, check, "Error in nearest neighbour sampling")
+                if reader.GetBilinearSampleValue(row + 0.5, j + 0.5, value):
+                    print "Bilinear ", value
+                    self.assertEqual(value, check, "Error in bilinear sampling")
+                if reader.GetBicubicSampleValue(row + 0.5, j + 0.5, value):
+                    print "Bicubic ", value
+                    self.assertEqual(value, check, "Error in bicubic sampling")
+
+        reader.CloseMap()
+        
 if __name__ == '__main__':
     suite = unittest.TestLoader().loadTestsFromTestCase(GRASSRasterMapReaderWriterTest)
     unittest.TextTestRunner(verbosity=2).run(suite)

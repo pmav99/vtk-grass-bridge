@@ -29,7 +29,8 @@ vtkStandardNewMacro(vtkGRASSRasterMapBase);
 
 //----------------------------------------------------------------------------
 
-vtkGRASSRasterMapBase::vtkGRASSRasterMapBase() {
+vtkGRASSRasterMapBase::vtkGRASSRasterMapBase()
+{
     this->RasterName = NULL;
     this->Mapset = NULL;
     this->Region = vtkGRASSRegion::New();
@@ -50,7 +51,8 @@ vtkGRASSRasterMapBase::vtkGRASSRasterMapBase() {
 
 //----------------------------------------------------------------------------
 
-vtkGRASSRasterMapBase::~vtkGRASSRasterMapBase() {
+vtkGRASSRasterMapBase::~vtkGRASSRasterMapBase()
+{
     this->CloseMap();
 
     if (this->RasterName)
@@ -70,7 +72,8 @@ vtkGRASSRasterMapBase::~vtkGRASSRasterMapBase() {
 //----------------------------------------------------------------------------
 
 void
-vtkGRASSRasterMapBase::PrintSelf(ostream& os, vtkIndent indent) {
+vtkGRASSRasterMapBase::PrintSelf(ostream& os, vtkIndent indent)
+{
     this->Superclass::PrintSelf(os, indent);
 
     os << indent << "Is map open: " << (this->Open ? "YES" : "NO") << endl;
@@ -88,7 +91,8 @@ vtkGRASSRasterMapBase::PrintSelf(ostream& os, vtkIndent indent) {
 
 //----------------------------------------------------------------------------
 
-const char* vtkGRASSRasterMapBase::GetMapTypeAsString() {
+const char* vtkGRASSRasterMapBase::GetMapTypeAsString()
+{
     if (this->MapType == CELL_TYPE)
         return "CELL_TYPE";
     if (this->MapType == FCELL_TYPE)
@@ -102,13 +106,14 @@ const char* vtkGRASSRasterMapBase::GetMapTypeAsString() {
 //----------------------------------------------------------------------------
 
 bool
-vtkGRASSRasterMapBase::SetRegion() {
+vtkGRASSRasterMapBase::SetRegion()
+{
     struct Cell_head head;
 
     if (this->RasterName == NULL || this->Mapset == NULL) {
         char buff[1024];
         G_snprintf(buff, 1024, "class: %s line: %i Unable to set the region. RasterName is not set.",
-                this->GetClassName(), __LINE__);
+                   this->GetClassName(), __LINE__);
         this->InsertNextError(buff);
         return false;
     }
@@ -130,7 +135,7 @@ vtkGRASSRasterMapBase::SetRegion() {
     }
     CATCH_BOOL
 
-            this->NumberOfRows = head.rows;
+        this->NumberOfRows = head.rows;
     this->NumberOfCols = head.cols;
 
     return true;
@@ -139,13 +144,14 @@ vtkGRASSRasterMapBase::SetRegion() {
 //----------------------------------------------------------------------------
 
 bool
-vtkGRASSRasterMapBase::SetUpRasterBuffer() {
+vtkGRASSRasterMapBase::SetUpRasterBuffer()
+{
 
     // The region must be set and map must be open to allocate the buffer
     if (this->Open == false || this->Map < 0) {
         char buff[1024];
         G_snprintf(buff, 1024, "class: %s line: %i Unable to allocate raster buffer. Raster map is not open",
-                this->GetClassName(), __LINE__);
+                   this->GetClassName(), __LINE__);
         this->InsertNextError(buff);
         return false;
     }
@@ -179,14 +185,15 @@ vtkGRASSRasterMapBase::SetUpRasterBuffer() {
 //----------------------------------------------------------------------------
 
 vtkDataArray *
-vtkGRASSRasterMapBase::GetRow(int idx) {
+vtkGRASSRasterMapBase::GetRow(int idx)
+{
     int i;
     void *ptr;
     char buff[1024];
 
     if (idx < 0 || idx > this->NumberOfRows - 1) {
         G_snprintf(buff, 1024, "class: %s line: %i The index %i is out of range.",
-                this->GetClassName(), __LINE__, idx);
+                   this->GetClassName(), __LINE__, idx);
         this->InsertNextError(buff);
         return NULL;
     }
@@ -200,11 +207,11 @@ vtkGRASSRasterMapBase::GetRow(int idx) {
     ptr = this->RasterBuff;
 
     for (i = 0; i < this->NumberOfCols; i++) {
-       
+
         if (this->UseNullValue) {
             if ((this->MapType == CELL_TYPE && Rast_is_c_null_value(&((CELL*)this->RasterBuff)[i])) ||
-                    (this->MapType == FCELL_TYPE && Rast_is_f_null_value(&((FCELL*)this->RasterBuff)[i])) ||
-                    (this->MapType == DCELL_TYPE && Rast_is_d_null_value(&((DCELL*)this->RasterBuff)[i]))) {
+                (this->MapType == FCELL_TYPE && Rast_is_f_null_value(&((FCELL*)this->RasterBuff)[i])) ||
+                (this->MapType == DCELL_TYPE && Rast_is_d_null_value(&((DCELL*)this->RasterBuff)[i]))) {
                 this->Row->SetTuple1(i, this->NullValue);
             } else {
 
@@ -234,13 +241,14 @@ vtkGRASSRasterMapBase::GetRow(int idx) {
 //----------------------------------------------------------------------------
 
 vtkCharArray *
-vtkGRASSRasterMapBase::GetNullRow(int idx) {
+vtkGRASSRasterMapBase::GetNullRow(int idx)
+{
     int i;
     char buff[1024];
 
     if (idx < 0 || idx > this->NumberOfRows - 1) {
         G_snprintf(buff, 1024, "class: %s line: %i The index %i is out of range.",
-                this->GetClassName(), __LINE__, idx);
+                   this->GetClassName(), __LINE__, idx);
         this->InsertNextError(buff);
         return NULL;
     }
@@ -259,7 +267,8 @@ vtkGRASSRasterMapBase::GetNullRow(int idx) {
 //----------------------------------------------------------------------------
 
 bool
-vtkGRASSRasterMapBase::CloseMap() {
+vtkGRASSRasterMapBase::CloseMap()
+{
     // Cleaning up the null buffer for reuse
     if (this->NullBuff) {
         G_free(this->NullBuff);
@@ -280,4 +289,72 @@ vtkGRASSRasterMapBase::CloseMap() {
     this->Open = false;
 
     return true;
+}
+
+//----------------------------------------------------------------------------
+
+bool vtkGRASSRasterMapBase::GetSampleValue(double x, double y, double &value, int type)
+{
+    if (!this->IsOpen()){
+        char buff[1024];
+        G_snprintf(buff, 1024, "class: %s line: %i Unable to compute sample because map is not open.",
+                   this->GetClassName(), __LINE__);
+        this->InsertNextError(buff);
+        return false;
+    }
+    
+    value = (double)Rast_get_sample(this->Map, this->Region->GetPointer(), NULL, x, y, 0, type);
+        
+    return !this->IsDoubleNullValue(value);
+}
+
+//----------------------------------------------------------------------------
+
+bool vtkGRASSRasterMapBase::GetNearestSampleValue(double x, double y, double &value)
+{
+    return this->GetSampleValue(x, y, value, NEAREST);
+}
+
+//----------------------------------------------------------------------------
+
+bool vtkGRASSRasterMapBase::GetBilinearSampleValue(double x, double y, double &value)
+{
+    return this->GetSampleValue(x, y, value, BILINEAR);
+}
+
+//----------------------------------------------------------------------------
+
+bool vtkGRASSRasterMapBase::GetBicubicSampleValue(double x, double y, double &value)
+{
+    return this->GetSampleValue(x, y, value, CUBIC);
+}
+
+//----------------------------------------------------------------------------
+
+bool vtkGRASSRasterMapBase::IsDoubleNullValue(double value)
+{
+    if (Rast_is_d_null_value(&value))
+        return true;
+    else
+        return false;
+}
+
+//----------------------------------------------------------------------------
+
+bool vtkGRASSRasterMapBase::IsFloatNullValue(float value)
+{
+    if (Rast_is_f_null_value(&value))
+        return true;
+    else
+        return false;
+}
+
+//----------------------------------------------------------------------------
+
+bool vtkGRASSRasterMapBase::IsIntegerNullValue(int value)
+{
+    if (Rast_is_c_null_value(&value))
+        return true;
+    else
+        return false;
 }
