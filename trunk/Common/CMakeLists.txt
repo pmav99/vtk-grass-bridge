@@ -15,6 +15,7 @@ vtkGRASSVectorMapLister.cxx
 vtkGRASSRegion.cxx
 vtkObjectGRASSErrorHandler.cxx
 vtkGRASSInit.cxx
+vtkDouble.cxx
 vtkGRASSModule.cxx
 vtkGRASSFlag.cxx
 vtkGRASSOption.cxx
@@ -30,6 +31,7 @@ vtkGRASSRaster3dMapLister.h
 vtkGRASSVectorMapLister.h
 vtkGRASSRegion.h
 vtkGRASSInit.h
+vtkDouble.h
 vtkGRASSModule.h
 vtkGRASSFlag.h
 vtkGRASSOption.h

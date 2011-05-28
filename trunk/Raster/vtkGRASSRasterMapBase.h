@@ -35,6 +35,7 @@
 #include "vtkGRASSRegion.h"
 #include "vtkGRASSDefines.h"
 #include "vtkGRASSHistory.h"
+#include "vtkDouble.h"
 
 extern "C"{
 #include <grass/gis.h>
@@ -83,7 +84,11 @@ public:
   virtual bool GetNearestSampleValue(double x, double y, double &value);
   virtual bool GetBilinearSampleValue(double x, double y, double &value);
   virtual bool GetBicubicSampleValue(double x, double y, double &value);
-  
+
+  virtual bool GetNearestSampleValue(double x, double y, vtkDouble *value){return this->GetNearestSampleValue(x, y, value->Value);}
+  virtual bool GetBilinearSampleValue(double x, double y, vtkDouble *value){return this->GetBilinearSampleValue(x, y, value->Value);}
+  virtual bool GetBicubicSampleValue(double x, double y, vtkDouble *value){return this->GetBicubicSampleValue(x, y, value->Value);}
+
   static bool IsDoubleNullValue(double value);
   static bool IsFloatNullValue(float value);
   static bool IsIntegerNullValue(int value);
