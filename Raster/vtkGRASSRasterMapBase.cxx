@@ -22,6 +22,8 @@
 #include <vtkDoubleArray.h>
 #include "vtkGRASSRegion.h"
 #include "vtkGRASSHistory.h"
+#include "vtkCELL.h"
+#include "vtkFCELL.h"
 #include <vtkGRASSDefines.h>
 
 vtkCxxRevisionMacro(vtkGRASSRasterMapBase, "$Revision: 1.18 $");
@@ -198,7 +200,7 @@ vtkGRASSRasterMapBase::GetRow(int idx)
         return NULL;
     }
 
-    // Allocate the arster buffer with the map specific type
+    // Allocate the raster buffer with the map specific type
     this->SetUpRasterBuffer();
 
     TRY Rast_get_row(this->Map, this->RasterBuff, idx, this->MapType);
@@ -274,7 +276,7 @@ vtkGRASSRasterMapBase::CloseMap()
         G_free(this->NullBuff);
         this->NullBuff = (char*) NULL;
     }
-
+    
     // Cleaning up the raster buffer for reuse
     if (this->RasterBuff) {
         G_free(this->RasterBuff);
@@ -293,7 +295,7 @@ vtkGRASSRasterMapBase::CloseMap()
 
 //----------------------------------------------------------------------------
 
-bool vtkGRASSRasterMapBase::GetSampleValue(double x, double y, double &value, int type)
+bool vtkGRASSRasterMapBase::GetSampleValue(double x, double y, vtkDCELL *value, int type)
 {
     if (!this->IsOpen()){
         char buff[1024];
@@ -303,37 +305,37 @@ bool vtkGRASSRasterMapBase::GetSampleValue(double x, double y, double &value, in
         return false;
     }
     
-    value = (double)Rast_get_sample(this->Map, this->Region->GetPointer(), NULL, x, y, 0, type);
+    value->Value = Rast_get_sample(this->Map, this->Region->GetPointer(), NULL, x, y, 0, type);
         
     return !this->IsDoubleNullValue(value);
 }
 
 //----------------------------------------------------------------------------
 
-bool vtkGRASSRasterMapBase::GetNearestSampleValue(double x, double y, double &value)
+bool vtkGRASSRasterMapBase::GetNearestSampleValue(double x, double y, vtkDCELL *value)
 {
     return this->GetSampleValue(x, y, value, NEAREST);
 }
 
 //----------------------------------------------------------------------------
 
-bool vtkGRASSRasterMapBase::GetBilinearSampleValue(double x, double y, double &value)
+bool vtkGRASSRasterMapBase::GetBilinearSampleValue(double x, double y, vtkDCELL *value)
 {
     return this->GetSampleValue(x, y, value, BILINEAR);
 }
 
 //----------------------------------------------------------------------------
 
-bool vtkGRASSRasterMapBase::GetBicubicSampleValue(double x, double y, double &value)
+bool vtkGRASSRasterMapBase::GetBicubicSampleValue(double x, double y, vtkDCELL *value)
 {
     return this->GetSampleValue(x, y, value, CUBIC);
 }
 
 //----------------------------------------------------------------------------
 
-bool vtkGRASSRasterMapBase::IsDoubleNullValue(double value)
+bool vtkGRASSRasterMapBase::IsDoubleNullValue(vtkDCELL *value)
 {
-    if (Rast_is_d_null_value(&value))
+    if (Rast_is_d_null_value(&(value->Value)))
         return true;
     else
         return false;
@@ -341,9 +343,9 @@ bool vtkGRASSRasterMapBase::IsDoubleNullValue(double value)
 
 //----------------------------------------------------------------------------
 
-bool vtkGRASSRasterMapBase::IsFloatNullValue(float value)
+bool vtkGRASSRasterMapBase::IsFloatNullValue(vtkFCELL *value)
 {
-    if (Rast_is_f_null_value(&value))
+    if (Rast_is_f_null_value(&(value->Value)))
         return true;
     else
         return false;
@@ -351,9 +353,9 @@ bool vtkGRASSRasterMapBase::IsFloatNullValue(float value)
 
 //----------------------------------------------------------------------------
 
-bool vtkGRASSRasterMapBase::IsIntegerNullValue(int value)
+bool vtkGRASSRasterMapBase::IsIntegerNullValue(vtkCELL *value)
 {
-    if (Rast_is_c_null_value(&value))
+    if (Rast_is_c_null_value(&(value->Value)))
         return true;
     else
         return false;

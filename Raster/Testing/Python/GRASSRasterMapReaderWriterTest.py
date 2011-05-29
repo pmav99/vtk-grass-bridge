@@ -52,7 +52,6 @@ class GRASSRasterMapReaderWriterTest(unittest.TestCase):
                 data.SetTuple1(j, val)
             writer.PutNextRow(data)
 
-
         print writer
         writer.CloseMap()
 
@@ -145,7 +144,6 @@ class GRASSRasterMapReaderWriterTest(unittest.TestCase):
         print "Max ", newMax, max
         self.assertEqual(newMin, min, "Error while reading map")
         self.assertEqual(newMax, max, "Error while reading map")
-
 
         val = [0,0]
         reader.GetRange(val);
@@ -267,17 +265,17 @@ class GRASSRasterMapReaderWriterTest(unittest.TestCase):
             for j in range(reader.GetNumberOfCols()): 
                 
                 row = reader.GetNumberOfRows() - 1 - i
-                value = vtk.mutable(1)
+                value = vtkDCELL()
                 check = i * (reader.GetNumberOfCols())  +  j
                 if reader.GetNearestSampleValue(row + 0.5, j + 0.5, value):
-                    print "Nearest ", value
-                    self.assertEqual(value, check, "Error in nearest neighbour sampling")
+                    print "Nearest ", value.GetValueAsDouble()
+                    self.assertEqual(value.GetValueAsDouble(), check, "Error in nearest neighbour sampling")
                 if reader.GetBilinearSampleValue(row + 0.5, j + 0.5, value):
-                    print "Bilinear ", value
-                    self.assertEqual(value, check, "Error in bilinear sampling")
+                    print "Bilinear ", value.GetValueAsDouble()
+                    self.assertEqual(value.GetValueAsDouble(), check, "Error in bilinear sampling")
                 if reader.GetBicubicSampleValue(row + 0.5, j + 0.5, value):
-                    print "Bicubic ", value
-                    self.assertEqual(value, check, "Error in bicubic sampling")
+                    print "Bicubic ", value.GetValueAsDouble()
+                    self.assertEqual(value.GetValueAsDouble(), check, "Error in bicubic sampling")
 
         reader.CloseMap()
         

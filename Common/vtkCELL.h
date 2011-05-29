@@ -22,30 +22,44 @@
  *
  * */
 
-#ifndef __vtkDouble_h
-#define __vtkDouble_h
+#ifndef __vtkCELL_h
+#define __vtkCELL_h
 
 #include "vtkObject.h"
 #include "vtkGRASSBridgeCommonWin32Header.h"
 
-class VTK_GRASS_BRIDGE_COMMON_EXPORT vtkDouble : public vtkObject
+extern "C"{
+#include <grass/gis.h>
+#include <grass/raster.h>
+}
+
+
+class VTK_GRASS_BRIDGE_COMMON_EXPORT vtkCELL : public vtkObject
 {
 public:
-  static  vtkDouble *New();
-  vtkTypeRevisionMacro(vtkDouble,vtkObject);
+  static  vtkCELL *New();
+  vtkTypeRevisionMacro(vtkCELL,vtkObject);
 
-  vtkGetMacro(Value, double);
-  vtkSetMacro(Value, double);
+  double GetValueAsInt(){return (int)this->Value;}
+  double GetValueAsFloat(){return (float)this->Value;}
+  double GetValueAsDouble(){return (double)this->Value;}
 
-  double Value;
+  void SetIntValue(int value){this->Value = (CELL)value;}
+
+  bool IsNull(){return (Rast_is_c_null_value(&(this->Value))?true:false);}
+  void SetNull(){Rast_set_c_null_value(&(this->Value), 1);}
+
+  //BTX
+  CELL Value;
+  //ETX
   
 protected:
-  vtkDouble(){;}
-  ~vtkDouble() {};
+  vtkCELL(){;}
+  ~vtkCELL() {};
 
 private:
-  vtkDouble(const vtkDouble&);  // Not implemented.
-  void operator=(const vtkDouble&);  // Not implemented.
+  vtkCELL(const vtkCELL&);  // Not implemented.
+  void operator=(const vtkCELL&);  // Not implemented.
 };
 
 #endif
