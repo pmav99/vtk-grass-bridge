@@ -12,9 +12,9 @@
  * GNU General Public License for more details.
  */
 
-#include "vtkDouble.h"
+#include "vtkCELL.h"
 #include <vtkObjectFactory.h>
 
-vtkCxxRevisionMacro(vtkDouble, "$Revision: 1.18 $");
-vtkStandardNewMacro(vtkDouble);
+vtkCxxRevisionMacro(vtkCELL, "$Revision: 1.18 $");
+vtkStandardNewMacro(vtkCELL);
 

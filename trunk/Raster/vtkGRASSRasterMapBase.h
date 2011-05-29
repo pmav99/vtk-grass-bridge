@@ -36,6 +36,9 @@
 #include "vtkGRASSDefines.h"
 #include "vtkGRASSHistory.h"
 #include "vtkDouble.h"
+#include "vtkDCELL.h"
+#include "vtkFCELL.h"
+#include "vtkCELL.h"
 
 extern "C"{
 #include <grass/gis.h>
@@ -43,6 +46,7 @@ extern "C"{
 }
 
 class vtkCharArray;
+class vtkGRASSRasterRow;
 
 
 class VTK_GRASS_BRIDGE_RASTER_EXPORT vtkGRASSRasterMapBase : public vtkObjectGRASSErrorHandler
@@ -63,7 +67,10 @@ public:
 
   //!\brief Return the maptype as string (CELL_TYPE; FCELL_TYPE and DCELL_TYPE or NULL if unknown)
   virtual const char* GetMapTypeAsString();
-
+  virtual bool IsMapTypeCELL(){return (this->MapType == CELL_TYPE?true:false);}
+  virtual bool IsMapTypeFCELL(){return (this->MapType == FCELL_TYPE?true:false);}
+  virtual bool IsMapTypeDCELL(){return (this->MapType == DCELL_TYPE?true:false);}
+  
   //! \brief Set the Region which should be used to open the grass raster map
   vtkSetObjectMacro(Region, vtkGRASSRegion);
   vtkGetObjectMacro(Region, vtkGRASSRegion);
@@ -77,21 +84,18 @@ public:
   //! \brief Close the raster map
   virtual bool CloseMap();
 
-  //! \brief Read a row of the map and return the content as vtkDataArray
+  //! \brief Read a row of the map at position index
+  virtual bool GetRow(int idx, vtkGRASSRasterRow *row);
   virtual vtkDataArray *GetRow(int idx);
   virtual vtkCharArray *GetNullRow(int idx);
   
-  virtual bool GetNearestSampleValue(double x, double y, double &value);
-  virtual bool GetBilinearSampleValue(double x, double y, double &value);
-  virtual bool GetBicubicSampleValue(double x, double y, double &value);
+  virtual bool GetNearestSampleValue(double x, double y, vtkDCELL *value);
+  virtual bool GetBilinearSampleValue(double x, double y, vtkDCELL *value);
+  virtual bool GetBicubicSampleValue(double x, double y, vtkDCELL *value);
 
-  virtual bool GetNearestSampleValue(double x, double y, vtkDouble *value){return this->GetNearestSampleValue(x, y, value->Value);}
-  virtual bool GetBilinearSampleValue(double x, double y, vtkDouble *value){return this->GetBilinearSampleValue(x, y, value->Value);}
-  virtual bool GetBicubicSampleValue(double x, double y, vtkDouble *value){return this->GetBicubicSampleValue(x, y, value->Value);}
-
-  static bool IsDoubleNullValue(double value);
-  static bool IsFloatNullValue(float value);
-  static bool IsIntegerNullValue(int value);
+  static bool IsDoubleNullValue(vtkDCELL *value);
+  static bool IsFloatNullValue(vtkFCELL *value);
+  static bool IsIntegerNullValue(vtkCELL *value);
 
   vtkGetMacro(MapType, int);
   vtkGetMacro(NumberOfRows, int);
@@ -120,7 +124,7 @@ protected:
 
   vtkSetMacro(UseNullValue, int);
   
-  virtual bool GetSampleValue(double x, double y, double &value, int type);
+  virtual bool GetSampleValue(double x, double y, vtkDCELL *value, int type);
 
   int RegionUsage;
   bool Open; // True if the raster file was opened
