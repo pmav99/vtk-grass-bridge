@@ -24,6 +24,7 @@
 #include "vtkGRASSHistory.h"
 #include "vtkCELL.h"
 #include "vtkFCELL.h"
+#include "vtkGRASSRasterRow.h"
 #include <vtkGRASSDefines.h>
 
 vtkCxxRevisionMacro(vtkGRASSRasterMapBase, "$Revision: 1.18 $");
@@ -179,6 +180,35 @@ vtkGRASSRasterMapBase::SetUpRasterBuffer()
             this->RasterBuff = (DCELL*) G_calloc(this->NumberOfCols, sizeof (DCELL));
 
     }
+    CATCH_BOOL
+
+    return true;
+}
+
+//----------------------------------------------------------------------------
+
+bool vtkGRASSRasterMapBase::GetRow(int idx, vtkGRASSRasterRow *row)
+{
+
+    char buff[1024];
+
+    if (idx < 0 || idx > this->NumberOfRows - 1) {
+        G_snprintf(buff, 1024, "class: %s line: %i The index %i is out of range.",
+                   this->GetClassName(), __LINE__, idx);
+        this->InsertNextError(buff);
+        return false;
+    }
+
+    //Check if raster row is of correct type and allocated
+    if((row->GetRowType() == this->GetMapType()) && row->GetNumberOfCols() == this->NumberOfCols)
+    {
+        ;
+    } else {
+        // Allocate the raster buffer with the map specific type
+        row->Allocate(this->NumberOfCols, this->MapType);
+    }
+
+    TRY Rast_get_row(this->Map, row->GetBuffer(), idx, this->MapType);
     CATCH_BOOL
 
     return true;

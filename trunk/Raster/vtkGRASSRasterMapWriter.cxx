@@ -14,6 +14,7 @@
 
 #include "vtkGRASSRasterMapWriter.h"
 #include "vtkGRASSHistory.h"
+#include "vtkGRASSRasterRow.h"
 #include <vtkStringArray.h>
 #include <vtkObjectFactory.h>
 #include <vtkDataArray.h>
@@ -102,7 +103,7 @@ vtkGRASSRasterMapWriter::OpenMap(char *name)
 
 //----------------------------------------------------------------------------
 
-int
+bool
 vtkGRASSRasterMapWriter::PutNextRow(vtkDataArray *data)
 {
 
@@ -114,19 +115,19 @@ vtkGRASSRasterMapWriter::PutNextRow(vtkDataArray *data)
         G_snprintf(buff, 1024, "class: %s line: %i The data array is NULL.",
                    this->GetClassName(), __LINE__);
         this->InsertNextError(buff);
-        return -1;
+        return false;
     }
 
     if (data->GetNumberOfTuples() < this->NumberOfCols)
     {
-        G_snprintf(buff, 1024, "class: %s line: %i The index of data is out of range.",
+        G_snprintf(buff, 1024, "class: %s line: %i The wrong number of tupples in data array.",
                    this->GetClassName(), __LINE__);
         this->InsertNextError(buff);
-        return -1;
+        return false;
     }
 
     if (!this->SetUpRasterBuffer())
-        return -1;
+        return false;
 
     // copy data
     for (i = 0; i < this->NumberOfCols; i++)
@@ -153,9 +154,46 @@ vtkGRASSRasterMapWriter::PutNextRow(vtkDataArray *data)
     }
 
     TRY Rast_put_row(this->Map, this->RasterBuff, this->MapType);
-    CATCH_INT
+    CATCH_BOOL
     
-    return 1;
+    return true;
+}
+
+//----------------------------------------------------------------------------
+
+bool
+vtkGRASSRasterMapWriter::PutNextRow(vtkGRASSRasterRow *row)
+{
+    char buff[1024];
+
+    if (row == NULL)
+    {
+        G_snprintf(buff, 1024, "class: %s line: %i The row is NULL.",
+                   this->GetClassName(), __LINE__);
+        this->InsertNextError(buff);
+        return false;
+    }
+
+    if (row->GetNumberOfCols() < this->NumberOfCols)
+    {
+        G_snprintf(buff, 1024, "class: %s line: %i The number of rows differs.",
+                   this->GetClassName(), __LINE__);
+        this->InsertNextError(buff);
+        return false;
+    }
+
+    if (row->GetRowType() < this->MapType)
+    {
+        G_snprintf(buff, 1024, "class: %s line: %i The row type and map type differ.",
+                   this->GetClassName(), __LINE__);
+        this->InsertNextError(buff);
+        return false;
+    }
+
+    TRY Rast_put_row(this->Map, row->GetBuffer(), this->MapType);
+    CATCH_BOOL
+
+    return true;
 }
 
 //----------------------------------------------------------------------------

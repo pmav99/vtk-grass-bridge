@@ -56,7 +56,9 @@ public:
   //! \brief Open old raster map for reading
   virtual bool OpenMap(char *name);
   //! \brief Write a rast row, returns 1 on success, -1 in case of an error
-  virtual int PutNextRow(vtkDataArray *data);
+  virtual bool PutNextRow(vtkDataArray *data);
+  //! \brief Write a rast row, returns 1 on success, -1 in case of an error
+  virtual bool PutNextRow(vtkGRASSRasterRow *row);
   //! \brief close Map and write a short history
   virtual bool CloseMap();
   //! \brief the current position of the row in the new raster map
