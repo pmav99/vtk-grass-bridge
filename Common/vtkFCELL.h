@@ -44,7 +44,7 @@ public:
   double GetValueAsFloat(){return (float)this->Value;}
   double GetValueAsDouble(){return (double)this->Value;}
   
-  void SetIntValue(int value){this->Value = (CELL)value;}
+  void SetFloatValue(float value){this->Value = (FCELL)value;}
 
   bool IsNull(){return (Rast_is_f_null_value(&(this->Value))?true:false);}
   void SetNull(){Rast_set_f_null_value(&(this->Value), 1);}

@@ -44,6 +44,9 @@ public:
   static  vtkGRASSRasterRow *New();
   vtkTypeRevisionMacro(vtkGRASSRasterRow, vtkObject);
 
+  //!\brief Allocate a raster row of type DCELL, FCELL or CELL, removes previously allocated data
+  //!\param cols The number of cols to allocate
+  bool Allocate(int cols, int rowtype);
   //!\brief Allocate a raster row of type DCELL, removes previously allocated data
   //!\param cols The number of cols to allocate
   bool AllocateDCELL(int cols);
@@ -54,7 +57,7 @@ public:
   //!\param cols The number of cols to allocate
   bool AllocateCELL(int cols);
   //!\brief Check if the row was allocated
-  bool IsAllocated();
+  bool IsAllocated(){return this->Allocated;}
 
   //!\brief Get the DCELL value of the row at position col
   //! The raster row must be of type DCELL, otherwise false is returned
@@ -94,16 +97,21 @@ public:
   //!\return NULL in case of failure
   vtkDataArray *ToDataArray();
   
-  vtkGetMacro(NumberOfColumns, int);
+  vtkGetMacro(NumberOfCols, int);
   vtkGetMacro(RowType, int);
 
+  //BTX
+  //!\brief Return the active buffer or NULL if no buffer was allocated
+  void * GetBuffer();
+  //ETX
+
 protected:
-  vtkGRASSRasterRow(){;}
-  ~vtkGRASSRasterRow() {};
+  vtkGRASSRasterRow();
+  ~vtkGRASSRasterRow();
 
   bool Allocated;
   int RowType;
-  int NumberOfColumns;
+  int NumberOfCols;
   CELL *CELLBuff;
   FCELL *FCELLBuff;
   DCELL *DCELLBuff;

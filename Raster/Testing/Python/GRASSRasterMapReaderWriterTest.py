@@ -20,7 +20,7 @@ class GRASSRasterMapReaderWriterTest(unittest.TestCase):
     def setUp(self):
         init = vtkGRASSInit()
         init.Init("GRASSRasterMapReaderWriterTest")
-        init.ExitOnErrorOn()
+        init.ExitOnErrorOff()
 
     def testSimpleReadWriteCycleDCELL(self):
 
@@ -36,23 +36,24 @@ class GRASSRasterMapReaderWriterTest(unittest.TestCase):
         writer.UseUserDefinedRegion()
         writer.OpenMap("test_dcell")
 
-        data = vtkDoubleArray()
-        data.SetNumberOfTuples(writer.GetNumberOfCols())
+        value = vtkDCELL()
+        row = vtkGRASSRasterRow()
+        row.AllocateDCELL(region.GetCols())
 
         min = 100000000.0
         max = 0.0
 
-        for i in range(writer.GetNumberOfRows()):
-            for j in range(writer.GetNumberOfCols()):
+        for i in range(region.GetRows()):
+            for j in range(region.GetCols()):
                 val = i + j + 100.5
                 if min > val:
                     min = val
                 if max < val:
                     max = val
-                data.SetTuple1(j, val)
-            writer.PutNextRow(data)
+                value.SetDoubleValue(val)
+                row.SetDCELLValue(j, value)
+            writer.PutNextRow(row)
 
-        print writer
         writer.CloseMap()
 
         reader = vtkGRASSRasterMapReader()
@@ -61,10 +62,11 @@ class GRASSRasterMapReaderWriterTest(unittest.TestCase):
 
         newMin = 100000000.0
         newMax = 0.0
-        for i in range(reader.GetNumberOfRows()):
-            data = reader.GetRow(i)
-            for j in range(reader.GetNumberOfCols()):
-                val =  data.GetTuple1(j)
+        for i in range(region.GetRows()):
+            reader.GetRow(i, row)
+            for j in range(region.GetCols()):
+                row.GetDCELLValue(j, value)
+                val = value.GetValueAsDouble()
                 if newMin > val:
                     newMin = val
                 if newMax < val:
@@ -104,34 +106,37 @@ class GRASSRasterMapReaderWriterTest(unittest.TestCase):
         writer.UseUserDefinedRegion()
         writer.OpenMap("test_fcell")
 
-        data = vtkFloatArray()
-        data.SetNumberOfTuples(writer.GetNumberOfCols())
+        value = vtkFCELL()
+        row = vtkGRASSRasterRow()
+        row.AllocateFCELL(region.GetCols())
 
         min = 100000000.0
         max = 0.0
 
-        for i in range(writer.GetNumberOfRows()):
-            for j in range(writer.GetNumberOfCols()):
-                val = i + j + 100.25
+        for i in range(region.GetRows()):
+            for j in range(region.GetCols()):
+                val = i + j + 100.5
                 if min > val:
                     min = val
                 if max < val:
                     max = val
-                data.SetTuple1(j, val)
-            writer.PutNextRow(data)
+                value.SetFloatValue(val)
+                row.SetFCELLValue(j, value)
+            writer.PutNextRow(row)
 
-        print writer
         writer.CloseMap()
 
         reader = vtkGRASSRasterMapReader()
         reader.OpenMap("test_fcell")
 
+
         newMin = 100000000.0
         newMax = 0.0
-        for i in range(reader.GetNumberOfRows()):
-            data = reader.GetRow(i)
-            for j in range(reader.GetNumberOfCols()):
-                val =  data.GetTuple1(j)
+        for i in range(region.GetRows()):
+            reader.GetRow(i, row)
+            for j in range(region.GetCols()):
+                row.GetFCELLValue(j, value)
+                val = value.GetValueAsFloat()
                 if newMin > val:
                     newMin = val
                 if newMax < val:
@@ -171,34 +176,37 @@ class GRASSRasterMapReaderWriterTest(unittest.TestCase):
         writer.UseUserDefinedRegion()
         writer.OpenMap("test_cell")
 
-        data = vtkIntArray()
-        data.SetNumberOfTuples(writer.GetNumberOfCols())
+        value = vtkCELL()
+        row = vtkGRASSRasterRow()
+        row.AllocateCELL(region.GetCols())
 
-        min = 100000000
-        max = 0
+        min = 100000000.0
+        max = 0.0
 
-        for i in range(writer.GetNumberOfRows()):
-            for j in range(writer.GetNumberOfCols()):
+        for i in range(region.GetRows()):
+            for j in range(region.GetCols()):
                 val = i + j + 100
                 if min > val:
                     min = val
                 if max < val:
                     max = val
-                data.SetTuple1(j, val)
-            writer.PutNextRow(data)
+                value.SetIntValue(val)
+                row.SetCELLValue(j, value)
+            writer.PutNextRow(row)
 
-        print writer
         writer.CloseMap()
 
         reader = vtkGRASSRasterMapReader()
         reader.OpenMap("test_cell")
 
-        newMin = 100000000
-        newMax = 0
-        for i in range(reader.GetNumberOfRows()):
-            data = reader.GetRow(i)
-            for j in range(reader.GetNumberOfCols()):
-                val =  int(data.GetTuple1(j))
+
+        newMin = 100000000.0
+        newMax = 0.0
+        for i in range(region.GetRows()):
+            reader.GetRow(i, row)
+            for j in range(region.GetCols()):
+                row.GetCELLValue(j, value)
+                val = value.GetValueAsInt()
                 if newMin > val:
                     newMin = val
                 if newMax < val:
