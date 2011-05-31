@@ -48,8 +48,8 @@ vgb_error_handler(const char *msg, int fatal)
     }
     else 
     {
-		fprintf(stderr, "\n############## Exceptiont called ###########\n");
-		vgb_error_message = msg;
+	fprintf(stderr, "\n############## Exceptiont called ###########\n");
+	vgb_error_message = msg;
         longjmp(vgb_stack_buffer, 1);
     }
     return 1;
