@@ -22,7 +22,8 @@
 #include "vtkGRASSRegion.h"
 #include "vtkGRASSRaster3dMapReader.h"
 #include "vtkDataArray.h"
-#include "../Raster3d/vtkGRASSRaster3dMapBase.h"
+#include "vtkGRASSRaster3dMapBase.h"
+#include "vtkGRASSMessagingInterface.h"
 
 extern "C"
 {
@@ -159,12 +160,18 @@ vtkGRASSRaster3dImageReaderExecute(vtkGRASSRaster3dImageReader *self,
     vtkIdType outIncX, outIncY, outIncZ;
     vtkGRASSRaster3dMapReader *map = self->GetRaster3dMap();
 
+    vtkGRASSMessagingInterface *gm = vtkGRASSMessagingInterface::New();
+
     // Get increments to march through data
     data->GetContinuousIncrements(outExt, outIncX, outIncY, outIncZ);
 
+    int count = 0;
     // Loop through output pixel
     for (idxZ = outExt[4]; idxZ <= outExt[5]; idxZ++)
     {
+        gm->Percent(count, outExt[5], 1);
+        count++;
+        
         for (idxY = outExt[2]; !self->GetAbortExecute() && idxY <= outExt[3]; idxY++)
         {
 
