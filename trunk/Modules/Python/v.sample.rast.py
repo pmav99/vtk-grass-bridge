@@ -30,7 +30,7 @@ def main():
     init.ExitOnErrorOn()
 
     module = vtkGRASSModule()
-    module.SetDescription("Sample a raster map based on the points of an input vector map")
+    module.SetDescription("Sample raster maps based on the points of an input vector map")
     module.AddKeyword("vector")
     module.AddKeyword("sample")
 
@@ -158,6 +158,8 @@ def main():
         
     vectormap.CloseMap()
     rastermap.CloseMap()
+    
+    outputmap.BuildAll()
     outputmap.CloseMap()
 
 if __name__ == "__main__":
