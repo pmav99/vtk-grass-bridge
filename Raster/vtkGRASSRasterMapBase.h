@@ -35,7 +35,6 @@
 #include "vtkGRASSRegion.h"
 #include "vtkGRASSDefines.h"
 #include "vtkGRASSHistory.h"
-#include "vtkDouble.h"
 #include "vtkDCELL.h"
 #include "vtkFCELL.h"
 #include "vtkCELL.h"
