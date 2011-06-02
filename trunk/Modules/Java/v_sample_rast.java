@@ -18,11 +18,6 @@ public class v_sample_rast {
 
     static {
         System.loadLibrary("vtkCommonJava");
-        System.loadLibrary("vtkFilteringJava");
-        System.loadLibrary("vtkIOJava");
-        System.loadLibrary("vtkImagingJava");
-        System.loadLibrary("vtkGraphicsJava");
-        System.loadLibrary("vtkRenderingJava");
         System.loadLibrary("vtkGRASSBridgeIOJava");
         System.loadLibrary("vtkGRASSBridgeRasterJava");
         System.loadLibrary("vtkGRASSBridgeVectorJava");
@@ -37,7 +32,7 @@ public class v_sample_rast {
 
         // Set up the module description
         vtkGRASSModule module = new vtkGRASSModule();
-        module.SetDescription("Sample a raster maps based on the points of an input vector map");
+        module.SetDescription("Sample raster maps based on the points of an input vector map");
         module.AddKeyword("vector");
         module.AddKeyword("sample");
 
@@ -50,6 +45,9 @@ public class v_sample_rast {
 
         // Put the command line arguments into a vtk string array and pass it to the parser
         vtkStringArray parameter = new vtkStringArray();
+
+        // We  need to specify the name of the module
+        parameter.InsertNextValue("v.sample.rast");
 
         for (int i = 0; i < args.length; i++) {
             parameter.InsertNextValue(args[i]);
@@ -72,7 +70,7 @@ public class v_sample_rast {
 
         // Open the output vector map
         vtkGRASSVectorMapWriter outputmap = new vtkGRASSVectorMapWriter();
-        outputmap.OpenMap(output.GetAnswer());
+        outputmap.OpenMap(output.GetAnswer(), 0);
 
         // Setup the new SQL table for the output map
         vtkGRASSDbmiInterface db = outputmap.GetDbmiInterface();
@@ -90,7 +88,7 @@ public class v_sample_rast {
         for (int map = 0; map < rasterNames.GetNumberOfValues(); map++) {
             String name = rasterNames.GetValue(map);
             vtkGRASSDbmiColumn column_rast = new vtkGRASSDbmiColumn();
-            // Assure that the raster map names are SQL compatible
+            // Assure that the raster map names are SQL compatible column names
             column_rast.SetName(name.replace('.', '_'));
             column_rast.SetSQLTypeToDoublePrecision();
             column_rast.SetNullAllowed();
@@ -117,6 +115,8 @@ public class v_sample_rast {
             string.append(i + 1);
             string.append(")");
 
+            //System.out.println(string.toString());
+
             db.ExecuteImmediate(string.toString());
         }
         // End transaction
@@ -124,7 +124,10 @@ public class v_sample_rast {
 
         vtkGRASSVectorFeaturePoints points = new vtkGRASSVectorFeaturePoints();
         vtkGRASSVectorFeatureCats cats = new vtkGRASSVectorFeatureCats();
-
+        // Create a new vector category for each found input point
+        vtkGRASSVectorFeatureCats newcats = new vtkGRASSVectorFeatureCats();
+        vtkDCELL val = new vtkDCELL();
+        
         // Iterate over all rater maps
         for (int map = 0; map < rasterNames.GetNumberOfValues(); map++) {
 
@@ -133,6 +136,8 @@ public class v_sample_rast {
             message.append("Sampling raster map ");
             message.append(name);
             gm.Message(message.toString());
+            // The column name
+            String sql_name = name.replace('.', '_');
 
             // Open the raster map
             vtkGRASSRasterMapReader rastermap = new vtkGRASSRasterMapReader();
@@ -141,7 +146,9 @@ public class v_sample_rast {
             // Start the transaction
             db.BeginTransaction();
             for (int i = 0; i < vectormap.GetNumberOfFeatures(); i++) {
+
                 gm.Percent(i, vectormap.GetNumberOfFeatures(), 1);
+                
                 // Break at the end of the vector file
                 if (vectormap.ReadFeature(i + 1, points, cats) < 0) {
                     break;
@@ -149,33 +156,42 @@ public class v_sample_rast {
                 // Read only points and add the value to the new vector map
                 if (points.IsFeatureTypePoint()) {
                     int cat = i + 1;
-
-                    // Create a new vector category for each found input point
-                    vtkGRASSVectorFeatureCats newcats = new vtkGRASSVectorFeatureCats();
+                    newcats.Reset();
                     newcats.AddCat(1, cat);
 
                     // Append the point and the new category to the output map
                     outputmap.WriteFeature(points, newcats);
 
-                    vtkDCELL val = new vtkDCELL();
                     double p[] = points.GetPoint(0);
-
                     // Sample the raster value and attach only found values
                     if (rastermap.GetNearestSampleValue(p[0], p[1], val)) {
 
                         // SQL statement to insert the found value into the output vector table
                         string.delete(0, string.length());
-                        string.append("INSERT INTO ");
+                        string.append("UPDATE ");
                         string.append(table.GetName());
-                        string.append(" (");
-                        string.append(name);
-                        string.append(")");
-                        string.append(" values (");
+                        string.append(" SET ");
+                        string.append(sql_name);
+                        string.append(" = ");
                         string.append(val.GetValueAsDouble());
-                        string.append(") where cat == ");
+                        string.append(" where cat = ");
                         string.append(cat);
 
-                        gm.Message(string.toString());
+                        //System.out.println(string.toString());
+
+                        db.ExecuteImmediate(string.toString());
+                    } else {
+
+                        // SQL statement to insert the found value into the output vector table
+                        string.delete(0, string.length());
+                        string.append("UPDATE ");
+                        string.append(table.GetName());
+                        string.append(" SET ");
+                        string.append(sql_name);
+                        string.append(" = null where cat = ");
+                        string.append(cat);
+
+                        //System.out.println(string.toString());
 
                         db.ExecuteImmediate(string.toString());
                     }
@@ -192,6 +208,6 @@ public class v_sample_rast {
         db.DisconnectDB();
 
         vectormap.CloseMap();
-        outputmap.CloseMap();
+        outputmap.CloseMap(1);
     }
 }

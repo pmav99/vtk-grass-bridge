@@ -334,9 +334,10 @@ bool vtkGRASSRasterMapBase::GetSampleValue(double x, double y, vtkDCELL *value, 
         this->InsertNextError(buff);
         return false;
     }
+
+    // northin easting is input
+    value->Value = Rast_get_sample(this->Map, this->Region->GetPointer(), NULL, y, x, 0, type);
     
-    value->Value = Rast_get_sample(this->Map, this->Region->GetPointer(), NULL, x, y, 0, type);
-        
     return !this->IsDoubleNullValue(value);
 }
 

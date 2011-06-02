@@ -4,7 +4,7 @@
 #
 # MODULE:       v.sample.rast
 # AUTHOR(S):    Soeren Gebbert
-# PURPOSE:      Sample a raster map based on the points of an input vector map
+# PURPOSE:      Sample raster maps based on the points of an input vector map
 #
 # COPYRIGHT:    (C) 2010 Soeren Gebbert
 #
@@ -104,6 +104,9 @@ def main():
 
     points = vtkGRASSVectorFeaturePoints()
     cats = vtkGRASSVectorFeatureCats()
+    val = vtkDCELL()
+    # Create a new vector category for each found sample
+    newcats = vtkGRASSVectorFeatureCats()
     
     # Smaple the data for each raster map
     for map in range(rasterNames.GetNumberOfValues()):
@@ -125,12 +128,10 @@ def main():
                 break
             # Read only points and add the value to the new vector map
             if points.IsFeatureTypePoint():
-                val = vtkDCELL()
                 p = points.GetPoint(0)
                 cat = i + 1
-                
-                # Create a new vector category for each found sample
-                newcats = vtkGRASSVectorFeatureCats()
+
+                newcats.Reset()
                 newcats.AddCat(1, cat)
 
                 # Append the point and the new category to the output map

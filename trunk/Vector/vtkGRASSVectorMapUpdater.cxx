@@ -72,7 +72,7 @@ vtkGRASSVectorMapUpdater::OpenMap(const char *name, int with_z)
     else if (this->Open == true)
     {
         // If a new name is given, the open map will be closed
-        this->CloseMap();
+        this->CloseMap(0);
     }
 
     this->SetVectorName(name);

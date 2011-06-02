@@ -36,13 +36,27 @@ public:
     vtkTypeRevisionMacro(vtkGRASSVectorMapWriter, vtkGRASSVectorMapTopoReader);
 
 
+    /*!\brief Open a new vector map to write with 3d z-coordinate support
+     *
+     * \param name of the vector map
+     * \return true or false
+     * */
+    virtual bool OpenMap(const char *name){return this->OpenMap(name, 1);}
+
     /*!\brief Open a new vector map to write
      *
      * \param name of the vector map
-     * \param with_z open in 2d or 3d mode
+     * \param with_z open in 2d (0) or 3d (1) mode
      * \return true or false
      * */
-    virtual bool OpenMap(const char *name, int with_z = 0);
+    virtual bool OpenMap(const char *name, int with_z);
+
+    /*! \brief close vector map and build topology
+     *
+     *  \return true for success, false for failure
+     *
+     * */
+    virtual bool CloseMap(){return this->CloseMap(1);}
 
     /*! \brief close vector map
      *
@@ -50,7 +64,7 @@ public:
      *  \return true for success, false for failure
      *
      * */
-    virtual bool CloseMap(int build_topo = 0);
+    virtual bool CloseMap(int build_topo);
 
     /*!
       \brief Writes new feature to the end of file (table)
