@@ -108,7 +108,7 @@ def main():
     # Create a new vector category for each found sample
     newcats = vtkGRASSVectorFeatureCats()
     
-    # Smaple the data for each raster map
+    # Sample the data for each raster map
     for map in range(rasterNames.GetNumberOfValues()):
         name = rasterNames.GetValue(map)
         
@@ -117,6 +117,8 @@ def main():
         # Open the raster map
         rastermap = vtkGRASSRasterMapReader()
         rastermap.OpenMap(name)
+        # The column name
+        sql_name = name.replace(".", "_")
     
         # Start the transaction
         db.BeginTransaction()
@@ -140,12 +142,12 @@ def main():
                 # Sample the raster value
                 if rastermap.GetNearestSampleValue(p[0], p[1], val):
                     # SQL statement to insert the found value into the output vector table
-                    string = "UPDATE " + str(table.GetName()) + " SET " + name.replace(".", "_") + " = " \
+                    string = "UPDATE " + str(table.GetName()) + " SET " + sql_name + " = " \
                              + str(val.GetValueAsDouble()) + " WHERE cat = " + str(cat)
                     # print string
                 else:
                     # In case nothing found the null value is inserted
-                    string = "UPDATE " + str(table.GetName()) + " SET " + name.replace(".", "_") + " = " \
+                    string = "UPDATE " + str(table.GetName()) + " SET " + sql_name + " = " \
                              + "null" + " WHERE cat = " + str(cat)
                     
                 db.ExecuteImmediate(string)
@@ -159,8 +161,6 @@ def main():
         
     vectormap.CloseMap()
     rastermap.CloseMap()
-    
-    outputmap.BuildAll()
     outputmap.CloseMap()
 
 if __name__ == "__main__":

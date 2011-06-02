@@ -128,14 +128,16 @@ public class v_sample_rast {
         vtkGRASSVectorFeatureCats newcats = new vtkGRASSVectorFeatureCats();
         vtkDCELL val = new vtkDCELL();
         
-        // Iterate over all rater maps
+        // Sample the data for each raster map
         for (int map = 0; map < rasterNames.GetNumberOfValues(); map++) {
 
             String name = rasterNames.GetValue(map);
             StringBuilder message = new StringBuilder();
             message.append("Sampling raster map ");
             message.append(name);
+
             gm.Message(message.toString());
+
             // The column name
             String sql_name = name.replace('.', '_');
 
@@ -163,11 +165,12 @@ public class v_sample_rast {
                     outputmap.WriteFeature(points, newcats);
 
                     double p[] = points.GetPoint(0);
-                    // Sample the raster value and attach only found values
+                    string.delete(0, string.length());
+
+                    // Sample the raster value and attach found values or null values
                     if (rastermap.GetNearestSampleValue(p[0], p[1], val)) {
 
                         // SQL statement to insert the found value into the output vector table
-                        string.delete(0, string.length());
                         string.append("UPDATE ");
                         string.append(table.GetName());
                         string.append(" SET ");
@@ -178,12 +181,9 @@ public class v_sample_rast {
                         string.append(cat);
 
                         //System.out.println(string.toString());
-
-                        db.ExecuteImmediate(string.toString());
                     } else {
 
-                        // SQL statement to insert the found value into the output vector table
-                        string.delete(0, string.length());
+                        // SQL statement to insert the null value into the output vector table
                         string.append("UPDATE ");
                         string.append(table.GetName());
                         string.append(" SET ");
@@ -192,9 +192,9 @@ public class v_sample_rast {
                         string.append(cat);
 
                         //System.out.println(string.toString());
-
-                        db.ExecuteImmediate(string.toString());
                     }
+
+                    db.ExecuteImmediate(string.toString());
                 }
             }
             // End transaction
