@@ -36,7 +36,7 @@ vtkGRASSRasterMapWriter::vtkGRASSRasterMapWriter()
 //----------------------------------------------------------------------------
 
 bool
-vtkGRASSRasterMapWriter::OpenMap(char *name)
+vtkGRASSRasterMapWriter::OpenMap(const char *name)
 {
     char buff[1024];
     int error = 0;

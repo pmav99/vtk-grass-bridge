@@ -54,7 +54,7 @@ public:
   vtkSetObjectMacro(History, vtkGRASSHistory);
 
   //! \brief Open old raster map for reading
-  virtual bool OpenMap(char *name);
+  virtual bool OpenMap(const char *name);
   //! \brief Write a rast row, returns 1 on success, -1 in case of an error
   virtual bool PutNextRow(vtkDataArray *data);
   //! \brief Write a rast row, returns 1 on success, -1 in case of an error

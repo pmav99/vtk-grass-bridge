@@ -46,7 +46,7 @@ public class v_sample_rast {
         // Put the command line arguments into a vtk string array and pass it to the parser
         vtkStringArray parameter = new vtkStringArray();
 
-        // We  need to specify the name of the module
+        // We  need to specify the name of the module, otherwise the parser mess up
         parameter.InsertNextValue("v.sample.rast");
 
         for (int i = 0; i < args.length; i++) {
@@ -102,7 +102,7 @@ public class v_sample_rast {
 
         db.GetTable(table);
 
-        // Create the sting buffer
+        // Create the sql string buffer
         StringBuilder string = new StringBuilder("");
 
         // Create the categories
@@ -164,11 +164,12 @@ public class v_sample_rast {
                     // Append the point and the new category to the output map
                     outputmap.WriteFeature(points, newcats);
 
-                    double p[] = points.GetPoint(0);
+                    double north = points.GetPoint(0)[1];
+                    double east = points.GetPoint(0)[0];
                     string.delete(0, string.length());
 
                     // Sample the raster value and attach found values or null values
-                    if (rastermap.GetNearestSampleValue(p[0], p[1], val)) {
+                    if (rastermap.GetNearestSampleValue(north, east, val)) {
 
                         // SQL statement to insert the found value into the output vector table
                         string.append("UPDATE ");

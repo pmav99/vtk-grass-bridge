@@ -43,14 +43,14 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   //! \brief Read the history of a raster map
-  virtual bool ReadHistory(char *rastername);
+  virtual bool ReadHistory(const char *rastername);
   //! \brief Write the history of a raster map
-  virtual bool WriteHistory(char *rastername);
+  virtual bool WriteHistory(const char *rastername);
 
   //! \brief Read the history of a 3d raster map
-  virtual bool Read3dHistory(char *rastername);
+  virtual bool Read3dHistory(const char *rastername);
   //! \brief Write the history of a 3d raster map
-  virtual bool Write3dHistory(char *rastername);
+  virtual bool Write3dHistory(const char *rastername);
 
   vtkGetStringMacro(RasterName);
   virtual const char *GetMapId(){return Rast_get_history(this->hist, HIST_MAPID);}

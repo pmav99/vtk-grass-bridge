@@ -325,7 +325,7 @@ vtkGRASSRasterMapBase::CloseMap()
 
 //----------------------------------------------------------------------------
 
-bool vtkGRASSRasterMapBase::GetSampleValue(double x, double y, vtkDCELL *value, int type)
+bool vtkGRASSRasterMapBase::GetSampleValue(double north, double east, vtkDCELL *value, int type)
 {
     if (!this->IsOpen()){
         char buff[1024];
@@ -335,59 +335,28 @@ bool vtkGRASSRasterMapBase::GetSampleValue(double x, double y, vtkDCELL *value, 
         return false;
     }
 
-    // northin easting is input
-    value->Value = Rast_get_sample(this->Map, this->Region->GetPointer(), NULL, y, x, 0, type);
+    value->Value = Rast_get_sample(this->Map, this->Region->GetPointer(), NULL, north, east, 0, type);
     
-    return !this->IsDoubleNullValue(value);
+    return !value->IsNull();
 }
 
 //----------------------------------------------------------------------------
 
-bool vtkGRASSRasterMapBase::GetNearestSampleValue(double x, double y, vtkDCELL *value)
+bool vtkGRASSRasterMapBase::GetNearestSampleValue(double north, double east, vtkDCELL *value)
 {
-    return this->GetSampleValue(x, y, value, NEAREST);
+    return this->GetSampleValue(north, east, value, NEAREST);
 }
 
 //----------------------------------------------------------------------------
 
-bool vtkGRASSRasterMapBase::GetBilinearSampleValue(double x, double y, vtkDCELL *value)
+bool vtkGRASSRasterMapBase::GetBilinearSampleValue(double north, double east, vtkDCELL *value)
 {
-    return this->GetSampleValue(x, y, value, BILINEAR);
+    return this->GetSampleValue(north, east, value, BILINEAR);
 }
 
 //----------------------------------------------------------------------------
 
-bool vtkGRASSRasterMapBase::GetBicubicSampleValue(double x, double y, vtkDCELL *value)
+bool vtkGRASSRasterMapBase::GetBicubicSampleValue(double north, double east, vtkDCELL *value)
 {
-    return this->GetSampleValue(x, y, value, CUBIC);
-}
-
-//----------------------------------------------------------------------------
-
-bool vtkGRASSRasterMapBase::IsDoubleNullValue(vtkDCELL *value)
-{
-    if (Rast_is_d_null_value(&(value->Value)))
-        return true;
-    else
-        return false;
-}
-
-//----------------------------------------------------------------------------
-
-bool vtkGRASSRasterMapBase::IsFloatNullValue(vtkFCELL *value)
-{
-    if (Rast_is_f_null_value(&(value->Value)))
-        return true;
-    else
-        return false;
-}
-
-//----------------------------------------------------------------------------
-
-bool vtkGRASSRasterMapBase::IsIntegerNullValue(vtkCELL *value)
-{
-    if (Rast_is_c_null_value(&(value->Value)))
-        return true;
-    else
-        return false;
+    return this->GetSampleValue(north, east, value, CUBIC);
 }
