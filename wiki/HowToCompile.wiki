@@ -170,6 +170,8 @@ db.select "select * from sample_1" > /tmp/spample_1.txt
 
 # Now start the Java implementation and compare the results
 cd ../Java
+# Compile the java program first
+javac -classpath $CLASSPATH v_sample_rast.java
 java -classpath $CLASSPATH:. v_sample_rast --o input=archsites raster=elevation.dem,soils output=sample_2
 
 db.select "select * from sample_2" > /tmp/spample_2.txt
