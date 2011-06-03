@@ -2,7 +2,7 @@
 
 == Introduction ==
 
-The vtk-grass-bridge depends on cmake for configuration and on several third party libraries. The two main libraries are *VTK* and *grass7*. Additionally gdal and proj4 libaries should be present. 
+The vtk-grass-bridge depends on cmake for configuration and on several third party libraries. The two main libraries are *VTK* and *grass7*. Additionally gdal and proj4 libraries should be present. 
 
 The vtk-grass-bridge works with VTK versions 5.2, 5.4 and 5.6. Two optional features of the vtk-grass-bridge depend on VTK 5.9:
   * Temporal pipeline support
