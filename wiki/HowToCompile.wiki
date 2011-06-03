@@ -120,7 +120,7 @@ export LD_LIBRARY_PATH="/usr/local/lib:/home/soeren/src/grass7.0/grass_trunk/dis
 
 To use the vtk-grass-bridge in your Java programs the vtk-grass-bridge and VTK must be compiled with Java support. The automatically generated Java classes located in vtk-grass-bridge_build_VTK5.6/java/vtk must compiled and a new vtk.jar including the VTK and vtk-grass-bridge classes must be created. This Java archive must be present in your CLASSPATH environment variable.
 
-This little shell script should help you. be sure you are in the vtk-grass-bridge build directory:
+This little shell script should help you. Make sure you are in the vtk-grass-bridge build directory:
 {{{
 #!/bin/sh
 cd java/vtk
@@ -176,3 +176,19 @@ diff /tmp/spample_1.txt /tmp/spample_2.txt
 }}}
 
 The vtk-grass-bridge is ready to use when no error occurred and the diff command shows no difference between the text files.  
+
+== HowTo use the vtk-grass-bridge ==
+
+To use the vtk-grass-bridge please study the [http://code.google.com/p/vtk-grass-bridge/source/browse/trunk/#trunk%2FExamples examples], [http://code.google.com/p/vtk-grass-bridge/source/browse/trunk/#trunk%2FVector%2FTesting%2FPython tests] and vtk-grass-bridge [http://code.google.com/p/vtk-grass-bridge/source/browse/trunk/#trunk%2FModules%2FPython modules]. 
+
+The vtk-grass-bridge is documented using doxygen. You can generate the documentation from the source directory:
+
+{{{
+#!/bin/sh
+# Make sure you are in the vtk-grass-bridge directory
+doxygen Doxyfile
+# Switch into the documentation dir
+cd ../vtkGRASSBridgeDoc/html/
+# Call firefox to read the docs
+firefox index.html
+}}}
