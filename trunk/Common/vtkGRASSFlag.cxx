@@ -28,5 +28,43 @@ vtkGRASSFlag::vtkGRASSFlag()
 {
 	this->flag = G_define_flag();
 
+    this->Description = NULL;
+    this->Label = NULL;
+    this->GuiSection = NULL;
 }
 
+//----------------------------------------------------------------------------
+
+void vtkGRASSFlag::SetDescription(const char *description)
+{
+    if(this->Description)
+        free(this->Description);
+    
+    this->Description = strdup(description);
+    
+    this->flag->description = (const char*)this->Description;
+}
+
+//----------------------------------------------------------------------------
+
+void vtkGRASSFlag::SetLabel(const char *label)
+{        
+    if(this->Label)
+        free(this->Label);
+    
+    this->Label = strdup(label);
+    
+    this->flag->label = (const char*)this->Label;
+}
+
+//----------------------------------------------------------------------------
+
+void vtkGRASSFlag::SetGuiSection(const char *guisection)
+{
+    if(this->GuiSection)
+        free(this->GuiSection);
+    
+    this->GuiSection = strdup(guisection);
+    
+    this->flag->guisection = (const char*)this->GuiSection;
+}
