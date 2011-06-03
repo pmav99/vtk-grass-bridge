@@ -56,12 +56,12 @@ public:
   void SetKey(char key){this->flag->key = key;}
   //!\brief Set the description of the flag
   //! This description will be used within the help and the manual page
-  void SetDescription(const char *description){this->flag->description = description;}
+  void SetDescription(const char *description);
   //!\brief Set the label of the module
-  void SetLabel(const char *label){this->flag->label = label;}
+  void SetLabel(const char *label);
   //!\brief Set the gui section identifier. This string is used to create
   //! specific tabs in the generated gui
-  void SetGuiSection(const char *guisection){this->flag->guisection = guisection;}
+  void SetGuiSection(const char *guisection);
   //!\brief Return the flag desription
   const char * GetDescription(){return this->flag->description;}
   //!\brief Return the guisection string
@@ -77,6 +77,9 @@ protected:
 
   //BTX
   struct Flag *flag;
+  char *Description;
+  char *Label;
+  char *GuiSection;
   //ETX
 
 private:

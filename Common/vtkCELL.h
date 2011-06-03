@@ -13,8 +13,7 @@
 */
 
 /**
- * \brief This class should be used when a double value is a mutable 
- *        argument of a method and other approaches are not available
+ * \brief This is a simple wrapper class to have CELL value support in Python and Java code. 
  *
  * \author Soeren Gebbert
  * \author Berlin, Germany Aug. 2009
@@ -40,13 +39,18 @@ public:
   static  vtkCELL *New();
   vtkTypeRevisionMacro(vtkCELL,vtkObject);
 
+  //!\brief The internal CELL value is cast to int and returned
   double GetValueAsInt(){return (int)this->Value;}
+  //!\brief The internal CELL value is cast to float and returned
   double GetValueAsFloat(){return (float)this->Value;}
+  //!\brief The internal CELL value is cast to double and returned
   double GetValueAsDouble(){return (double)this->Value;}
 
+  //!\brief Set the value using an int value which is casted to CELL internally
   void SetIntValue(int value){this->Value = (CELL)value;}
-
+  //!\brief Check if the CELL value is of type null
   bool IsNull(){return (Rast_is_c_null_value(&(this->Value))?true:false);}
+  //!\brief Set the CELL value to null
   void SetNull(){Rast_set_c_null_value(&(this->Value), 1);}
 
   //BTX

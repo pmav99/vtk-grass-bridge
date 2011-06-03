@@ -13,7 +13,7 @@
 */
 
 /**
- * \brief
+ * \brief This is a simple wrapper class to have DCELL value support in Python and Java code. 
  * 
  * \author Soeren Gebbert
  * \author Berlin, Germany Aug. 2009
@@ -39,13 +39,18 @@ public:
   static  vtkDCELL *New();
   vtkTypeRevisionMacro(vtkDCELL,vtkObject);
 
+  //!\brief The internal DCELL value is cast to int and returned
   double GetValueAsInt(){return (int)this->Value;}
+  //!\brief The internal DCELL value is cast to float and returned
   double GetValueAsFloat(){return (float)this->Value;}
+  //!\brief The internal DCELL value is cast to double and returned
   double GetValueAsDouble(){return (double)this->Value;}
 
-  void SetDoubleValue(double value){this->Value = (DCELL)value;}
-
+  //!\brief Set the value using a double value which is casted to DCELL internally
+  void SeDoubleValue(double value){this->Value = (DCELL)value;}
+  //!\brief Check if the DCELL value is of type null
   bool IsNull(){return (Rast_is_d_null_value(&(this->Value))?true:false);}
+  //!\brief Set the DCELL value to null
   void SetNull(){Rast_set_d_null_value(&(this->Value), 1);}
 
   //BTX
