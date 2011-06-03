@@ -2,15 +2,13 @@
 
 == Introduction ==
 
-The vtk-grass-bridge use the cmake for configuration and depends on several libraries. The two main libraries are *VTK* and *grass7*. Additionally gdal and proj4 libaries should be present. 
+The vtk-grass-bridge and depends on cmake for configuration and several libraries. The two main libraries are *VTK* and *grass7*. Additionally gdal and proj4 libaries should be present. 
 
-The vtk-grass-bridge works with VTK version 5.2, 5.4, 5.6 and the latest development version 5.9. I strongly recommend to use only the stable versions. Some Linux distributions provide a stable VTK version as package.
-
-Two optional features of the vtk-grass-bridge depend on VTK 5.9:
+The vtk-grass-bridge works with VTK versions 5.2, 5.4, 5.6.Two optional features of the vtk-grass-bridge depend on VTK 5.9:
   * Temporal pipeline support
   * R-VTK interface
 
-Please do not use these optional features, they are in an experimental state and disabled by default.
+Do not use these optional features, they are in an experimental state and disabled by default.
 
 Use always the latest grass7 svn version. The gdal and proj4 libraries should be available on your system via the package manager.
 
@@ -21,9 +19,13 @@ Use your package manager or download the latest version here:
 
 http://www.cmake.org/cmake/resources/software.html
 
-Compile and install cmake. On unix a simple 
+Extract, compile and install cmake. On unix this simple shell script 
 {{{
-configure --qt-gui && make && make install
+#!/bin/sh
+wget http://www.cmake.org/files/v2.8/cmake-2.8.4.tar.gz
+tar xzvf cmake-2.8.4.tar.gz 
+cd cmake-2.8.4 
+./configure --qt-gui && make && make install
 }}}
 should do the job.
 
@@ -44,12 +46,26 @@ You don't need to install GRASS, the build directory contains a full functional 
 
 == Install/Compile VTK ==
 
-Use your package manager and install VTK. Python support should be enabled to run the vtk-grass-bridge tests. Optional Java support can be enabled to run the Java vtk-grass-bridge modules and to use it in your own java modules.
+Use your package manager and install VTK. Python support should be enabled to run the vtk-grass-bridge tests. Optional Java support can be enabled to run the Java vtk-grass-bridge modules.
 
 If no VTK package is available you need to compile VTK. Download the latests stable version here:
 http://www.vtk.org/VTK/resources/software.html
 
-Use cmake-gui to configure VTK. Enable Python and Java support. After configuration type {{{make && make install}}} to install VTK on your computer(this may take a while). The default installation path is {{{/usr/local/lib/vtk-5.6}}} in case of VTK 5.6.
+Extract the sources in your source directory and create a new build directory (VTK_Build). Use cmake-gui to configure VTK. 
+Enable shared library, Python and Java support. After configuration compile and install VTK on your computer(this may take a while). The default installation path is {{{/usr/local/lib/vtk-5.6}}} in case of VTK 5.6.
+{{{
+#!/bin/sh
+mkdir VTK_5.6
+cd VTK_5.6
+wget http://www.vtk.org/files/release/5.6/vtk-5.6.1.tar.gz
+tar xzvf vtk-5.6.1.tar.gz
+mkdir VTK_Build
+cd VTK_Build
+cmake-gui ../VTK
+make && make install
+}}}
+Here a screenshot of a valid VTK configuration:
+http://vtk-grass-bridge.googlecode.com/files/vtk-cmake-gui.png
 
 == Compile/Install vtk-grass-bridge ==  
 
@@ -82,5 +98,3 @@ To run the Python tests, examples and modules you need to set the python and lib
 export PYTHONPATH="/usr/local/lib/python2.6/site-packages/:/usr/local/lib"
 export LD_LIBRARY_PATH="/usr/local/lib:/home/soeren/src/grass7.0/grass_trunk/dist.x86_64-unknown-linux-gnu/lib:/usr/local/lib/vtk-5.6"
 }}}
-
-
