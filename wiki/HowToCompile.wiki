@@ -12,7 +12,7 @@ Do not use these optional features, they are in an experimental state and disabl
 
 Use always the latest grass7 svn version. The gdal and proj4 libraries should be available on your system via the package manager.
 
-== Install CMake ==
+== Compile/Install CMake ==
 
 You need cmake to configure the vtk-grass-bridge as well as VTK itself.
 Use your package manager or download the latest version here: 
@@ -44,7 +44,7 @@ export LDFLAGS="-lgomp"
 
 You don't need to install GRASS, the build directory contains a full functional grass installation.
 
-== Install/Compile VTK ==
+== Compile/Install VTK ==
 
 Use your package manager and install VTK. Python support should be enabled to run the vtk-grass-bridge tests. Optional Java support can be enabled to run the Java vtk-grass-bridge modules.
 
@@ -90,11 +90,23 @@ Have a look at this screenshot showing a valid configuration:
 
 http://vtk-grass-bridge.googlecode.com/files/vtk-grass-bridge-cmake-gui.png
 
-After configuration compile the sources on Unix with {{{make}}} and install them using {{{make install}}}. The libraries are insalled by default in {{{/usr/local/lib}}}.
+After configuration compile the sources on Unix with 
+{{{
+make
+}}} 
+and install them using 
+{{{
+make install
+}}}
+The libraries are installed by default in {{{/usr/local/lib}}}.
 
-To run the Python tests, examples and modules you need to set the python and library paths. Here an example for the bash:
+== Configure your environment ==
+
+To use the vtk-grass-bridge in your projects or to run the Python tests, examples and modules you need to assure that the grass7, vtk-grass-libraries and the VTK libraries are located in your LD_LIBRARY_PATH. Additionally the vtk-grass-bridge libraries and the VTK Python package must be in your PYTHONPATH. Here an example for the bash:
 
 {{{
 export PYTHONPATH="/usr/local/lib/python2.6/site-packages/:/usr/local/lib"
 export LD_LIBRARY_PATH="/usr/local/lib:/home/soeren/src/grass7.0/grass_trunk/dist.x86_64-unknown-linux-gnu/lib:/usr/local/lib/vtk-5.6"
+
+== Java support ==
 }}}
