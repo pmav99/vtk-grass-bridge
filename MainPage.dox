@@ -3,11 +3,11 @@
 
 The purpose of this library is to provide an interface between the grass C libraries and
 C++, Python and Java.
-It uses the VTK wrapper to support Python and Java.
+It uses the VTK wrapper to create support for Python and Java.
 The support is currently limited to the basic gis, raster and vector map functions of libgrass_gis,
-libgrass_vector and libgrass_raster.
+libgrass_vector, libgrass_raster and libgrass_raster3d.
 
-The library works only with VTK 5.9 and the altest grass7 svn version.
+The library works with VTK 5.2, 5.4, 5.6 and 5.9 and the latest grass7 svn version.
 
 \author Soeren Gebbert
 \author Berlin, Germany Aug. 2009

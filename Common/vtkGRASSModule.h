@@ -44,9 +44,9 @@ public:
   void AddKeyword(const char *keyword);
   //!\brief Set the module description
   //! This description will be used within the help and the manual page
-  void SetDescription(const char *description){this->module->description = description;}
+  void SetDescription(const char *description);
   //!\brief Set the label of the module
-  void SetLabel(const char *label){this->module->label = label;}
+  void SetLabel(const char *label);
   //!\brief Return the module desription
   const char * GetDescription(){return this->module->description;}
   //!\brief Return the label string
@@ -58,6 +58,8 @@ protected:
 
   //BTX
   struct GModule *module;
+  char *Description;
+  char *Label;
   //ETX
 
 
