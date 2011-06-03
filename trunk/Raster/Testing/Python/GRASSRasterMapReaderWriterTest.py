@@ -275,14 +275,14 @@ class GRASSRasterMapReaderWriterTest(unittest.TestCase):
                 row = reader.GetNumberOfRows() - 1 - i
                 value = vtkDCELL()
                 check = i * (reader.GetNumberOfCols())  +  j
-                if reader.GetNearestSampleValue(j + 0.5, row + 0.5, value):
-                    #print "Nearest ", value.GetValueAsDouble()
+                if reader.GetNearestSampleValue(row + 0.5, j + 0.5, value):
+                    print "Nearest ", value.GetValueAsDouble(), "Check", check
                     self.assertEqual(value.GetValueAsDouble(), check, "Error in nearest neighbour sampling")
-                if reader.GetBilinearSampleValue(j + 0.5, row + 0.5, value):
-                    #print "Bilinear ", value.GetValueAsDouble()
+                if reader.GetBilinearSampleValue(row + 0.5, j + 0.5, value):
+                    print "Bilinear ", value.GetValueAsDouble(), "Check", check
                     self.assertEqual(value.GetValueAsDouble(), check, "Error in bilinear sampling")
-                if reader.GetBicubicSampleValue(j + 0.5, row + 0.5, value):
-                    #print "Bicubic ", value.GetValueAsDouble()
+                if reader.GetBicubicSampleValue(row + 0.5, j + 0.5, value):
+                    print "Bicubic ", value.GetValueAsDouble(), "Check", check
                     self.assertEqual(value.GetValueAsDouble(), check, "Error in bicubic sampling")
 
         reader.CloseMap()

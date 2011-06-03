@@ -27,7 +27,7 @@ vtkStandardNewMacro(vtkGRASSRasterMapReader);
 //----------------------------------------------------------------------------
 
 bool
-vtkGRASSRasterMapReader::OpenMap(char *name)
+vtkGRASSRasterMapReader::OpenMap(const char *name)
 {
     const char *mapset;
     char buff[1024];

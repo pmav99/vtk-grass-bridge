@@ -47,7 +47,7 @@ public:
   double GetValueAsDouble(){return (double)this->Value;}
 
   //!\brief Set the value using a double value which is casted to DCELL internally
-  void SeDoubleValue(double value){this->Value = (DCELL)value;}
+  void SetDoubleValue(double value){this->Value = (DCELL)value;}
   //!\brief Check if the DCELL value is of type null
   bool IsNull(){return (Rast_is_d_null_value(&(this->Value))?true:false);}
   //!\brief Set the DCELL value to null

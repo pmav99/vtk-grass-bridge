@@ -56,7 +56,7 @@ vtkGRASSHistory::~vtkGRASSHistory()
 //----------------------------------------------------------------------------
 
 bool
-vtkGRASSHistory::ReadHistory(char *rastername)
+vtkGRASSHistory::ReadHistory(const char *rastername)
 {
     const char *mapset;
     char buff[1024];
@@ -88,7 +88,7 @@ vtkGRASSHistory::ReadHistory(char *rastername)
 //----------------------------------------------------------------------------
 
 bool
-vtkGRASSHistory::Read3dHistory(char *rastername)
+vtkGRASSHistory::Read3dHistory(const char *rastername)
 {
     const char *mapset;
     char buff[1024];
@@ -121,7 +121,7 @@ vtkGRASSHistory::Read3dHistory(char *rastername)
 //----------------------------------------------------------------------------
 
 bool
-vtkGRASSHistory::WriteHistory(char *rastername)
+vtkGRASSHistory::WriteHistory(const char *rastername)
 {
     TRY Rast_write_history(rastername, this->hist);
     CATCH_BOOL
@@ -135,7 +135,7 @@ vtkGRASSHistory::WriteHistory(char *rastername)
 //----------------------------------------------------------------------------
 
 bool
-vtkGRASSHistory::Write3dHistory(char *rastername)
+vtkGRASSHistory::Write3dHistory(const char *rastername)
 {
     TRY G3d_writeHistory(rastername, this->hist);
     CATCH_BOOL

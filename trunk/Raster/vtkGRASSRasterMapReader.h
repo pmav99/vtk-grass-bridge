@@ -45,7 +45,7 @@ public:
   //! \brief Open an existing raster map for reading.
   //! \param name the name of an existing raster map
   //! \return true for success, false fo error
-  virtual bool OpenMap(char *name);
+  virtual bool OpenMap(const char *name);
   
   //! \brief Return the min and max range as double for all map types.
   //! Call only after the raster map was opened.

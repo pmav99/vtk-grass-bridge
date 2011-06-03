@@ -130,7 +130,8 @@ def main():
                 break
             # Read only points and add the value to the new vector map
             if points.IsFeatureTypePoint():
-                p = points.GetPoint(0)
+                north = points.GetPoint(0)[1]
+                east = points.GetPoint(0)[0]
                 cat = i + 1
 
                 newcats.Reset()
@@ -140,7 +141,7 @@ def main():
                 outputmap.WriteFeature(points, newcats)
                 
                 # Sample the raster value
-                if rastermap.GetNearestSampleValue(p[0], p[1], val):
+                if rastermap.GetNearestSampleValue(north, east, val):
                     # SQL statement to insert the found value into the output vector table
                     string = "UPDATE " + str(table.GetName()) + " SET " + sql_name + " = " \
                              + str(val.GetValueAsDouble()) + " WHERE cat = " + str(cat)
