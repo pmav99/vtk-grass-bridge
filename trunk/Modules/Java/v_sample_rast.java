@@ -53,7 +53,7 @@ public class v_sample_rast {
             parameter.InsertNextValue(args[i]);
         }
 
-        // Use the GRASS GIS messaging interface for gm and noisy output
+        // Use the GRASS GIS messaging interface for noisy output
         vtkGRASSMessagingInterface gm = new vtkGRASSMessagingInterface();
 
         if (init.Parser(parameter) != true) {
@@ -208,6 +208,6 @@ public class v_sample_rast {
         db.DisconnectDB();
 
         vectormap.CloseMap();
-        outputmap.CloseMap(1);
+        outputmap.CloseMap();
     }
 }

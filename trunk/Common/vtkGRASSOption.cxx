@@ -26,11 +26,20 @@ vtkStandardNewMacro(vtkGRASSOption);
 
 vtkGRASSOption::vtkGRASSOption()
 {
-	this->option = NULL;
+    this->option = NULL;
+
+    this->Key = NULL;
+    this->Description = NULL;
+    this->Label = NULL;
+    this->Answer = NULL;
+    this->Options = NULL;
+    this->GuiSection = NULL;
+    this->GisPrompt = NULL;
 }
 
-bool vtkGRASSOption::CreateOption(int OptionType) {
-    if(this->option == NULL) {
+bool vtkGRASSOption::CreateOption(int OptionType)
+{
+    if (this->option == NULL) {
         this->option = G_define_standard_option(OptionType);
         return true;
     } else {
@@ -47,18 +56,110 @@ void vtkGRASSOption::GetAnswers(vtkStringArray *array)
     array->Initialize();
     array->SetNumberOfComponents(1);
 
-    if(this->option->answers != NULL)
-    {
-        while(this->option->answers[count] != NULL)
-        {
+    if (this->option->answers != NULL) {
+        while (this->option->answers[count] != NULL) {
             array->InsertNextValue(this->option->answers[count]);
-            count ++;
+            count++;
         }
     }
 
     return;
 }
 
+//----------------------------------------------------------------------------
 
+void vtkGRASSOption::SetKey(const char *key)
+{
+    VGB_CHECK_OPTION 
+        
+    if(this->Key)
+        free(this->Key);
+    
+    this->Key = strdup(key);
+    
+    this->option->key = (const char*)this->Key;
+}
 
+//----------------------------------------------------------------------------
 
+void vtkGRASSOption::SetDescription(const char *description)
+{
+    VGB_CHECK_OPTION
+        
+    if(this->Description)
+        free(this->Description);
+    
+    this->Description = strdup(description);
+    
+    this->option->description = (const char*)this->Description;
+}
+
+//----------------------------------------------------------------------------
+
+void vtkGRASSOption::SetLabel(const char *label)
+{
+    VGB_CHECK_OPTION
+        
+    if(this->Label)
+        free(this->Label);
+    
+    this->Label = strdup(label);
+    
+    this->option->label = (const char*)this->Label;
+}
+
+//----------------------------------------------------------------------------
+
+void vtkGRASSOption::SetGuiSection(const char *guisection)
+{
+    VGB_CHECK_OPTION
+        
+    if(this->GuiSection)
+        free(this->GuiSection);
+    
+    this->GuiSection = strdup(guisection);
+    
+    this->option->guisection = (const char*)this->GuiSection;
+}
+
+//----------------------------------------------------------------------------
+
+void vtkGRASSOption::SetGisprompt(const char *gisprompt)
+{
+    VGB_CHECK_OPTION 
+        
+    if(this->GisPrompt)
+        free(this->GisPrompt);
+    
+    this->GisPrompt = strdup(gisprompt);
+    
+    this->option->gisprompt = (const char*)this->GisPrompt;
+}
+
+//----------------------------------------------------------------------------
+
+void vtkGRASSOption::SetDefaultOptions(const char *options)
+{
+    VGB_CHECK_OPTION
+        
+    if(this->Options)
+        free(this->Options);
+    
+    this->Options = strdup(options);
+    
+    this->option->options = (const char*)this->Options;
+}
+
+//----------------------------------------------------------------------------
+
+void vtkGRASSOption::SetDefaultAnswer(char *answer)
+{
+    VGB_CHECK_OPTION;
+        
+    if(this->Answer)
+        free(this->Answer);
+    
+    this->Answer = strdup(answer);
+    
+    this->option->answer = this->Answer;
+}

@@ -17,9 +17,9 @@
 #include <vtkObjectFactory.h>
 #include "vtkGRASSDefines.h"
 
-extern "C"
-{
+extern "C" {
 #include <grass/gis.h>
+#include <string.h>
 }
 
 vtkCxxRevisionMacro(vtkGRASSModule, "$Revision: 1.18 $");
@@ -30,13 +30,38 @@ vtkStandardNewMacro(vtkGRASSModule);
 
 vtkGRASSModule::vtkGRASSModule()
 {
-	this->module = G_define_module();
+    this->module = G_define_module();
+    this->Description = NULL;
+    this->Label = NULL;
 }
 
 //----------------------------------------------------------------------------
 
 void vtkGRASSModule::AddKeyword(const char *keyword)
 {
-	G_add_keyword(keyword);
+    G_add_keyword(keyword);
 }
 
+//----------------------------------------------------------------------------
+
+void vtkGRASSModule::SetDescription(const char *description)
+{
+    if(this->Description)
+        free(this->Description);
+    
+    this->Description = strdup(description);
+    
+    this->module->description = (const char*)this->Description;
+}
+
+//----------------------------------------------------------------------------
+
+void vtkGRASSModule::SetLabel(const char *label)
+{
+    if(this->Label)
+        free(this->Label);
+    
+    this->Label = strdup(label);
+    
+    this->module->label = (const char*)this->Label;
+}

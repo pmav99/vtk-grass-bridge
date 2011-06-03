@@ -47,7 +47,7 @@ def main():
     if init.Parser(parameter) != True:
         return -1
 
-    # Use the GRASS GIS messaging interface for gm and noisy output
+    # Use the GRASS GIS messaging interface for noisy output
     gm = vtkGRASSMessagingInterface()
     
     # Read the raster names
@@ -154,13 +154,14 @@ def main():
 
         # End transaction
         db.CommitTransaction()
+        # Close the arster map
+        rastermap.CloseMap()
 
     gm.Percent(1, 1, 1)
     
     db.DisconnectDB()
         
     vectormap.CloseMap()
-    rastermap.CloseMap()
     outputmap.CloseMap()
 
 if __name__ == "__main__":

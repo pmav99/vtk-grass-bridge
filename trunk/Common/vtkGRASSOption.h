@@ -68,21 +68,21 @@ public:
 
   //!\brief Set the key.
   //! This will set the identifier string
-  void SetKey(const char *key){VGB_CHECK_OPTION this->option->key = key;}
+  void SetKey(const char *key);
   //!\brief Set the description of the option
   //! This description will be used within the help and the manual page
-  void SetDescription(const char *description){VGB_CHECK_OPTION this->option->description = description;}
+  void SetDescription(const char *description);
   //!\brief Set the label of the module
-  void SetLabel(const char *label){VGB_CHECK_OPTION this->option->label = label;}
+  void SetLabel(const char *label);
   //!\brief Set the gui section identifier. This string is used to create
   //! specific tabs in the generated gui
-  void SetGuiSection(const char *guisection){VGB_CHECK_OPTION this->option->guisection = guisection;}
+  void SetGuiSection(const char *guisection);
   //!\brief Set the gispompt string ("old,raster,cell" or "new,vector,vector")
-  void SetGisprompt(const char *gisprompt){VGB_CHECK_OPTION this->option->gisprompt = gisprompt;}
+  void SetGisprompt(const char *gisprompt);
   //!\brief Set default options ("a,b,c,d")
-  void SetDefaultOptions(const char *options) {VGB_CHECK_OPTION this->option->options = options;}
+  void SetDefaultOptions(const char *options);
   //!\brief Set the default answer
-  void SetDefaultAnswer(char *answer) {VGB_CHECK_OPTION this->option->answer = answer;}
+  void SetDefaultAnswer(char *answer);
 
   //!\brief Set if the option support multiple answers
   void MultipleOn() {VGB_CHECK_OPTION this->option->multiple = 1;}
@@ -134,6 +134,13 @@ protected:
   
   //BTX
   struct Option *option;
+  char *Key;
+  char *Description;
+  char *Label;
+  char *Answer;
+  char *Options;
+  char *GuiSection;
+  char *GisPrompt;
   //ETX
 
 private:
