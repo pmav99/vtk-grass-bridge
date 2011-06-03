@@ -2,7 +2,7 @@
 
 == Introduction ==
 
-The vtk-grass-bridge and depends on cmake for configuration and several third party libraries. The two main libraries are *VTK* and *grass7*. Additionally gdal and proj4 libaries should be present. 
+The vtk-grass-bridge depends on cmake for configuration and on several third party libraries. The two main libraries are *VTK* and *grass7*. Additionally gdal and proj4 libaries should be present. 
 
 The vtk-grass-bridge works with VTK versions 5.2, 5.4 and 5.6. Two optional features of the vtk-grass-bridge depend on VTK 5.9:
   * Temporal pipeline support
@@ -10,7 +10,7 @@ The vtk-grass-bridge works with VTK versions 5.2, 5.4 and 5.6. Two optional feat
 
 These optional featurs are in an experimental state and disabled by default.
 
-The gdal and proj4 libraries should be available on your system via the package manager, they are needed by VTK and by grass7 as well.
+The gdal and proj4 libraries should be available on your system via the package manager. These libraries are needed by VTK and by grass7 as well.
 
 To use the vtk-grass-bridge in your project you need to:
   * Compile and install cmake
@@ -18,6 +18,7 @@ To use the vtk-grass-bridge in your project you need to:
   * Compile and install grass7
   * Compile and install vtk-grass-bridge
   * Set up some environment variables
+  * Test the vtk-grass-bridge
 
 == Compile/Install CMake ==
 
@@ -78,7 +79,7 @@ http://vtk-grass-bridge.googlecode.com/files/vtk-cmake-gui.png
 
 After the compilation/installation of grass7 and VTK you can configure and compile the vtk-grass-bridge.
 
-Downlad the latest code via svn:
+Download the latest code via svn:
 {{{
 svn checkout http://vtk-grass-bridge.googlecode.com/svn/trunk/ vtk-grass-bridge
 }}}
@@ -109,7 +110,7 @@ The libraries are installed by default in {{{/usr/local/lib}}}.
 
 == Configure your environment ==
 
-To use the vtk-grass-bridge in your projects or to run the Python tests, examples and modules you need to assure that the grass7, vtk-grass-bridge and the VTK libraries are located in your LD_LIBRARY_PATH. Additionally the vtk-grass-bridge libraries and the VTK Python package must be in your PYTHONPATH. Here an example for the bash:
+To use the vtk-grass-bridge in your projects or to run the Python tests, examples and modules you need to assure that the grass7-, vtk-grass-bridge- and the VTK-libraries are located in your LD_LIBRARY_PATH. Additionally the vtk-grass-bridge libraries and the VTK Python package must be in your PYTHONPATH. Here an example for the bash:
 
 {{{
 export PYTHONPATH="/usr/local/lib/python2.6/site-packages/:/usr/local/lib"
@@ -118,7 +119,7 @@ export LD_LIBRARY_PATH="/usr/local/lib:/home/soeren/src/grass7.0/grass_trunk/dis
 
 == Java support ==
 
-To use the vtk-grass-bridge in your Java programs the vtk-grass-bridge and VTK must be compiled with Java support. The automatically generated Java classes located in vtk-grass-bridge_build_VTK5.6/java/vtk must compiled and a new vtk.jar including the VTK and vtk-grass-bridge classes must be created. This Java archive must be present in your CLASSPATH environment variable.
+To use the vtk-grass-bridge in your Java programs the vtk-grass-bridge and VTK must be compiled with Java support. The automatically generated Java classes located in vtk-grass-bridge_build_VTK5.6/java/vtk must be compiled and a new vtk.jar including the VTK and vtk-grass-bridge classes must be created. The new Java archive must be present in your CLASSPATH environment variable.
 
 This little shell script should help you. Make sure you are in the vtk-grass-bridge build directory:
 {{{
@@ -149,12 +150,14 @@ The vtk-grass-bridge examples, tests and modules must be run in the grass shell 
 First we need to rebuild topology for all vector maps, otherwise vtk-grass-bridge and grass7 modules will have problems to open them in topology mode:
 
 {{{
+#!/bin/sh
+# Rebuild topology for grass7 use
 for i in `g.mlist vect` ; do 
   v.build $i; 
 done
 }}}
 
-To test the correct installation of the vtk-grass-bridge with Python and Java support we will run a Python and a Java module with similar functionality.
+To test the correct installation of the vtk-grass-bridge with Python and Java support we will run a Python and a Java module with similar functionality. The modules sample several raster maps using points of a vector map.
 
 {{{
 #!/bin/sh
@@ -162,12 +165,12 @@ To test the correct installation of the vtk-grass-bridge with Python and Java su
 
 # First we start the Python version of v.sample.rast
 cd Modules/Python
-python v.sample.rast.py --o input=archsites raster=elevation.dem output=sample_1
+python v.sample.rast.py --o input=archsites raster=elevation.dem,soils output=sample_1
 db.select "select * from sample_1" > /tmp/spample_1.txt
 
 # Now start the Java implementation and compare the results
 cd ../Java
-java -classpath $CLASSPATH:. v_sample_rast input=archsites raster=elevation.dem output=sample_2
+java -classpath $CLASSPATH:. v_sample_rast --o input=archsites raster=elevation.dem,soils output=sample_2
 
 db.select "select * from sample_2" > /tmp/spample_2.txt
 
