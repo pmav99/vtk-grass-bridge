@@ -163,10 +163,18 @@ To test the correct installation of the vtk-grass-bridge with Python and Java su
 #!/bin/sh
 # Make sure we are in the source folder of vtk-grass-bridge
 
-# First we start the Python version of v.sample.rast
+# First we start the Cxx version of v.sample.rast
+# which was installed in /usr/local/bin
+v.sample.rast --o input=archsites raster=elevation.dem,soils output=sample_0
+db.select "select * from sample_0" > /tmp/sample_0.txt
+
+# Then we start the Python version of v.sample.rast
 cd Modules/Python
 python v.sample.rast.py --o input=archsites raster=elevation.dem,soils output=sample_1
-db.select "select * from sample_1" > /tmp/spample_1.txt
+db.select "select * from sample_1" > /tmp/sample_1.txt
+
+# Compare the Cxx and Python version using diff
+diff /tmp/sample_0.txt /tmp/sample_1.txt
 
 # Now start the Java implementation and compare the results
 cd ../Java
@@ -174,10 +182,10 @@ cd ../Java
 javac -classpath $CLASSPATH v_sample_rast.java
 java -classpath $CLASSPATH:. v_sample_rast --o input=archsites raster=elevation.dem,soils output=sample_2
 
-db.select "select * from sample_2" > /tmp/spample_2.txt
+db.select "select * from sample_2" > /tmp/sample_2.txt
 
-# Compare the result using diff
-diff /tmp/spample_1.txt /tmp/spample_2.txt
+# Compare the Python and Java results using diff
+diff /tmp/sample_1.txt /tmp/sample_2.txt
 }}}
 
 The vtk-grass-bridge is ready to use when no error occurred and the diff command shows no difference between the text files.  
