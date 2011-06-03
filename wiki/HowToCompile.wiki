@@ -157,7 +157,7 @@ for i in `g.mlist vect` ; do
 done
 }}}
 
-To test the correct installation of the vtk-grass-bridge with Python and Java support we will run a Python and a Java module with similar functionality. The modules sample several raster maps using points of a vector map.
+To test the correct installation of the vtk-grass-bridge with Python and Java support we will run a Cxx, Python and a Java module with similar functionality. The modules sample several raster maps using points of a vector map.
 
 {{{
 #!/bin/sh
