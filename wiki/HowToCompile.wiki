@@ -134,4 +134,45 @@ cd ..
 make
 }}}
 
-Now put the vtkGrass.jar archive into your CLASSPATH variable. 
+Now put the vtkGrass.jar archive into your CLASSPATH variable. Additionally add the Java xawt library to your LD_LIBRARY_PATH:
+
+{{{
+export LD_LIBRARY_PATH="/usr/lib64/jvm/java-1.6.0-sun-1.6.0/jre/lib/amd64/xawt:$LD_LIBRARY_PATH"
+}}}
+
+== Test your installation ==
+
+We will now test the vtk-grass-bridge installation. Make sure all paths (PYTHONPATH, LD_LIBRARY_PATH and CLASSPATH) are set correctly.
+
+The vtk-grass-bridge examples, tests and modules must be run in the grass shell environment. Start grass7 with the spearfish6 LOCATION using MAPSET PERMANENT. 
+
+First we need to rebuild topology for all vector maps, otherwise vtk-grass-bridge and grass7 modules will have problems to open them in topology mode:
+
+{{{
+for i in `g.mlist vect` ; do 
+  v.build $i; 
+done
+}}}
+
+To test the correct installation of the vtk-grass-bridge with Python and Java support we will run a Python and a Java module with similar functionality.
+
+{{{
+#!/bin/sh
+# Make sure we are in the source folder of vtk-grass-bridge
+
+# First we start the Python version of v.sample.rast
+cd Modules/Python
+python v.sample.rast.py --o input=archsites raster=elevation.dem output=sample_1
+db.select "select * from sample_1" > /tmp/spample_1.txt
+
+# Now start the Java implementation and compare the results
+cd ../Java
+java -classpath $CLASSPATH:. v_sample_rast input=archsites raster=elevation.dem output=sample_2
+
+db.select "select * from sample_2" > /tmp/spample_2.txt
+
+# Compare the result using diff
+diff /tmp/spample_1.txt /tmp/spample_2.txt
+}}}
+
+The vtk-grass-bridge is ready to use when no error occurred and the diff command shows no difference between the text files.  
