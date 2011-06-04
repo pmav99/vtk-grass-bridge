@@ -133,12 +133,14 @@ def main():
                 north = points.GetPoint(0)[1]
                 east = points.GetPoint(0)[0]
                 cat = i + 1
+                
+                #Write the new point only once
+                if map == 0:
+                    newcats.Reset()
+                    newcats.AddCat(1, cat)
 
-                newcats.Reset()
-                newcats.AddCat(1, cat)
-
-                # Append the point and the new category to the output map
-                outputmap.WriteFeature(points, newcats)
+                    # Append the point and the new category to the output map
+                    outputmap.WriteFeature(points, newcats)
                 
                 # Sample the raster value
                 if rastermap.GetNearestSampleValue(north, east, val):
