@@ -158,11 +158,15 @@ public class v_sample_rast {
                 // Read only points and add the value to the new vector map
                 if (points.IsFeatureTypePoint()) {
                     int cat = i + 1;
-                    newcats.Reset();
-                    newcats.AddCat(1, cat);
 
-                    // Append the point and the new category to the output map
-                    outputmap.WriteFeature(points, newcats);
+                    // Write the new point only once
+                    if(map == 0) {
+                        newcats.Reset();
+                        newcats.AddCat(1, cat);
+
+                        // Append the point and the new category to the output map
+                        outputmap.WriteFeature(points, newcats);
+                    }
 
                     double north = points.GetPoint(0)[1];
                     double east = points.GetPoint(0)[0];

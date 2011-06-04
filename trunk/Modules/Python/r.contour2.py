@@ -2,7 +2,7 @@
 #
 ############################################################################
 #
-# MODULE:       r.contour
+# MODULE:       r.contour2
 # AUTHOR(S):    Soeren Gebbert
 # PURPOSE:      Create a contour vector map based on raster map values.
 #
@@ -113,7 +113,7 @@ def main():
 if __name__ == "__main__":
     # Initiate GRASS
     init = vtkGRASSInit()
-    init.Init("r.to.tin")
+    init.Init("r.contour2")
     init.ExitOnErrorOn()
 
     options, flags = grass.parser()

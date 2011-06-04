@@ -2,7 +2,7 @@
 #
 ############################################################################
 #
-# MODULE:       d.rast
+# MODULE:       d.rast2
 # AUTHOR(S):    Soeren Gebbert
 # PURPOSE:      Visualize a raster map using VTK image render window
 #
@@ -24,7 +24,7 @@ import sys
 def main():
     # Initiate GRASS
     init = vtkGRASSInit()
-    init.Init("d.rast")
+    init.Init("d.rast2")
     init.ExitOnErrorOn()
 
     module = vtkGRASSModule()
