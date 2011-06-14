@@ -174,7 +174,6 @@ vtkGRASSRaster3dImageReaderExecute(vtkGRASSRaster3dImageReader *self,
         
         for (idxY = outExt[2]; !self->GetAbortExecute() && idxY <= outExt[3]; idxY++)
         {
-
             for (idxX = outExt[0]; idxX <= outExt[1]; idxX++)
             {
                 *outPtr++ = (T)map->GetValue(idxX, idxY, idxZ);
@@ -183,6 +182,8 @@ vtkGRASSRaster3dImageReaderExecute(vtkGRASSRaster3dImageReader *self,
         }
         outPtr += outIncZ;
     }
+    
+    gm->Delete();
 }
 
 //----------------------------------------------------------------------------

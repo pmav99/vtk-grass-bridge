@@ -69,8 +69,7 @@ vtkGRASSRaster3dImageWriterExecute(vtkGRASSRaster3dImageWriter *self, vtkImageDa
     // Loop through output pixel
     for (z = 0; z < dims[2]; z++)
     {
-        // We need to count from the top
-        for (y = dims[1] - 1; !self->GetAbortExecute() && y >= 0; y--)
+        for (y =  0; !self->GetAbortExecute() && y < dims[1]; y++)
         {
             for (x = 0; x < dims[0]; x++)
             {
