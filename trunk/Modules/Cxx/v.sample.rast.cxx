@@ -214,6 +214,12 @@ int main(int argc, char **argv)
     vectormap->CloseMap();
     outputmap->CloseMap();
     
+    vtkIndent indent;
+    
+    input->PrintSelf(cout, indent);
+    raster->PrintSelf(cout, indent);
+    output->PrintSelf(cout, indent);
+    
     input->Delete();
     raster->Delete();
     output->Delete();

@@ -32,6 +32,7 @@
 #include "vtkGRASSRegion.h"
 #include "vtkGRASSDefines.h"
 #include "vtkGRASSHistory.h"
+#include "vtkDCELL.h"
 
 extern "C"{
 #include <grass/gis.h>
@@ -71,10 +72,18 @@ public:
   //! \brief Close the raster 3d map
   virtual bool CloseMap();
 
-  //! \brief Read a single value on index position x, y and z
+  //! \brief Read a single value on index position x, y and z in right hand 
+  //! side cube coordinate system
   //! Double is always returned, independent from the map type
   virtual double GetValue(int x, int y, int z);
 
+  //! \brief Read a single value on index position x, y and z in right hand 
+  //! side cube coordinate system
+  virtual bool GetValue(int x, int y, int z, vtkDCELL *value);
+
+  //! \brief Read a single value as DCELL value at window coordinates north, east and top
+  virtual bool GetValue(double north, double east, double top, vtkDCELL *value);
+  
   vtkGetMacro(MapType, int);
   vtkGetMacro(NumberOfRows, int);
   vtkGetMacro(NumberOfCols, int);

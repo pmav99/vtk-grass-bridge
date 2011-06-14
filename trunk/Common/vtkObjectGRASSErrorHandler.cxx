@@ -47,8 +47,6 @@ vtkObjectGRASSErrorHandler::vtkObjectGRASSErrorHandler()
 
 vtkObjectGRASSErrorHandler::~vtkObjectGRASSErrorHandler()
 {
-
-
     this->ErrorList->Delete();
     this->WarningList->Delete();
 }
@@ -58,7 +56,6 @@ vtkObjectGRASSErrorHandler::~vtkObjectGRASSErrorHandler()
 void
 vtkObjectGRASSErrorHandler::ResetErrors()
 {
-
     this->NumberOfErrors = 0;
     this->NumberOfWarnings = 0;
     this->LastErrorNumber = 0;

@@ -144,6 +144,32 @@ vtkGRASSRaster3dMapBase::GetValue(int x, int y, int z)
 //----------------------------------------------------------------------------
 
 bool
+vtkGRASSRaster3dMapBase::GetValue(int x, int y, int z, vtkDCELL *value)
+{
+    if(!this->Open)
+        return false;
+            
+    value->Value = (DCELL)G3d_getDouble(this->Map, x, y, z);
+
+    return true;
+}
+
+//----------------------------------------------------------------------------
+
+bool
+vtkGRASSRaster3dMapBase::GetValue(double north, double east, double top, vtkDCELL *value)
+{
+    if(!this->Open)
+        return false;
+    
+    G3d_getRegionValue(this->Map, north, east, top, &(value->Value), DCELL_TYPE);
+
+    return true;
+}
+
+//----------------------------------------------------------------------------
+
+bool
 vtkGRASSRaster3dMapBase::CloseMap()
 {
     if (this->Open == true && this->Map != NULL)
