@@ -168,7 +168,7 @@ vtkGRASSVectorMapTopoReader::GetIsleBoundaries(int isle, vtkIntArray* boundaryid
 int
 vtkGRASSVectorMapTopoReader::SelectLinesByBox(vtkGRASSVectorBBox *box, int type, vtkIntArray *ids)
 {
-    ilist *pids = Vect_new_list();
+    boxlist *pids = Vect_new_boxlist(0);
     int ret = -1;
     int i;
 
@@ -181,11 +181,11 @@ vtkGRASSVectorMapTopoReader::SelectLinesByBox(vtkGRASSVectorBBox *box, int type,
 
         for (i = 0; i < pids->n_values; i++)
         {
-            ids->InsertNextValue(pids->value[i]);
+            ids->InsertNextValue(pids->id[i]);
         }
     }
 
-    Vect_destroy_list(pids);
+    Vect_destroy_boxlist(pids);
     return ret;
 }
 
@@ -194,7 +194,7 @@ vtkGRASSVectorMapTopoReader::SelectLinesByBox(vtkGRASSVectorBBox *box, int type,
 int
 vtkGRASSVectorMapTopoReader::SelectAreasByBox(vtkGRASSVectorBBox *box, vtkIntArray *ids)
 {
-    ilist *pids = Vect_new_list();
+    boxlist *pids = Vect_new_boxlist(0);
     int ret = -1;
     int i;
 
@@ -207,11 +207,11 @@ vtkGRASSVectorMapTopoReader::SelectAreasByBox(vtkGRASSVectorBBox *box, vtkIntArr
 
         for (i = 0; i < pids->n_values; i++)
         {
-            ids->InsertNextValue(pids->value[i]);
+            ids->InsertNextValue(pids->id[i]);
         }
     }
 
-    Vect_destroy_list(pids);
+    Vect_destroy_boxlist(pids);
     return ret;
 }
 
@@ -220,7 +220,7 @@ vtkGRASSVectorMapTopoReader::SelectAreasByBox(vtkGRASSVectorBBox *box, vtkIntArr
 int
 vtkGRASSVectorMapTopoReader::SelectIslesByBox(vtkGRASSVectorBBox *box, vtkIntArray *ids)
 {
-    ilist *pids = Vect_new_list();
+    boxlist *pids = Vect_new_boxlist(0);
     int ret = -1;
     int i;
 
@@ -233,11 +233,11 @@ vtkGRASSVectorMapTopoReader::SelectIslesByBox(vtkGRASSVectorBBox *box, vtkIntArr
 
         for (i = 0; i < pids->n_values; i++)
         {
-            ids->InsertNextValue(pids->value[i]);
+            ids->InsertNextValue(pids->id[i]);
         }
     }
 
-    Vect_destroy_list(pids);
+    Vect_destroy_boxlist(pids);
     return ret;
 }
 

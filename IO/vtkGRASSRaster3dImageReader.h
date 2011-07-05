@@ -84,6 +84,15 @@ public:
   //! to enable the NullValue, set the this->UseGRASSNulleValueOff() 
   vtkGetMacro(NullValue, double);
 
+  //! \brief Read the GRASS raster image values as cell data rather then point data which is the default.
+  //! Is set true the layout of the image will change (number of raster pixels are now number of cells)
+  vtkSetMacro(AsCellData, int);
+  //! \brief Read the GRASS raster image values as cell data rather then point data which is the default
+  vtkGetMacro(AsCellData, int);
+  //! \brief Read the GRASS raster image values as cell data rather then point data which is the default.
+  //! Is set true the layout of the image will change (number of raster pixels are now number of cells)
+  vtkBooleanMacro(AsCellData, int);
+
 protected:
   vtkGRASSRaster3dImageReader();
   ~vtkGRASSRaster3dImageReader();
@@ -96,6 +105,8 @@ protected:
   int DataScalarType;
   int RegionUsage;
   double NullValue;
+  
+  int AsCellData;
 
   int DataExtent[6];
   double DataSpacing[3];
