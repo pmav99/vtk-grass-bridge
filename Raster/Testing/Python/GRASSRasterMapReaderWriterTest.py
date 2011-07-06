@@ -59,7 +59,6 @@ class GRASSRasterMapReaderWriterTest(unittest.TestCase):
         reader = vtkGRASSRasterMapReader()
         reader.OpenMap("test_dcell")
 
-
         newMin = 100000000.0
         newMax = 0.0
         for i in range(region.GetRows()):
@@ -128,7 +127,6 @@ class GRASSRasterMapReaderWriterTest(unittest.TestCase):
 
         reader = vtkGRASSRasterMapReader()
         reader.OpenMap("test_fcell")
-
 
         newMin = 100000000.0
         newMax = 0.0
@@ -199,7 +197,6 @@ class GRASSRasterMapReaderWriterTest(unittest.TestCase):
         reader = vtkGRASSRasterMapReader()
         reader.OpenMap("test_cell")
 
-
         newMin = 100000000.0
         newMax = 0.0
         for i in range(region.GetRows()):
@@ -231,7 +228,6 @@ class GRASSRasterMapReaderWriterTest(unittest.TestCase):
         self.assertEqual(reader.GetNumberOfCols(), region.GetCols(), "Error cols differ")
 
         reader.CloseMap()
-        
         
     def testRasterSampling(self):
             
