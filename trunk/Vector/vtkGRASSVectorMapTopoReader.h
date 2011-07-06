@@ -161,8 +161,12 @@ public:
        \return 0 if not
      */
     int IsPointInArea(int area, double x, double y){
-        TRY if (this->Open) return Vect_point_in_area (&this->map, area, x, y);
-        else return -1; CATCH_INT
+        TRY if (this->Open) {
+        struct bound_box box;
+        if(!Vect_get_area_box(&this->map, area, &box))
+            return 0; 
+        return Vect_point_in_area (x, y, &this->map, area, box);
+        } else return 0; CATCH_INT
     }
     /*!
        \brief Returns area of area without areas of isles
