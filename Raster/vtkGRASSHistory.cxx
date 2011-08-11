@@ -103,7 +103,7 @@ vtkGRASSHistory::Read3dHistory(const char *rastername)
         return false;
     }
 
-    if (G3d_readHistory(rastername, mapset, this->hist) == -1)
+    if (Rast3d_readHistory(rastername, mapset, this->hist) == -1)
     {
         G_snprintf(buff, 1024, "class: %s line: %i Unable to read history file of 3d raster map %s.",
                    this->GetClassName(), __LINE__, rastername);
@@ -137,7 +137,7 @@ vtkGRASSHistory::WriteHistory(const char *rastername)
 bool
 vtkGRASSHistory::Write3dHistory(const char *rastername)
 {
-    TRY G3d_writeHistory(rastername, this->hist);
+    TRY Rast3d_writeHistory(rastername, this->hist);
     CATCH_BOOL
 
     this->SetRasterName(rastername);

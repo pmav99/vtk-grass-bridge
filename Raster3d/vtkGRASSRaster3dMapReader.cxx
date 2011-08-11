@@ -31,7 +31,7 @@ vtkGRASSRaster3dMapReader::OpenMap(char *name) {
     const char *mapset;
     char buff[1024];
     int error = 0;
-    G3D_Region region;
+    RASTER3D_Region region;
 
     // Check if the same map is already opened
     if (this->Open == true && strcmp(name, this->Raster3dName) == 0) {
@@ -58,13 +58,13 @@ vtkGRASSRaster3dMapReader::OpenMap(char *name) {
     this->SetMapset(mapset);
     // Set the region for the 3d map based on the region settings
     if (this->RegionUsage == VTK_GRASS_REGION_RASTER) {
-        G3d_readRegionMap(this->Raster3dName, this->Mapset, &region);
-        G3d_regionToCellHead(&region, this->Region->GetPointer());
+        Rast3d_readRegionMap(this->Raster3dName, this->Mapset, &region);
+        Rast3d_regionToCellHead(&region, this->Region->GetPointer());
         this->Region->CopyRegionFrom(this->Region->GetPointer());
     } else {
         this->SetRegion();
         this->Region->CopyRegionTo(this->Region->GetPointer());
-        G3d_regionFromToCellHead(this->Region->GetPointer(), &region);
+        Rast3d_regionFromToCellHead(this->Region->GetPointer(), &region);
     }
 
     this->NumberOfRows = region.rows;
@@ -73,8 +73,8 @@ vtkGRASSRaster3dMapReader::OpenMap(char *name) {
 
     if (!setjmp(vgb_stack_buffer)) {
         /* open 3d raster map */
-        this->Map = (G3D_Map*)G3d_openCellOld(this->Raster3dName, this->Mapset,
-                &region, G3D_TILE_SAME_AS_FILE, G3D_USE_CACHE_DEFAULT);
+        this->Map = (RASTER3D_Map*)Rast3d_openCellOld(this->Raster3dName, this->Mapset,
+                &region, RASTER3D_TILE_SAME_AS_FILE, RASTER3D_USE_CACHE_DEFAULT);
         if (this->Map == NULL) {
             error = 1;
         }
@@ -98,7 +98,7 @@ vtkGRASSRaster3dMapReader::OpenMap(char *name) {
     }
 
     // Get the map type
-    TRY this->MapType = G3d_fileTypeMap(this->Map);
+    TRY this->MapType = Rast3d_fileTypeMap(this->Map);
     CATCH_BOOL
 
     this->Open = true;
@@ -118,7 +118,7 @@ vtkGRASSRaster3dMapReader::GetRange(double range[2]) {
         return false;
     }
 
-    TRY G3d_range_min_max(this->Map, &range[0], &range[1]);
+    TRY Rast3d_range_min_max(this->Map, &range[0], &range[1]);
     CATCH_BOOL
 
     return true;

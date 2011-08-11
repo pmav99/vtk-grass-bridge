@@ -31,7 +31,7 @@
 
 extern "C" {
 #include <grass/gis.h>
-#include <grass/G3d.h>
+#include <grass/raster3d.h>
 #include <grass/raster.h>
 }
 
