@@ -36,7 +36,7 @@
 
 extern "C"{
 #include <grass/gis.h>
-#include <grass/G3d.h>
+#include <grass/raster3d.h>
 #include <grass/raster.h>
 }
 
@@ -108,7 +108,7 @@ protected:
   char *Mapset;
 
   //BTX
-  G3D_Map *Map;  // Pointer to the raster3d map
+  RASTER3D_Map *Map;  // Pointer to the raster3d map
   //ETX
 
   vtkGRASSRegion *Region;

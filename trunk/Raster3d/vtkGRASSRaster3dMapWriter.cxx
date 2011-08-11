@@ -37,7 +37,7 @@ bool
 vtkGRASSRaster3dMapWriter::OpenMap(char *name) {
     char buff[1024];
     int error = 0;
-    G3D_Region region;
+    RASTER3D_Region region;
 
     // Check if the same map is already opened
     if (this->Open == true && strcmp(name, this->Raster3dName) == 0) {
@@ -54,12 +54,12 @@ vtkGRASSRaster3dMapWriter::OpenMap(char *name) {
     this->SetRaster3dName(name);
     this->Mapset = G_store(G_mapset());
     
-    G3d_initDefaults();
+    Rast3d_initDefaults();
 
     // Set the region for the 3d map based on the region settings
     this->SetRegion();
     this->Region->CopyRegionTo(this->Region->GetPointer());
-    G3d_regionFromToCellHead(this->Region->GetPointer(), &region);
+    Rast3d_regionFromToCellHead(this->Region->GetPointer(), &region);
 
     this->NumberOfRows = region.rows;
     this->NumberOfCols = region.cols;
@@ -67,8 +67,8 @@ vtkGRASSRaster3dMapWriter::OpenMap(char *name) {
 
     if (!setjmp(vgb_stack_buffer)) {
         /* open 3d raster map */
-        this->Map = (G3D_Map*)G3d_openCellNew(this->Raster3dName, this->MapType,
-                            G3D_USE_CACHE_DEFAULT, &region);
+        this->Map = (RASTER3D_Map*)Rast3d_openCellNew(this->Raster3dName, this->MapType,
+                            RASTER3D_USE_CACHE_DEFAULT, &region);
         if (this->Map == NULL) {
             error = 1;
         }
@@ -96,7 +96,7 @@ int
 vtkGRASSRaster3dMapWriter::PutValue(int x, int y, int z, double value)
 {
     if(this->Open)
-        return G3d_putDouble(this->Map, x, y, z, value);
+        return Rast3d_putDouble(this->Map, x, y, z, value);
             
     return 1;
 }
