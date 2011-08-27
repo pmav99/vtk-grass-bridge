@@ -54,12 +54,12 @@ vtkGRASSRaster3dMapWriter::OpenMap(char *name) {
     this->SetRaster3dName(name);
     this->Mapset = G_store(G_mapset());
     
-    Rast3d_initDefaults();
+    Rast3d_init_defaults();
 
     // Set the region for the 3d map based on the region settings
     this->SetRegion();
     this->Region->CopyRegionTo(this->Region->GetPointer());
-    Rast3d_regionFromToCellHead(this->Region->GetPointer(), &region);
+    Rast3d_region_from_to_cell_head(this->Region->GetPointer(), &region);
 
     this->NumberOfRows = region.rows;
     this->NumberOfCols = region.cols;
@@ -67,7 +67,7 @@ vtkGRASSRaster3dMapWriter::OpenMap(char *name) {
 
     if (!setjmp(vgb_stack_buffer)) {
         /* open 3d raster map */
-        this->Map = (RASTER3D_Map*)Rast3d_openCellNew(this->Raster3dName, this->MapType,
+        this->Map = (RASTER3D_Map*)Rast3d_open_cell_new(this->Raster3dName, this->MapType,
                             RASTER3D_USE_CACHE_DEFAULT, &region);
         if (this->Map == NULL) {
             error = 1;
@@ -96,7 +96,7 @@ int
 vtkGRASSRaster3dMapWriter::PutValue(int x, int y, int z, double value)
 {
     if(this->Open)
-        return Rast3d_putDouble(this->Map, x, y, z, value);
+        return Rast3d_put_double(this->Map, x, y, z, value);
             
     return 1;
 }
