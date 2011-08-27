@@ -47,7 +47,7 @@ vtkGRASSRaster3dMapReader::OpenMap(char *name) {
 
     this->SetRaster3dName(name);
 
-    mapset = G_find_grid3(this->GetRaster3dName(), "");
+    mapset = G_find_raster3d(this->GetRaster3dName(), "");
     if (mapset == NULL) {
         G_snprintf(buff, 1024, "class: %s line: %i Raster map %s not found.",
                 this->GetClassName(), __LINE__, this->Raster3dName);
@@ -58,13 +58,13 @@ vtkGRASSRaster3dMapReader::OpenMap(char *name) {
     this->SetMapset(mapset);
     // Set the region for the 3d map based on the region settings
     if (this->RegionUsage == VTK_GRASS_REGION_RASTER) {
-        Rast3d_readRegionMap(this->Raster3dName, this->Mapset, &region);
-        Rast3d_regionToCellHead(&region, this->Region->GetPointer());
+        Rast3d_read_region_map(this->Raster3dName, this->Mapset, &region);
+        Rast3d_region_to_cell_head(&region, this->Region->GetPointer());
         this->Region->CopyRegionFrom(this->Region->GetPointer());
     } else {
         this->SetRegion();
         this->Region->CopyRegionTo(this->Region->GetPointer());
-        Rast3d_regionFromToCellHead(this->Region->GetPointer(), &region);
+        Rast3d_region_from_to_cell_head(this->Region->GetPointer(), &region);
     }
 
     this->NumberOfRows = region.rows;
@@ -73,7 +73,7 @@ vtkGRASSRaster3dMapReader::OpenMap(char *name) {
 
     if (!setjmp(vgb_stack_buffer)) {
         /* open 3d raster map */
-        this->Map = (RASTER3D_Map*)Rast3d_openCellOld(this->Raster3dName, this->Mapset,
+        this->Map = (RASTER3D_Map*)Rast3d_open_cell_old(this->Raster3dName, this->Mapset,
                 &region, RASTER3D_TILE_SAME_AS_FILE, RASTER3D_USE_CACHE_DEFAULT);
         if (this->Map == NULL) {
             error = 1;
@@ -98,7 +98,7 @@ vtkGRASSRaster3dMapReader::OpenMap(char *name) {
     }
 
     // Get the map type
-    TRY this->MapType = Rast3d_fileTypeMap(this->Map);
+    TRY this->MapType = Rast3d_file_type_map(this->Map);
     CATCH_BOOL
 
     this->Open = true;

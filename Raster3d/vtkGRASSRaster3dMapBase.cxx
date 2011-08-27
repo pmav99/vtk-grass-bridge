@@ -134,7 +134,7 @@ double
 vtkGRASSRaster3dMapBase::GetValue(int x, int y, int z)
 {
     if(this->Open)
-        return Rast3d_getDouble(this->Map, x, y, z);
+        return Rast3d_get_double(this->Map, x, y, z);
 
     double nan;
     Rast_set_d_null_value(&nan, 1);
@@ -149,7 +149,7 @@ vtkGRASSRaster3dMapBase::GetValue(int x, int y, int z, vtkDCELL *value)
     if(!this->Open)
         return false;
             
-    value->Value = (DCELL)Rast3d_getDouble(this->Map, x, y, z);
+    value->Value = (DCELL)Rast3d_get_double(this->Map, x, y, z);
 
     return true;
 }
@@ -162,7 +162,7 @@ vtkGRASSRaster3dMapBase::GetValue(double north, double east, double top, vtkDCEL
     if(!this->Open)
         return false;
     
-    Rast3d_getRegionValue(this->Map, north, east, top, &(value->Value), DCELL_TYPE);
+    Rast3d_get_region_value(this->Map, north, east, top, &(value->Value), DCELL_TYPE);
 
     return true;
 }
@@ -174,7 +174,7 @@ vtkGRASSRaster3dMapBase::CloseMap()
 {
     if (this->Open == true && this->Map != NULL)
     {
-         TRY Rast3d_closeCell(this->Map);
+         TRY Rast3d_close(this->Map);
          CATCH_BOOL
     }
     // This flag is important and must be set by open and close methods
