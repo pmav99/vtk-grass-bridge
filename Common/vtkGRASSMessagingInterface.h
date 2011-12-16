@@ -39,11 +39,11 @@ public:
   vtkTypeRevisionMacro(vtkGRASSMessagingInterface,vtkObjectGRASSErrorHandler);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-  static void Message(char *message){G_message(message);}
-  static void VerboseMessage(char *message){G_verbose_message(message);}
-  static void ImportantMessage(char *message){G_important_message(message);}
-  static void Warning(char *message){G_warning(message);}
-  static void FatalError(char *message){G_fatal_error(message);}
+  static void Message(char *message){G_message("%s",message);}
+  static void VerboseMessage(char *message){G_verbose_message("%s",message);}
+  static void ImportantMessage(char *message){G_important_message("%s",message);}
+  static void Warning(char *message){G_warning("%s",message);}
+  static void FatalError(char *message){G_fatal_error("%s",message);}
   static void Percent(int current_element, int total_number_of_elements, int increment_size){G_percent(current_element, total_number_of_elements, increment_size);}
   static void PercentReset(){G_percent_reset();}
   static void SetVerbosityLevel(int level){G_set_verbose(level);}
@@ -51,7 +51,7 @@ public:
   static int GetMinVerbositiyLevel(){return G_verbose_min();}
   static int GetMaxVerbositiyLevel(){return G_verbose_max();}
   static int GetStandardVerbositiyLevel(){return G_verbose_std();}
-  static int DebugMessage(int level, char* message){return G_debug(level, message);}
+  static int DebugMessage(int level, char* message){return G_debug(level, "%s", message);}
 
 protected:
   vtkGRASSMessagingInterface(){};
