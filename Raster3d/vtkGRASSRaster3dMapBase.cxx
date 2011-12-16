@@ -53,7 +53,7 @@ vtkGRASSRaster3dMapBase::~vtkGRASSRaster3dMapBase()
     if (this->Raster3dName)
         delete [] this->Raster3dName;
     if (this->Mapset)
-        delete [] this->Mapset;
+        G_free(this->Mapset);
 
     this->Region->Delete();
     this->History->Delete();
