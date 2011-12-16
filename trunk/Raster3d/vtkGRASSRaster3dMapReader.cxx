@@ -55,7 +55,14 @@ vtkGRASSRaster3dMapReader::OpenMap(char *name) {
         return false;
     }
 
-    this->SetMapset(mapset);
+    /* Make a copy of the mapset string */
+    if (!setjmp(vgb_stack_buffer)) {
+        this->Mapset = G_store(mapset);
+    } else {
+        this->InsertNextError(vgb_error_message);
+        return false;
+    }
+
     // Set the region for the 3d map based on the region settings
     if (this->RegionUsage == VTK_GRASS_REGION_RASTER) {
         Rast3d_read_region_map(this->Raster3dName, this->Mapset, &region);
