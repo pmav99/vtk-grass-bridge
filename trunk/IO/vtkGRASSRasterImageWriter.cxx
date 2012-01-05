@@ -99,8 +99,6 @@ vtkGRASSRasterImageWriter::SimpleExecute(vtkImageData* input, vtkImageData* outp
 
     input->GetDimensions(dims);
 
-    input->Print(cout);
-
     VGB_CREATE(vtkGRASSRegion, region);
 
     // SetThe region of the raster map
