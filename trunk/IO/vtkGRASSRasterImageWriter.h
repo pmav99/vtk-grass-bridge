@@ -17,9 +17,9 @@
  *
  * To use this class make sure you are in a grass session and vtkGRASSInit was called first.
  *
- * The user can choose the current region, the default region, the raster map region or
+ * The user can choose the current region, the default region or
  * a user defined region to write the image as grass raster map.
- * Based on the dimesnion of the vtkImageData,
+ * Based on the dimension of the vtkImageData,
  * the region resolution will be adjusted accordingly.
  *
  * This class uses the vtkGRASSRasterMapWriter to write the image data into
