@@ -13,17 +13,17 @@
 */
 
 /**
- * \brief This class writes a vtkImageData into a grass raster map.
+ * \brief This class writes a 3d vtkImageData into a grass raster3d map.
  *
- * To use this class make sure you are in a grass session and vtkGRASSInit was called first.
+ * To use this class make sure you are in a valid grass session and vtkGRASSInit was called first.
  *
- * The user can choose the current region, the default region, the raster map region or
- * a user defined region to write the image as grass raster map.
- * Based on the dimesnion of the vtkImageData,
+ * The user can choose the current region, the default region or
+ * a user defined region to write the 3d image as grass raster3d map.
+ * Based on the dimension of the vtkImageData,
  * the region resolution will be adjusted accordingly.
  *
- * This class uses the vtkGRASSRaster3dMapWriter to write the image data into
- * the grass raster map.
+ * This class uses the vtkGRASSRaster3dMapWriter to write the 3d image data into
+ * the grass raster3d map.
  *
  * \author Soeren Gebbert
  * \author Berlin, Germany Aug. 2009
