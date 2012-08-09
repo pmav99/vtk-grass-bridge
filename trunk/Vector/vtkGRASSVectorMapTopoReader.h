@@ -165,7 +165,7 @@ public:
         struct bound_box box;
         if(!Vect_get_area_box(&this->map, area, &box))
             return 0; 
-        return Vect_point_in_area (x, y, &this->map, area, box);
+        return Vect_point_in_area (x, y, &this->map, area, &box);
         } else return 0; CATCH_INT
     }
     /*!
