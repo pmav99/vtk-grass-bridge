@@ -16,6 +16,7 @@
 
 #include <vtkCellArray.h>
 #include <vtkCellData.h>
+#include <vtkDataSetAttributes.h>
 #include <vtkObjectFactory.h>
 #include <vtkPoints.h>
 #include <vtkPolyData.h>
@@ -160,7 +161,9 @@ vtkGRASSVectorPolyDataReader::RequestData(vtkInformation*,
 
 //----------------------------------------------------------------------------
 
-void vtkGRASSVectorPolyDataReader::ReadDatabaseData(vtkGRASSVectorMapNoTopoReader *map, vtkIntArray *cats, vtkCellData *cdata)
+void vtkGRASSVectorPolyDataReader::ReadDatabaseData(vtkGRASSVectorMapNoTopoReader *map,
+                                                    vtkIntArray *cats,
+                                                    vtkDataSetAttributes *cdata)
 {
     int i;
     int ncols;
