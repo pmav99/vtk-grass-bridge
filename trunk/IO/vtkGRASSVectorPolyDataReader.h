@@ -36,7 +36,7 @@
 #include "vtkStringArray.h"
 
 class vtkStringArray;
-class vtkCellData;
+class vtkDataSetAttributes;
 class vtkIntArray;
 class vtkGRASSVectorMapNoTopoReader;
 
@@ -105,7 +105,8 @@ protected:
   //! The selection is based on column names located in the internal vtkStringArray ColumnNames
   //! In case this array is empty, all available double and integer columns are readed.
   //! The cell data arrays are named like the column names of the database table.
-  virtual void ReadDatabaseData(vtkGRASSVectorMapNoTopoReader *map, vtkIntArray *cats, vtkCellData *cdata);
+  virtual void ReadDatabaseData(vtkGRASSVectorMapNoTopoReader *map,
+                                vtkIntArray *cats, vtkDataSetAttributes *cdata);
 
 private:
   vtkGRASSVectorPolyDataReader(const vtkGRASSVectorPolyDataReader&);  // Not implemented.

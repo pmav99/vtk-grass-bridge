@@ -124,7 +124,6 @@ public:
   //!\brief Check if the type is string (true/false)
   bool IsTypeString() {return ((this->option && this->option->type == TYPE_STRING)?true:false);}
 
-
 protected:
   vtkGRASSOption();
   ~vtkGRASSOption() {};
