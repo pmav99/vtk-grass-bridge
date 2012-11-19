@@ -17,6 +17,7 @@ vtkGRASSVectorPolyDataWriter.cxx
 vtkGRASSVectorPolyDataAreaWriter.cxx
 vtkGRASSVectorTopoPolyDataReader.cxx
 vtkGRASSMultiVectorPolyDataLineReader.cxx
+vtkGRASSMultiRasterPolyDataLineReader.cxx
 )
 
 SET (IO_H
@@ -31,6 +32,7 @@ vtkGRASSVectorPolyDataAreaWriter.h
 vtkGRASSVectorTopoPolyDataReader.h
 vtkGRASSBridgeIOWin32Header.h
 vtkGRASSMultiVectorPolyDataLineReader.h
+vtkGRASSMultiRasterPolyDataLineReader.h
 )
 
 # --------------------------------------------------------------------------
