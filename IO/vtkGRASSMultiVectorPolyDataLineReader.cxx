@@ -86,13 +86,6 @@ void vtkGRASSMultiVectorPolyDataLineReader::PrintSelf(ostream& os,
                                                       vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
-  os << indent << "Vector name: "
-      << (this->VectorName ? this->VectorName : "(none)") << "\n";
-  os << indent << "Mapset: " << (this->Mapset ? this->Mapset : "(none)")
-      << "\n";
-  os << indent << "CategoryArrayName: "
-      << (this->CategoryArrayName ? this->CategoryArrayName : "(none)") << "\n";
-
 }
 
 //----------------------------------------------------------------------------
@@ -137,6 +130,10 @@ int vtkGRASSMultiVectorPolyDataLineReader::RequestData(
       }
     }
 
+	VGB_CREATE(vtkShortArray, layer);
+	layer->SetNumberOfComponents(1);
+	layer->SetName("Layer");
+
   vtkPolyData* output = vtkPolyData::GetData(outputVector);
   output->Allocate(1);
   VGB_CREATE(vtkPoints, points);
@@ -175,6 +172,8 @@ int vtkGRASSMultiVectorPolyDataLineReader::RequestData(
         ids->Initialize();
         // We expect only a single point
         double *point = feature->GetPoint(0);
+        // We safe the layer number
+		layer->InsertNextValue(n + 1);
         // We create two points for the first layer
         if (n == 0)
           {
@@ -186,7 +185,6 @@ int vtkGRASSMultiVectorPolyDataLineReader::RequestData(
           ids->InsertNextId(id);
           featureCount++;
           featureCount2++;
-          cout << featureCount2 << "  Cat " << cats->GetCat(this->Layer) << endl;
           categories->InsertNextValue(cats->GetCat(this->Layer));
           }
         else
@@ -213,14 +211,14 @@ int vtkGRASSMultiVectorPolyDataLineReader::RequestData(
              *
              */
             ids->InsertNextId(id - (2*featureCount - featureCount2 - 1));
-            std::cout << "First point id: " << id << "  Second point id: "
-                << id - (2*featureCount - featureCount2 - 1) << std::endl;
+            //std::cout << "First point id: " << id << "  Second point id: "
+            //    << id - (2*featureCount - featureCount2 - 1) << std::endl;
             }
           else
             {
             ids->InsertNextId(id - featureCount);
-            std::cout << "First point id: " << id << "  Second point id: "
-                << id - featureCount << std::endl;
+            //std::cout << "First point id: " << id << "  Second point id: "
+            //    << id - featureCount << std::endl;
             }
           // Second point
           ids->InsertNextId(id);
@@ -265,7 +263,6 @@ int vtkGRASSMultiVectorPolyDataLineReader::RequestData(
           target->InsertNextTuple(source->GetTuple(j));
           }
         }
-      cellData->GetArray(i)->Print(cout);
       }
     reader->CloseMap();
     cellData->Delete();
@@ -282,6 +279,7 @@ int vtkGRASSMultiVectorPolyDataLineReader::RequestData(
     }
 
   // Store the points in the output data object.
+  output->GetCellData()->AddArray(layer);
   output->SetPoints(points);
 
   return 1;
