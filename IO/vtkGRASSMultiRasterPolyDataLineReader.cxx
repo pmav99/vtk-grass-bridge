@@ -46,6 +46,7 @@
 #include "vtkDCELL.h"
 #include "vtkGRASSRasterRow.h"
 #include "vtkGRASSDefines.h"
+#include "vtkGRASSMessagingInterface.h"
 
 vtkCxxRevisionMacro(vtkGRASSMultiRasterPolyDataLineReader, "$Revision: 1.1 $");
 vtkStandardNewMacro(vtkGRASSMultiRasterPolyDataLineReader);
@@ -89,6 +90,8 @@ int vtkGRASSMultiRasterPolyDataLineReader::RequestData(vtkInformation*,
 	double length, x, y;
 	vtkIdType id;
 	VGB_CREATE(vtkDCELL, dvalue);
+	char message[1024];
+	VGB_CREATE(vtkGRASSMessagingInterface, talk);
 
 	if (this->RasterNames == NULL) {
 		vtkErrorMacro( << "Raster names not set.");
@@ -141,6 +144,10 @@ int vtkGRASSMultiRasterPolyDataLineReader::RequestData(vtkInformation*,
 			return -1;
 		}
 
+		G_snprintf(message, 1024, "Processing layer %i of %i", n + 1,
+				(int)this->RasterNames->GetNumberOfValues());
+		talk->Message(message);
+
 		rows = this->RasterMap->GetNumberOfRows();
 		cols = this->RasterMap->GetNumberOfCols();
 
@@ -149,6 +156,7 @@ int vtkGRASSMultiRasterPolyDataLineReader::RequestData(vtkInformation*,
 
 		for (row = 0; row < rows; row++) {
 
+			talk->Percent(row, rows, 1);
 			this->RasterMap->GetRow(row, buff);
 
 			for (col = 0; col < cols; col++) {

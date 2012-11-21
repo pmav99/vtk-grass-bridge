@@ -47,6 +47,7 @@
 #include "vtkGRASSRasterMemoryMap.h"
 #include "vtkGRASSMultiRasterPolyDataLineWriter.h"
 #include "vtkGRASSDefines.h"
+#include "vtkGRASSMessagingInterface.h"
 
 extern "C" {
 #include <string.h>
@@ -94,6 +95,9 @@ int vtkGRASSMultiRasterPolyDataLineWriter::RequestData(vtkInformation * vtkNotUs
 	double bounds[6];
 	int nLayers, lCount;
 	VGB_CREATE(vtkDCELL, dvalue);
+	char message[1024];
+
+	VGB_CREATE(vtkGRASSMessagingInterface, talk);
 
 	if (this->RasterBaseName == NULL) {
 		vtkErrorMacro( << "The DataName must be specified");
@@ -108,26 +112,33 @@ int vtkGRASSMultiRasterPolyDataLineWriter::RequestData(vtkInformation * vtkNotUs
 		return -1;
 	}
 
-
 	nArrays = input->GetCellData()->GetNumberOfArrays();
-	// Layer array will not be written
-	nArrays -= 1;
+
 	// Number of Layers
 	nLayers = (int)input->GetCellData()->GetArray("Layer")->GetRange()[1];
+	vtkDataArray *layerArray = input->GetCellData()->GetArray("Layer");
 
 	for(lCount = 0; lCount < nLayers; lCount++) {
 		layer = lCount + 1;
+
+		G_snprintf(message, 1024, "Processing layer %i of %i", lCount + 1,
+				nLayers);
+		talk->Message(message);
+
 		for(aCount = 0; aCount < nArrays; aCount++) {
 
 			double value;
 			char mapName[1024];
 			vtkDataArray *array = input->GetCellData()->GetArray(aCount);
-			vtkDataArray *layerArray = input->GetCellData()->GetArray("Layer");
 			const char *arrayName = array->GetName();
 
 			// Check if we have the layer array
 			if(strcmp(arrayName, "Layer") == 0)
 				continue;
+
+			G_snprintf(message, 1024, "(%i of %i) Processing array %s", aCount + 1,
+					nArrays, arrayName);
+			talk->Message(message);
 
 			VGB_CREATE(vtkGRASSRasterMapWriter, RasterMap);
 			VGB_CREATE(vtkGRASSRasterMemoryMap, mmap);
@@ -135,8 +146,6 @@ int vtkGRASSMultiRasterPolyDataLineWriter::RequestData(vtkInformation * vtkNotUs
 
 			G_snprintf(mapName, 1024, "%s_%s_%i", this->RasterBaseName,
 					arrayName, layer);
-
-			std::cerr << mapName << std::endl;
 
 			RasterMap->SetMapTypeToDCELL();
 			RasterMap->UseCurrentRegion();
@@ -151,6 +160,8 @@ int vtkGRASSMultiRasterPolyDataLineWriter::RequestData(vtkInformation * vtkNotUs
 			mmap->SetToNull();
 
 			for(n = 0; n < input->GetNumberOfCells(); n++) {
+
+				talk->Percent(n, input->GetNumberOfCells(), 2);
 
 				if((int)layerArray->GetTuple1(n) != layer)
 					continue;
@@ -168,8 +179,8 @@ int vtkGRASSMultiRasterPolyDataLineWriter::RequestData(vtkInformation * vtkNotUs
 				if(row < 0 or row > rows - 1)
 					continue;
 
-				std::cout << "Write value: " << value << " at position [" <<
-						row << "][" << col << "]" << std::endl;
+				//std::cout << "Write value: " << value << " at position [" <<
+				//		row << "][" << col << "]" << std::endl;
 
 				value = array->GetTuple1(n);
 				dcell->Value = value;
@@ -179,6 +190,7 @@ int vtkGRASSMultiRasterPolyDataLineWriter::RequestData(vtkInformation * vtkNotUs
 				return -1;
 			if(!RasterMap->CloseMap())
 				return -1;
+			talk->Percent(1, 1, 1);
 		}
 	}
 	return 1;
