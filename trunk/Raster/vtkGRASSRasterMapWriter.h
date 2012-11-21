@@ -21,8 +21,8 @@
  *
  * This class does not use the vtk update mechanism.
  * Before writing the new raster map rows you need to open the raster map.
- * After writing you must close the raster map or delete the object. The
- * destructor will close the map.
+ * After writing you must close the raster map. The
+ * destructor will not close the map.
  * 
  * The user can provide a vtkGRASSHistory object, which will be used to write the history
  * of the map.
@@ -39,26 +39,32 @@
 #include "vtkGRASSBridgeRasterWin32Header.h"
 
 class vtkDataArray;
+class vtkGRASSRasterRow;
+class vtkGRASSRasterMemoryMap;
 
 class VTK_GRASS_BRIDGE_RASTER_EXPORT vtkGRASSRasterMapWriter : public vtkGRASSRasterMapBase
 {
 public:
   static  vtkGRASSRasterMapWriter *New();
   vtkTypeRevisionMacro(vtkGRASSRasterMapWriter,vtkGRASSRasterMapBase);
+  void PrintSelf(ostream& os, vtkIndent indent);
 
   virtual void SetMapTypeToCELL() {this->SetMapType(CELL_TYPE);}
   virtual void SetMapTypeToFCELL() {this->SetMapType(FCELL_TYPE);}
   virtual void SetMapTypeToDCELL() {this->SetMapType(DCELL_TYPE);}
 
-  //! \brief Set the histroy which should be written to the raster map
+  //! \brief Set the history which should be written to the raster map
   vtkSetObjectMacro(History, vtkGRASSHistory);
 
-  //! \brief Open old raster map for reading
+  //! \brief Open a raster map for writing
   virtual bool OpenMap(const char *name);
   //! \brief Write a rast row, returns 1 on success, -1 in case of an error
   virtual bool PutNextRow(vtkDataArray *data);
   //! \brief Write a rast row, returns 1 on success, -1 in case of an error
   virtual bool PutNextRow(vtkGRASSRasterRow *row);
+  //! \brief Write a memory map which must be of the same type and size,
+  //! returns 1 on success, -1 in case of an error
+  virtual bool WriteMemoryMap(vtkGRASSRasterMemoryMap *mmap);
   //! \brief close Map and write a short history
   virtual bool CloseMap();
   //! \brief the current position of the row in the new raster map
@@ -72,9 +78,9 @@ public:
 
 protected:
   vtkGRASSRasterMapWriter();
-  ~vtkGRASSRasterMapWriter(){};
 
   vtkSetMacro(UseNullValue, int);
+  bool Empty;
   
 private:
 

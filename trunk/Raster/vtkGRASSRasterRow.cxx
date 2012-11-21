@@ -24,6 +24,7 @@ vtkStandardNewMacro(vtkGRASSRasterRow);
 vtkGRASSRasterRow::vtkGRASSRasterRow()
 {
     this->Allocated = false;
+    this->UseExternalBuffer = false;
     this->CELLBuff = NULL;
     this->FCELLBuff = NULL;
     this->DCELLBuff = NULL;
@@ -42,24 +43,26 @@ vtkGRASSRasterRow::~vtkGRASSRasterRow()
 
 void vtkGRASSRasterRow::Reset()
 {
-	if(this->Allocated) {
+	if(this->Allocated && this->UseExternalBuffer == false) {
 		TRY
 		if(this->CELLBuff) {
 			G_free(this->CELLBuff);
-			this->CELLBuff = NULL;
 		} else if(this->FCELLBuff) {
 			G_free(this->FCELLBuff);
-			this->FCELLBuff = NULL;
 		} if(this->DCELLBuff) {
 			G_free(this->DCELLBuff);
-			this->DCELLBuff = NULL;
 		}
 		CATCH_VOID
 	}
 
+	this->CELLBuff = NULL;
+	this->FCELLBuff = NULL;
+	this->DCELLBuff = NULL;
+
     this->NumberOfCols = 0;
     this->RowType = -1;
     this->Allocated = false;
+    this->UseExternalBuffer = false;
 }
 
 //----------------------------------------------------------------------------
@@ -82,8 +85,8 @@ bool vtkGRASSRasterRow::Allocate(int cols, int rowtype)
 bool vtkGRASSRasterRow::AllocateCELL(int cols)
 {
     if(cols < 1) {
-        return false;
         this->InsertNextError("Number of columns is lower than 1");
+        return false;
     }
 
     this->Reset();
@@ -95,6 +98,7 @@ bool vtkGRASSRasterRow::AllocateCELL(int cols)
     this->NumberOfCols = cols;
     this->Allocated = true;
     this->RowType = CELL_TYPE;
+    this->UseExternalBuffer = false;
 
     return true;
 }
@@ -104,8 +108,8 @@ bool vtkGRASSRasterRow::AllocateCELL(int cols)
 bool vtkGRASSRasterRow::AllocateFCELL(int cols)
 {
     if(cols < 1) {
-        return false;
         this->InsertNextError("Number of columns is lower than 1");
+        return false;
     }
 
     this->Reset();
@@ -118,6 +122,7 @@ bool vtkGRASSRasterRow::AllocateFCELL(int cols)
     this->NumberOfCols = cols;
     this->Allocated = true;
     this->RowType = FCELL_TYPE;
+    this->UseExternalBuffer = false;
 
     return true;
 }
@@ -127,8 +132,8 @@ bool vtkGRASSRasterRow::AllocateFCELL(int cols)
 bool vtkGRASSRasterRow::AllocateDCELL(int cols)
 {
     if(cols < 1) {
-        return false;
         this->InsertNextError("Number of columns is lower than 1");
+        return false;
     }
 
     this->Reset();
@@ -141,6 +146,7 @@ bool vtkGRASSRasterRow::AllocateDCELL(int cols)
     this->NumberOfCols = cols;
     this->Allocated = true;
     this->RowType = DCELL_TYPE;
+    this->UseExternalBuffer = false;
 
     return true;
 }
@@ -160,6 +166,30 @@ void *vtkGRASSRasterRow::GetBuffer()
         return this->DCELLBuff;
 
     return NULL;
+}
+
+//----------------------------------------------------------------------------
+
+bool vtkGRASSRasterRow::SetBuffer(int cols, int rowType, void *buf)
+{
+    this->Reset();
+
+    if(rowType == CELL_TYPE)
+        this->CELLBuff = (CELL*)buf;
+    else if(rowType == FCELL_TYPE)
+        this->FCELLBuff = (FCELL*)buf;
+    else if(rowType == DCELL_TYPE)
+        this->DCELLBuff = (DCELL*)buf;
+    else
+    	return false;
+
+
+    this->NumberOfCols = cols;
+    this->RowType = rowType;
+    this->UseExternalBuffer = true;
+    this->Allocated = true;
+
+    return true;
 }
 
 //----------------------------------------------------------------------------
@@ -333,14 +363,4 @@ bool vtkGRASSRasterRow::SetToNull()
         Rast_set_d_null_value(this->DCELLBuff, this->NumberOfCols);
 
     return true;
-}
-
-//----------------------------------------------------------------------------
-
-vtkDataArray *vtkGRASSRasterRow::ToDataArray()
-{
-    if(this->Allocated == false)
-        return NULL;
-
-    return NULL;
 }

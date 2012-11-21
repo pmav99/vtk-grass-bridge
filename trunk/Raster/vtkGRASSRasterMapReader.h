@@ -21,8 +21,8 @@
  *
  * This class does not use the vtk update mechanism.
  * Before reading the raster map rows you need to open the raster map.
- * After reading you must close the raster map or delete the object. The
- * destructor will close the map.
+ * After reading you must close the raster map. The
+ * destructor will not close the map.
  *
  * \author Soeren Gebbert
  * \author Berlin, Germany Aug. 2009
@@ -35,6 +35,10 @@
 
 #include <vtkGRASSRasterMapBase.h>
 #include "vtkGRASSBridgeRasterWin32Header.h"
+
+class vtkGRASSRasterRow;
+class vtkDataArray;
+class vtkCharArray;
 
 class VTK_GRASS_BRIDGE_RASTER_EXPORT vtkGRASSRasterMapReader : public vtkGRASSRasterMapBase
 {
@@ -51,6 +55,29 @@ public:
   //! Call only after the raster map was opened.
   //! \return true for success, false for error
   virtual bool GetRange(double range[2]);
+
+  //! \brief Read a row of the map at position index
+  //!
+  //! This method reads the raster data directly into the vtkGRASSRasterRow and
+  //! is much faster than the vtkDataArray approach. The NullValue setting is ignored
+  //! using this method.
+  //!
+  //! \param idx the index of the raster row
+  //! \param row the raster row used to read the row internally
+  //! \return true on success, false otherwise
+  virtual bool GetRow(int idx, vtkGRASSRasterRow *row);
+
+  //! \brief Read a row of the map at position idx and return a vtkDataArray
+  //! the returned array is of type vtkIntArray in case of map type CELL,
+  //! of type vtkFloatArray in case of map type FCELL and of type vtkDoubleArray
+  //! in case of map type DCELL. If the NullValue is set and activated it will
+  //! be used to convert GRASS null values into the NullValue in the vtkDataArray.
+  virtual vtkDataArray *GetRow(int idx);
+
+  //! \brief Read the null row of the map at position idx
+  //! 1 == null value, 0 != null value
+  virtual vtkCharArray *GetNullRow(int idx);
+
 protected:
   vtkGRASSRasterMapReader(){};
   ~vtkGRASSRasterMapReader(){};

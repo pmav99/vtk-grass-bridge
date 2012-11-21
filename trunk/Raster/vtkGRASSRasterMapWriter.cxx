@@ -15,6 +15,7 @@
 #include "vtkGRASSRasterMapWriter.h"
 #include "vtkGRASSHistory.h"
 #include "vtkGRASSRasterRow.h"
+#include "vtkGRASSRasterMemoryMap.h"
 #include <vtkStringArray.h>
 #include <vtkObjectFactory.h>
 #include <vtkDataArray.h>
@@ -31,6 +32,18 @@ vtkGRASSRasterMapWriter::vtkGRASSRasterMapWriter()
 {
     this->MapTitle = NULL;
     this->SetMapTitle("Raster map title");
+    this->Empty = true;
+}
+
+//----------------------------------------------------------------------------
+
+void
+vtkGRASSRasterMapWriter::PrintSelf(ostream& os, vtkIndent indent)
+{
+    this->Superclass::PrintSelf(os, indent);
+    os << indent << "Is map empty: " << (this->Empty ? "YES" : "NO") << endl;
+
+    return;
 }
 
 //----------------------------------------------------------------------------
@@ -52,6 +65,9 @@ vtkGRASSRasterMapWriter::OpenMap(const char *name)
     else if (this->Open == true)
     {
         // If a new name is given, the open map will be closed
+    	G_snprintf(buff, 1024, "class: %s line: %i Raster map %s is already open.",
+        this->GetClassName(), __LINE__, this->RasterName);
+    	this->InsertNextError(buff);
         if(!this->CloseMap())
             return false;
     }
@@ -98,6 +114,7 @@ vtkGRASSRasterMapWriter::OpenMap(const char *name)
     }
 
     this->Open = true;
+    this->Empty = true;
     return true;
 }
 
@@ -156,6 +173,8 @@ vtkGRASSRasterMapWriter::PutNextRow(vtkDataArray *data)
     TRY Rast_put_row(this->Map, this->RasterBuff, this->MapType);
     CATCH_BOOL
     
+    this->Empty = false;
+
     return true;
 }
 
@@ -176,7 +195,7 @@ vtkGRASSRasterMapWriter::PutNextRow(vtkGRASSRasterRow *row)
 
     if (row->GetNumberOfCols() < this->NumberOfCols)
     {
-        G_snprintf(buff, 1024, "class: %s line: %i The number of rows differs.",
+        G_snprintf(buff, 1024, "class: %s line: %i The number of cols differs.",
                    this->GetClassName(), __LINE__);
         this->InsertNextError(buff);
         return false;
@@ -193,6 +212,60 @@ vtkGRASSRasterMapWriter::PutNextRow(vtkGRASSRasterRow *row)
     TRY Rast_put_row(this->Map, row->GetBuffer(), this->MapType);
     CATCH_BOOL
 
+    this->Empty = false;
+
+    return true;
+}
+
+//----------------------------------------------------------------------------
+
+bool
+vtkGRASSRasterMapWriter::WriteMemoryMap(vtkGRASSRasterMemoryMap *mmap)
+{
+    char buff[1024];
+    int i;
+    VGB_CREATE(vtkGRASSRasterRow, row);
+
+    if (mmap == NULL)
+    {
+        G_snprintf(buff, 1024, "class: %s line: %i The memory map is NULL.",
+                   this->GetClassName(), __LINE__);
+        this->InsertNextError(buff);
+        return false;
+    }
+
+    if (mmap->GetNumberOfCols() < this->NumberOfCols)
+    {
+        G_snprintf(buff, 1024, "class: %s line: %i The number of cols differs.",
+                   this->GetClassName(), __LINE__);
+        this->InsertNextError(buff);
+        return false;
+    }
+
+    if (mmap->GetNumberOfRows() < this->NumberOfRows)
+    {
+        G_snprintf(buff, 1024, "class: %s line: %i The number of rows differs.",
+                   this->GetClassName(), __LINE__);
+        this->InsertNextError(buff);
+        return false;
+    }
+
+    if (mmap->GetMapType() < this->MapType)
+    {
+        G_snprintf(buff, 1024, "class: %s line: %i The map types are different.",
+                   this->GetClassName(), __LINE__);
+        this->InsertNextError(buff);
+        return false;
+    }
+
+    for(i = 0; i < this->GetNumberOfRows(); i++) {
+    	mmap->GetRow(i, row);
+		TRY Rast_put_row(this->Map, row->GetBuffer(), this->MapType);
+		CATCH_BOOL
+    }
+
+    this->Empty = false;
+
     return true;
 }
 
@@ -201,6 +274,16 @@ vtkGRASSRasterMapWriter::PutNextRow(vtkGRASSRasterRow *row)
 bool
 vtkGRASSRasterMapWriter::CloseMap()
 {
+	char buff[1024];
+	// We close them only when its not empty
+    if (this->Empty)
+    {
+        G_snprintf(buff, 1024, "class: %s line: %i Map is empty, unable to close.",
+                   this->GetClassName(), __LINE__);
+        this->InsertNextError(buff);
+        return false;
+    }
+
     if(!this->Superclass::CloseMap())
         return false;
 

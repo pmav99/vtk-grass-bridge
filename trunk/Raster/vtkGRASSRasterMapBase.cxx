@@ -24,7 +24,6 @@
 #include "vtkGRASSHistory.h"
 #include "vtkCELL.h"
 #include "vtkFCELL.h"
-#include "vtkGRASSRasterRow.h"
 #include <vtkGRASSDefines.h>
 
 vtkCxxRevisionMacro(vtkGRASSRasterMapBase, "$Revision: 1.18 $");
@@ -56,8 +55,6 @@ vtkGRASSRasterMapBase::vtkGRASSRasterMapBase()
 
 vtkGRASSRasterMapBase::~vtkGRASSRasterMapBase()
 {
-    this->CloseMap();
-
     if (this->RasterName)
         delete [] this->RasterName;
     if (this->Mapset)
@@ -138,7 +135,7 @@ vtkGRASSRasterMapBase::SetRegion()
     }
     CATCH_BOOL
 
-        this->NumberOfRows = head.rows;
+    this->NumberOfRows = head.rows;
     this->NumberOfCols = head.cols;
 
     return true;
@@ -185,116 +182,6 @@ vtkGRASSRasterMapBase::SetUpRasterBuffer()
     return true;
 }
 
-//----------------------------------------------------------------------------
-
-bool vtkGRASSRasterMapBase::GetRow(int idx, vtkGRASSRasterRow *row)
-{
-
-    char buff[1024];
-
-    if (idx < 0 || idx > this->NumberOfRows - 1) {
-        G_snprintf(buff, 1024, "class: %s line: %i The index %i is out of range.",
-                   this->GetClassName(), __LINE__, idx);
-        this->InsertNextError(buff);
-        return false;
-    }
-
-    //Check if raster row is of correct type and allocated
-    if((row->GetRowType() == this->GetMapType()) && row->GetNumberOfCols() == this->NumberOfCols)
-    {
-        ;
-    } else {
-        // Allocate the raster buffer with the map specific type
-        row->Allocate(this->NumberOfCols, this->MapType);
-    }
-
-    TRY Rast_get_row(this->Map, row->GetBuffer(), idx, this->MapType);
-    CATCH_BOOL
-
-    return true;
-}
-
-//----------------------------------------------------------------------------
-
-vtkDataArray *
-vtkGRASSRasterMapBase::GetRow(int idx)
-{
-    int i;
-    void *ptr;
-    char buff[1024];
-
-    if (idx < 0 || idx > this->NumberOfRows - 1) {
-        G_snprintf(buff, 1024, "class: %s line: %i The index %i is out of range.",
-                   this->GetClassName(), __LINE__, idx);
-        this->InsertNextError(buff);
-        return NULL;
-    }
-
-    // Allocate the raster buffer with the map specific type
-    this->SetUpRasterBuffer();
-
-    TRY Rast_get_row(this->Map, this->RasterBuff, idx, this->MapType);
-    CATCH_NULL
-
-    ptr = this->RasterBuff;
-
-    for (i = 0; i < this->NumberOfCols; i++) {
-
-        if (this->UseNullValue) {
-            if ((this->MapType == CELL_TYPE && Rast_is_c_null_value(&((CELL*)this->RasterBuff)[i])) ||
-                (this->MapType == FCELL_TYPE && Rast_is_f_null_value(&((FCELL*)this->RasterBuff)[i])) ||
-                (this->MapType == DCELL_TYPE && Rast_is_d_null_value(&((DCELL*)this->RasterBuff)[i]))) {
-                this->Row->SetTuple1(i, this->NullValue);
-            } else {
-
-                if (this->MapType == CELL_TYPE) {
-                    this->Row->SetTuple1(i, (double) ((CELL*)this->RasterBuff)[i]);
-                } else if (this->MapType == FCELL_TYPE) {
-                    this->Row->SetTuple1(i, (double) ((FCELL*)this->RasterBuff)[i]);
-                } else if (this->MapType == DCELL_TYPE) {
-                    this->Row->SetTuple1(i, (double) ((DCELL*)this->RasterBuff)[i]);
-                }
-            }
-        } else {
-            if (this->MapType == CELL_TYPE) {
-                this->Row->SetTuple1(i, (double) ((CELL*)this->RasterBuff)[i]);
-            } else if (this->MapType == FCELL_TYPE) {
-                this->Row->SetTuple1(i, (double) ((FCELL*)this->RasterBuff)[i]);
-            } else if (this->MapType == DCELL_TYPE) {
-                this->Row->SetTuple1(i, (double) ((DCELL*)this->RasterBuff)[i]);
-
-            }
-        }
-    }
-
-    return this->Row;
-}
-
-//----------------------------------------------------------------------------
-
-vtkCharArray *
-vtkGRASSRasterMapBase::GetNullRow(int idx)
-{
-    int i;
-    char buff[1024];
-
-    if (idx < 0 || idx > this->NumberOfRows - 1) {
-        G_snprintf(buff, 1024, "class: %s line: %i The index %i is out of range.",
-                   this->GetClassName(), __LINE__, idx);
-        this->InsertNextError(buff);
-        return NULL;
-    }
-
-    this->SetUpRasterBuffer();
-    TRY Rast_get_null_value_row(this->Map, this->NullBuff, idx);
-    CATCH_NULL
-
-    for (i = 0; i < this->NumberOfCols; i++) {
-        this->NullRow->SetValue(i, this->NullBuff[i]);
-    }
-
-    return this->NullRow;
-}
 
 //----------------------------------------------------------------------------
 

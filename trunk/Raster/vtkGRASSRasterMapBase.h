@@ -45,7 +45,6 @@ extern "C" {
 }
 
 class vtkCharArray;
-class vtkGRASSRasterRow;
 
 class VTK_GRASS_BRIDGE_RASTER_EXPORT vtkGRASSRasterMapBase : public vtkObjectGRASSErrorHandler {
 public:
@@ -112,28 +111,6 @@ public:
 
     //! \brief Close the raster map
     virtual bool CloseMap();
-
-    //! \brief Read a row of the map at position index
-    //! 
-    //! This method reads the raster data directly into the vtkGRASSRasterRow and
-    //! is much faster than the vtkDataArray approach. The NullValue setting is ignored
-    //! using this method.
-    //!
-    //! \param idx the index of the raster row
-    //! \param row the raster row used to read the row internally
-    //! \return true on success, false otherwise
-    virtual bool GetRow(int idx, vtkGRASSRasterRow *row);
-    
-    //! \brief Read a row of the map at position idx and return a vtkDataArray
-    //! the returned array is of type vtkIntArray in case of map type CELL,
-    //! of type vtkFloatArray in case of map type FCELL and of type vtkDoubleArray 
-    //! in case of map type DCELL. If the NullValue is set and activated it will
-    //! be used to convert GRASS null values into the NullValue in the vtkDataArray.
-    virtual vtkDataArray *GetRow(int idx);
-    
-    //! \brief Read the null row of the map at position idx
-    //! 1 == null value, 0 != null value
-    virtual vtkCharArray *GetNullRow(int idx);
 
     /*!
      *  \brief Extract a cell value from raster map (neighbor interpolation)
