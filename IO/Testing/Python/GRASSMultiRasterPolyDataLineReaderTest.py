@@ -31,12 +31,20 @@ class GRASSMultiRasterPolyDataLineReaderTest(unittest.TestCase):
             proc = subprocess.Popen(args=inputlist)
             proc.communicate()
             # Create the input data
-            inputlist = ["r.mapcalc", "--o", 'expr=random_tmp=rand(0, 100)']
+            inputlist = ["r.mapcalc", "--o", 'expr=random_tmp_1=rand(0, 20)']
+            proc = subprocess.Popen(args=inputlist)
+            proc.communicate()
+            # Create the input data
+            inputlist = ["r.mapcalc", "--o", 'expr=random_tmp_2=rand(20, 40)']
+            proc = subprocess.Popen(args=inputlist)
+            proc.communicate()
+            # Create the input data
+            inputlist = ["r.mapcalc", "--o", 'expr=random_tmp_3=rand(40, 60)']
             proc = subprocess.Popen(args=inputlist)
             proc.communicate()
             firstCheck = True
 
-        num = 5
+        num = 3
             
         self.maps = vtkStringArray()
         self.maps.SetNumberOfTuples(num)
@@ -49,22 +57,25 @@ class GRASSMultiRasterPolyDataLineReaderTest(unittest.TestCase):
         init.Init("GRASSMultiRasterPolyDataLineReaderTest")
         init.ExitOnErrorOn()
         
-        for i in range(5):
-            self.maps.SetValue(i, "random_tmp")
+        for i in range(3):
+            self.maps.SetValue(i, "random_tmp_" + str(i + 1))
             self.lineLengths.SetValue(i, -3*(i + 1))
             
-        rs = vtkGRASSMultiRasterPolyDataLineReader()
-        rs.SetRasterNames(self.maps)
-        rs.SetDataName("RandomValues")
-        rs.SetLineLengths(self.lineLengths)
-
-        writer = vtkPolyDataWriter()
-        writer.SetFileName("/tmp/GRASSMultiRasterPolyDataLineReaderTest.vtk")
-        writer.SetInputConnection(rs.GetOutputPort())
+        reader = vtkGRASSMultiRasterPolyDataLineReader()
+        reader.SetRasterNames(self.maps)
+        reader.SetDataName("RandomValues")
+        reader.SetLineLengths(self.lineLengths)
+        
+        writer = vtkGRASSMultiRasterPolyDataLineWriter()
+        writer.SetRasterBaseName("multi_raster_test")
+        writer.SetInputConnection(reader.GetOutputPort())
         writer.Update()
-        
-        print rs.GetOutput()
-        
+
+        writer2 = vtkPolyDataWriter()
+        writer2.SetFileName("/tmp/GRASSMultiRasterPolyDataLineReaderTest.vtk")
+        writer2.SetInputConnection(reader.GetOutputPort())
+        writer2.Update()
+                
 if __name__ == '__main__':
     suite = unittest.TestLoader().loadTestsFromTestCase(GRASSMultiRasterPolyDataLineReaderTest)
     unittest.TextTestRunner(verbosity=2).run(suite)

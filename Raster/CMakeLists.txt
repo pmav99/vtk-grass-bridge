@@ -8,6 +8,7 @@
 
 SET (RASTERSRCS
 vtkGRASSRasterRow.cxx
+vtkGRASSRasterMemoryMap.cxx
 vtkGRASSRasterMapBase.cxx
 vtkGRASSRasterMapReader.cxx
 vtkGRASSRasterMapWriter.cxx
@@ -16,6 +17,7 @@ vtkGRASSHistory.cxx
 
 SET (RASTERH
 vtkGRASSRasterRow.h
+vtkGRASSRasterMemoryMap.h
 vtkGRASSRasterMapBase.h
 vtkGRASSRasterMapReader.h
 vtkGRASSRasterMapWriter.h

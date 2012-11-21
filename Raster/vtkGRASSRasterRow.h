@@ -86,23 +86,25 @@ public:
   //!\brief Set the raster row to Null
   bool SetToNull();
 
-  //!\brief Reset the raster row and free internal memoryused for row storage
+  //!\brief Reset the raster row and free internal memory used for row storage
   void Reset();
-
-  //!\brief convert the raster row into a vtkDataArray. The type of the
-  //! data array depends on the row type:
-  //! CELL  -> vtkIntArray
-  //! FCELL -> vtkFloatArray
-  //! DCELL -> vtkDoubleArray
-  //!\return NULL in case of failure
-  vtkDataArray *ToDataArray();
   
   vtkGetMacro(NumberOfCols, int);
   vtkGetMacro(RowType, int);
 
+  //!\brief Return true if an external buffer is used as row
+  bool UsingExternalBuffer(){return this->UseExternalBuffer;}
+
   //BTX
   //!\brief Return the active buffer or NULL if no buffer was allocated
   void * GetBuffer();
+  //!\brief Set the internal row buffer
+  //!The internal memory will be freed and the allocation flag will be set
+  //!to false, hence the provided row buffer must be freed outside
+  //!\param cols: The number of columns to be used of the buffer
+  //!\param rowType: CELL_TPYE, FCELL_TYPE or DCELL_TYPE
+  //!\param buf: The buffer must be of type (CELL*) (FCELL*) or (DCELL*)
+  bool SetBuffer(int cols, int rowType, void *buf);
   //ETX
 
 protected:
@@ -110,6 +112,7 @@ protected:
   ~vtkGRASSRasterRow();
 
   bool Allocated;
+  bool UseExternalBuffer;
   int RowType;
   int NumberOfCols;
   CELL *CELLBuff;
