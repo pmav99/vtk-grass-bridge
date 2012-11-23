@@ -1,6 +1,6 @@
 /*
  * Program: vtkGRASSBridge
- * COPYRIGHT: (C) 2009 by Soeren Gebbert, soerengebbert@googlemail.com
+ * COPYRIGHT: (C) 2012 by Soeren Gebbert, soerengebbert@googlemail.com
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -14,22 +14,23 @@
 
 /**
  * \brief This class reads multiple raster maps and creates a vtkPolyData
- * dataset that represents the non-Null cells of the raster maps as vertical lines.
+ * dataset that represents the non-Null cells of the raster maps as vertical
+ * lines with a user defined length.
  *
- * The raster maps may represent the soil properties at different depths.
+ * The raster maps may represent the soil properties at different depths. Hence
+ * maps must be provided in increasing or decreasing order.
  *
  * The cells of the input raster maps
  * will be  connected via lines in vertical direction.
  * The distance between the points must be provided as double array
- * and must be equal to the number of vector maps that are defined.
+ * and must be equal to the number of raster maps that are defined.
  *
  * The cell value data of the raster maps are assigned to the created lines,
  * hence each raster cell is represented as a vertical line and the cell
  * value is assigned to the line.
  *
- * The raster names can be replaced
- * by the alternative names in the cell data arrays.
- * That is needed in case filter expect a static name for arrays to process.
+ * The raster names will be replaced in the resulting datasets
+ * by an alternative user defined name.
  *
  * \author Soeren Gebbert
  * \author Berlin, Germany Aug. 2012

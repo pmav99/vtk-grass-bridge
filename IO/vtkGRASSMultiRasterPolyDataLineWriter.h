@@ -1,6 +1,6 @@
 /*
  * Program: vtkGRASSBridge
- * COPYRIGHT: (C) 2009 by Soeren Gebbert, soerengebbert@googlemail.com
+ * COPYRIGHT: (C) 2012 by Soeren Gebbert, soerengebbert@googlemail.com
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -13,11 +13,18 @@
 */
 
 /**
- * \brief This class writes PolyData build from vertical lines as
- * GRASS raster maps.
+ * \brief This module is designed to write PolyData build upon vertical lines
+ * that was created by vtkGRASSMulti(Raster|Vector)PolyDataLineReader as
+ * GRASS raster maps using the current region settings.
  *
- * Raster maps are written for each vertical layer and each cell data array
- * associated with the PolyData.
+ * As input a PolyData object and the base name of the raster maps that should
+ * be created must be provided.
+ *
+ * For each Layer in the PolyData ("Layer" array must be present in the dataset)
+ * and for each CellData array a new raster map will be created using layer and
+ * array name as together with the provided base name to generate the raster map
+ * name.
+ *
  *
  * \author Soeren Gebbert
  * \author Berlin, Germany Aug. 2012
@@ -55,14 +62,11 @@ public:
   //!\brief Set the array name that replace the raster names in the cell data
   vtkSetStringMacro(RasterBaseName);
 
-  vtkGetObjectMacro(RasterMapNames, vtkStringArray);
-
 protected:
   vtkGRASSMultiRasterPolyDataLineWriter();
   ~vtkGRASSMultiRasterPolyDataLineWriter();
 
   char *RasterBaseName;
-  vtkStringArray *RasterMapNames;
 
   virtual int RequestData(vtkInformation*,
                   vtkInformationVector**,
