@@ -13,18 +13,14 @@
 */
 
 /**
- * \brief This module is designed to write PolyData build upon vertical lines
+ * \brief This module is designed to export PolyData build upon vertical lines
  * that was created by vtkGRASSMulti(Raster|Vector)PolyDataLineReader as
  * GRASS raster maps using the current region settings.
  *
- * As input a PolyData object and the base name of the raster maps that should
- * be created must be provided.
+ * As input a PolyData set is expected. The name of a single
+ * array, the layer number and the resulting raster map name must be provided.
  *
- * For each Layer in the PolyData ("Layer" array must be present in the dataset)
- * and for each CellData array a new raster map will be created using layer and
- * array name as together with the provided base name to generate the raster map
- * name.
- *
+ * Only a single array and a single layer can be exported as raster map.
  *
  * \author Soeren Gebbert
  * \author Berlin, Germany Aug. 2012
@@ -57,16 +53,32 @@ public:
   vtkTypeRevisionMacro(vtkGRASSMultiRasterPolyDataLineWriter,vtkPolyDataAlgorithm);
   virtual void PrintSelf(ostream& os, vtkIndent indent);
 
-  //!\brief Get the array name that replace the raster names in the cell data
-  vtkGetStringMacro(RasterBaseName);
-  //!\brief Set the array name that replace the raster names in the cell data
-  vtkSetStringMacro(RasterBaseName);
+  //!\brief Get the name of the generated raster maps
+  vtkGetStringMacro(RasterMapName);
+  //!\brief Set the name of the generated raster maps
+  vtkSetStringMacro(RasterMapName);
+
+  //!\brief Get the name of the array that should be written as raster map,
+  //! default is the active array in case this variable was not set
+  vtkGetStringMacro(ArrayName);
+  //!\brief Set the name of the array that should be written as raster map
+  //! default is the active array in case this variable was not set
+  vtkSetStringMacro(ArrayName);
+
+  //!\brief Get the number of the layer that should be written as raster map,
+  //! default is layer 1
+  vtkGetMacro(Layer, int);
+  //!\brief Set the number of the layer that should be written as raster map,
+  //! default is layer 1
+  vtkSetMacro(Layer, int);
 
 protected:
   vtkGRASSMultiRasterPolyDataLineWriter();
   ~vtkGRASSMultiRasterPolyDataLineWriter();
 
-  char *RasterBaseName;
+  char *RasterMapName;
+  char *ArrayName;
+  int Layer;
 
   virtual int RequestData(vtkInformation*,
                   vtkInformationVector**,
