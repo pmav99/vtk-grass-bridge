@@ -41,7 +41,9 @@ vtkStandardNewMacro(vtkGRASSMultiRasterPolyDataLineWriter);
 //----------------------------------------------------------------------------
 
 vtkGRASSMultiRasterPolyDataLineWriter::vtkGRASSMultiRasterPolyDataLineWriter() {
-	this->RasterBaseName = NULL;
+	this->RasterMapName = NULL;
+	this->ArrayName = NULL;
+	this->Layer = 1;
 	this->SetNumberOfInputPorts(1);
 	this->SetNumberOfOutputPorts(0);
 }
@@ -49,8 +51,10 @@ vtkGRASSMultiRasterPolyDataLineWriter::vtkGRASSMultiRasterPolyDataLineWriter() {
 //----------------------------------------------------------------------------
 
 vtkGRASSMultiRasterPolyDataLineWriter::~vtkGRASSMultiRasterPolyDataLineWriter() {
-	if (this->RasterBaseName)
-		delete[] this->RasterBaseName;
+	if (this->ArrayName)
+		delete[] this->ArrayName;
+	if (this->RasterMapName)
+		delete[] this->RasterMapName;
 }
 
 //----------------------------------------------------------------------------
@@ -79,16 +83,22 @@ int vtkGRASSMultiRasterPolyDataLineWriter::RequestData(vtkInformation * vtkNotUs
 
 	VGB_CREATE(vtkGRASSMessagingInterface, talk);
 
-	if (this->RasterBaseName == NULL) {
-		vtkErrorMacro( << "The DataName must be specified");
-		return -1;
-	}
-
 	vtkPolyData* input = vtkPolyData::GetData(inputVector[0]);
 
 	if (!input->GetCellData()->HasArray("Layer")) {
 		vtkErrorMacro(
 				"Array with layer information is missing in input.");
+		return -1;
+	}
+
+	if (this->ArrayName == NULL) {
+		vtkErrorMacro("ArrayName must be specified");
+		return -1;
+	}
+
+	if (!input->GetCellData()->HasArray(this->ArrayName)) {
+		vtkErrorMacro(
+				"ArrayName <" << this->ArrayName << "> is missing in input.");
 		return -1;
 	}
 
@@ -101,14 +111,17 @@ int vtkGRASSMultiRasterPolyDataLineWriter::RequestData(vtkInformation * vtkNotUs
 	for(lCount = 0; lCount < nLayers; lCount++) {
 		layer = lCount + 1;
 
-		G_snprintf(message, 1024, "Processing layer %i of %i", lCount + 1,
+		if(this->Layer != layer)
+			continue;
+
+		G_snprintf(message, 1024, "vtkGRASSMultiRasterPolyDataLineWriter: "
+				"Processing layer %i of %i", lCount + 1,
 				nLayers);
 		talk->Message(message);
 
 		for(aCount = 0; aCount < nArrays; aCount++) {
 
 			double value;
-			char mapName[1024];
 			vtkDataArray *array = input->GetCellData()->GetArray(aCount);
 			const char *arrayName = array->GetName();
 
@@ -116,7 +129,8 @@ int vtkGRASSMultiRasterPolyDataLineWriter::RequestData(vtkInformation * vtkNotUs
 			if(strcmp(arrayName, "Layer") == 0)
 				continue;
 
-			G_snprintf(message, 1024, "(%i of %i) Processing array %s", aCount + 1,
+			G_snprintf(message, 1024, "vtkGRASSMultiRasterPolyDataLineWriter: "
+					"(%i of %i) Processing array %s", aCount + 1,
 					nArrays, arrayName);
 			talk->Message(message);
 
@@ -124,12 +138,10 @@ int vtkGRASSMultiRasterPolyDataLineWriter::RequestData(vtkInformation * vtkNotUs
 			VGB_CREATE(vtkGRASSRasterMemoryMap, mmap);
 			VGB_CREATE(vtkDCELL, dcell);
 
-			G_snprintf(mapName, 1024, "%s_%s_%i", this->RasterBaseName,
-					arrayName, layer);
 
 			RasterMap->SetMapTypeToDCELL();
 			RasterMap->UseCurrentRegion();
-			if(!RasterMap->OpenMap(mapName))
+			if(!RasterMap->OpenMap(this->RasterMapName))
 				return -1;
 
 			rows = RasterMap->GetNumberOfRows();

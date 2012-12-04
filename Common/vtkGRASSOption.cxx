@@ -34,6 +34,7 @@ vtkGRASSOption::vtkGRASSOption()
     this->Answer = NULL;
     this->Options = NULL;
     this->GuiSection = NULL;
+    this->GuiDependency = NULL;
     this->GisPrompt = NULL;
 }
 
@@ -120,6 +121,20 @@ void vtkGRASSOption::SetGuiSection(const char *guisection)
     this->GuiSection = strdup(guisection);
     
     this->option->guisection = (const char*)this->GuiSection;
+}
+
+//----------------------------------------------------------------------------
+
+void vtkGRASSOption::SetGuiDependency(const char *key)
+{
+    VGB_CHECK_OPTION
+
+    if(this->GuiDependency)
+        free(this->GuiDependency);
+
+    this->GuiDependency = strdup(key);
+
+    this->option->guidependency = (const char*)this->GuiDependency;
 }
 
 //----------------------------------------------------------------------------

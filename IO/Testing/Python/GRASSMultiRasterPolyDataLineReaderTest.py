@@ -67,7 +67,21 @@ class GRASSMultiRasterPolyDataLineReaderTest(unittest.TestCase):
         reader.SetLineLengths(self.lineLengths)
         
         writer = vtkGRASSMultiRasterPolyDataLineWriter()
-        writer.SetRasterBaseName("multi_raster_test")
+        writer.SetRasterMapName("multi_raster_test_1")
+        writer.SetArrayName("RandomValues")
+        writer.SetLayer(1)
+        writer.SetInputConnection(reader.GetOutputPort())
+        writer.Update()
+        
+        writer.SetRasterMapName("multi_raster_test_1")
+        writer.SetArrayName("RandomValues")
+        writer.SetLayer(2)
+        writer.SetInputConnection(reader.GetOutputPort())
+        writer.Update()
+        
+        writer.SetRasterMapName("multi_raster_test_1")
+        writer.SetArrayName("RandomValues")
+        writer.SetLayer(3)
         writer.SetInputConnection(reader.GetOutputPort())
         writer.Update()
 

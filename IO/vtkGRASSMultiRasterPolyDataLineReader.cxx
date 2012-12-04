@@ -126,7 +126,8 @@ int vtkGRASSMultiRasterPolyDataLineReader::RequestData(vtkInformation*,
 			return -1;
 		}
 
-		G_snprintf(message, 1024, "Processing layer %i of %i", n + 1,
+		G_snprintf(message, 1024, "vtkGRASSMultiRasterPolyDataLineReader: "
+				"Processing layer %i of %i", n + 1,
 				(int)this->RasterNames->GetNumberOfValues());
 		talk->Message(message);
 

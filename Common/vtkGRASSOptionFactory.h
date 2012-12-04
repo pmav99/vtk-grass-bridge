@@ -90,6 +90,28 @@ public:
   static int GetFileInputType(){return G_OPT_F_INPUT;}
   //!\brief Standard option for a file output
   static int GetFileOutputType(){return G_OPT_F_OUTPUT;}
+  //!\brief Standard option for temporal sample type
+  static int GetTemporalSampleType(){return G_OPT_T_SAMPLE;}
+  //!\brief Standard option for the temporal type
+  static int GetTemporalTypeType(){return G_OPT_T_TYPE;}
+  //!\brief Standard option for the temporal where statement
+  static int GetTemporalWhereype(){return G_OPT_T_WHERE;}
+  //!\brief Standard option for space time dataset input
+  static int GetSTDSInputType(){return G_OPT_STDS_INPUT;}
+  //!\brief Standard option for space time dataset inputs
+  static int GetSTDSInputsType(){return G_OPT_STDS_INPUTS;}
+  //!\brief Standard option for space time raster dataset input
+  static int GetSTRDSInputType(){return G_OPT_STRDS_INPUT;}
+  //!\brief Standard option for space time raster dataset inputs
+  static int GetSTRDSInputsType(){return G_OPT_STRDS_INPUTS;}
+  //!\brief Standard option for space time raster dataset output
+  static int GetSTRDSOutputType(){return G_OPT_STRDS_OUTPUT;}
+  //!\brief Standard option for space time vector dataset input
+  static int GetSTVDSInputType(){return G_OPT_STVDS_INPUT;}
+  //!\brief Standard option for space time vector dataset inputs
+  static int GetSTVDSInputsType(){return G_OPT_STVDS_INPUTS;}
+  //!\brief Standard option for space time vector dataset output
+  static int GetSTVDSOutputType(){return G_OPT_STVDS_OUTPUT;}
 
   protected:
   vtkGRASSOptionFactory();

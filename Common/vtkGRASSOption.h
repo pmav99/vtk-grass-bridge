@@ -76,6 +76,7 @@ public:
   void SetLabel(const char *label);
   //!\brief Set the gui section identifier. This string is used to create
   //! specific tabs in the generated gui
+  //! GUI Layout guidance: ';' delimited heirarchical tree position
   void SetGuiSection(const char *guisection);
   //!\brief Set the gispompt string ("old,raster,cell" or "new,vector,vector")
   void SetGisprompt(const char *gisprompt);
@@ -83,6 +84,10 @@ public:
   void SetDefaultOptions(const char *options);
   //!\brief Set the default answer
   void SetDefaultAnswer(char *answer);
+  //!\brief GUI dependency, list of options
+  //! (separated by commas) to be updated
+  //! if the value is changed
+  void SetGuiDependency(const char *guidependency);
 
   //!\brief Set if the option support multiple answers
   void MultipleOn() {VGB_CHECK_OPTION this->option->multiple = 1;}
@@ -140,6 +145,7 @@ protected:
   char *Options;
   char *GuiSection;
   char *GisPrompt;
+  char *GuiDependency;
   //ETX
 
 private:
