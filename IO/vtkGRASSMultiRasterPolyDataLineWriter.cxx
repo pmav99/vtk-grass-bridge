@@ -125,8 +125,8 @@ int vtkGRASSMultiRasterPolyDataLineWriter::RequestData(vtkInformation * vtkNotUs
 			vtkDataArray *array = input->GetCellData()->GetArray(aCount);
 			const char *arrayName = array->GetName();
 
-			// Check if we have the layer array
-			if(strcmp(arrayName, "Layer") == 0)
+			// Write only the provided array name
+			if(G_strcasecmp(arrayName, this->ArrayName) != 0)
 				continue;
 
 			G_snprintf(message, 1024, "vtkGRASSMultiRasterPolyDataLineWriter: "
