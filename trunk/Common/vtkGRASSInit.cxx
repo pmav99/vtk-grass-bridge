@@ -92,6 +92,20 @@ void vtkGRASSInit::Init(const char *name)
 
 //----------------------------------------------------------------------------
 
+int vtkGRASSInit::Overwrite()
+{
+  return G_get_overwrite();
+}
+
+//----------------------------------------------------------------------------
+
+int vtkGRASSInit::Verbosity()
+{
+  return G_verbose();
+}
+
+//----------------------------------------------------------------------------
+
 bool vtkGRASSInit::Parser(vtkStringArray *argv)
 {
 	char **buff = NULL;
@@ -111,6 +125,8 @@ bool vtkGRASSInit::Parser(vtkStringArray *argv)
     // Start the grass command line parser
     if(G_parser(argv->GetNumberOfValues(), buff) < 0)
         return false;
+
+	G_check_overwrite(argv->GetNumberOfValues(), buff);
 
     return true;
 }
