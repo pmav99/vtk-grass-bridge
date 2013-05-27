@@ -231,19 +231,19 @@ bool vtkGRASSRasterMapBase::GetSampleValue(double north, double east, vtkDCELL *
 
 bool vtkGRASSRasterMapBase::GetNearestSampleValue(double north, double east, vtkDCELL *value)
 {
-    return this->GetSampleValue(north, east, value, NEAREST);
+    return this->GetSampleValue(north, east, value, INTERP_NEAREST);
 }
 
 //----------------------------------------------------------------------------
 
 bool vtkGRASSRasterMapBase::GetBilinearSampleValue(double north, double east, vtkDCELL *value)
 {
-    return this->GetSampleValue(north, east, value, BILINEAR);
+    return this->GetSampleValue(north, east, value, INTERP_LINEAR);
 }
 
 //----------------------------------------------------------------------------
 
 bool vtkGRASSRasterMapBase::GetBicubicSampleValue(double north, double east, vtkDCELL *value)
 {
-    return this->GetSampleValue(north, east, value, CUBIC);
+    return this->GetSampleValue(north, east, value, INTERP_CUBIC);
 }
