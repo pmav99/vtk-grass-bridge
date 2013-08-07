@@ -302,6 +302,16 @@ void vtkGRASSVectorPolyDataWriter::AddCellDataToVectorMap(vtkCellData *celldata,
     for(i = 0; i < numcols; i++)
     {
         vtkDataArray *array = celldata->GetArray(i);
+
+        // Skip arrays with more than one component
+        if(array->GetNumberOfComponents() > 1)
+        {
+            vtkWarningMacro(<< "Skipping array " << array->GetName()
+                            << " with " <<  array->GetNumberOfComponents()
+                            << " components");
+            continue;
+        }
+        
         if(!cd->HasArray(array->GetName()))
             cd->AddArray(array);
     }

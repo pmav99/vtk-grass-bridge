@@ -114,10 +114,12 @@ int vtkGRASSMultiRasterPolyDataLineWriter::RequestData(vtkInformation * vtkNotUs
 		if(this->Layer != layer)
 			continue;
 
+		/*
 		G_snprintf(message, 1024, "vtkGRASSMultiRasterPolyDataLineWriter: "
 				"Processing layer %i of %i", lCount + 1,
 				nLayers);
 		talk->Message(message);
+		*/
 
 		for(aCount = 0; aCount < nArrays; aCount++) {
 
@@ -129,10 +131,12 @@ int vtkGRASSMultiRasterPolyDataLineWriter::RequestData(vtkInformation * vtkNotUs
 			if(G_strcasecmp(arrayName, this->ArrayName) != 0)
 				continue;
 
+			/*
 			G_snprintf(message, 1024, "vtkGRASSMultiRasterPolyDataLineWriter: "
 					"(%i of %i) Processing array %s", aCount + 1,
 					nArrays, arrayName);
 			talk->Message(message);
+			*/
 
 			VGB_CREATE(vtkGRASSRasterMapWriter, RasterMap);
 			VGB_CREATE(vtkGRASSRasterMemoryMap, mmap);
