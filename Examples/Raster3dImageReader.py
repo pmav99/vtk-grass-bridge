@@ -14,6 +14,16 @@
 
 #include the VTK and vtkGRASSBridge Python libraries
 from vtk import *
+
+# A small selection of available image filter 
+# for image processing in VTK
+# vtkImageGradient()
+# vtkImageIslandRemoval2D()
+# vtkImageLaplacian()
+# vtkImageMagnitude()
+# vtkImageNormalize()
+# vtkImageSobel2D()
+
 from libvtkGRASSBridgeIOPython import *
 from libvtkGRASSBridgeRasterPython import *
 from libvtkGRASSBridgeCommonPython import *
@@ -34,13 +44,6 @@ rs.SetRaster3dName(name)
 #Use the region of the raster map
 rs.UseRasterRegion()
 rs.Update()
-#Available image filter ofr image processing in VTK
-#filter = vtkImageGradient()
-#filter = vtkImageIslandRemoval2D()
-#filter = vtkImageLaplacian()
-#filter = vtkImageMagnitude()
-#filter = vtkImageNormalize()
-#filter = vtkImageSobel2D()
 #We choose the smooth
 filter = vtkImageGaussianSmooth()
 filter.SetInputConnection(rs.GetOutputPort())
@@ -50,10 +53,9 @@ writer.SetInput(filter.GetOutput())
 writer.SetFileName("/tmp/test.vti")
 writer.Write()
 
-#Choose the first raster map in the list (which is hopefully not empty)
+# Write the generated 3D raster map back to GRASS
 ws = vtkGRASSRaster3dImageWriter()
 ws.SetInput(filter.GetOutput())
 ws.SetRaster3dName("zImageGaussianSmooth")
-#Use the region of the raster map
 ws.UseCurrentRegion()
 ws.Update()
